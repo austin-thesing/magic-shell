@@ -1,9 +1,10 @@
 ---
 interface Props {
   platform?: "bun" | "npm" | "pnpm";
+  variant?: "default" | "compact";
 }
 
-const { platform = "bun" } = Astro.props;
+const { platform = "bun", variant = "default" } = Astro.props;
 
 const commands = {
   bun: "bun add -g @austinthesing/magic-shell",
@@ -12,7 +13,10 @@ const commands = {
 };
 ---
 
-<div class="install-block">
+<div class:list={[
+  "install-block",
+  { compact: variant === "compact" },
+]}>
   <div class="install-tabs" role="tablist">
     <button 
       class:list={["tab", { active: platform === "bun" }]} 
@@ -224,6 +228,42 @@ const commands = {
 
   .copy-btn svg {
     display: block;
+  }
+
+  .install-block.compact {
+    border-radius: var(--radius-md);
+  }
+
+  .install-block.compact .install-tabs {
+    background: rgba(18, 20, 24, 0.7);
+  }
+
+  .install-block.compact .tab {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.65rem;
+    letter-spacing: 0.02em;
+  }
+
+  .install-block.compact .command-wrapper {
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-2);
+  }
+
+  .install-block.compact .command {
+    font-size: var(--text-xs);
+  }
+
+  .install-block.compact .prompt {
+    font-size: 0.75rem;
+  }
+
+  .install-block.compact .copy-btn {
+    padding: 6px;
+  }
+
+  .install-block.compact .copy-btn svg {
+    width: 14px;
+    height: 14px;
   }
 
   @media (max-width: 640px) {
