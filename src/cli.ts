@@ -405,7 +405,7 @@ function getHelpBarContent(): StyledText {
   if (awaitingConfirmation) {
     return t`${fg(theme.colors.warning)(">>> Press Enter to execute command <<<")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.error)("Esc")}${fg(theme.colors.textMuted)(" Cancel")} ${fg(theme.colors.primary)("e")}${fg(theme.colors.textMuted)(" Edit")} ${fg(theme.colors.primary)("c")}${fg(theme.colors.textMuted)(" Copy")}`
   }
-  return t`${fg(theme.colors.textMuted)("Ctrl+X")} ${fg(theme.colors.primary)("P")}${fg(theme.colors.textMuted)(" Palette")}  ${fg(theme.colors.primary)("M")}${fg(theme.colors.textMuted)(" Model")}  ${fg(theme.colors.primary)("T")}${fg(theme.colors.textMuted)(" Theme")}  ${fg(theme.colors.primary)("Y")}${fg(theme.colors.textMuted)(" Safety")}  ${fg(theme.colors.primary)("D")}${fg(theme.colors.textMuted)(" Dry-run")}  ${fg(theme.colors.primary)("?")}${fg(theme.colors.textMuted)(" Help")}`
+  return t`${fg(theme.colors.primary)("Ctrl+X P")}${fg(theme.colors.textMuted)(" Commands")}  ${fg(theme.colors.primary)("Ctrl+Y")}${fg(theme.colors.textMuted)(" Safety")}  ${fg(theme.colors.primary)("Ctrl+Z")}${fg(theme.colors.textMuted)(" Exit")}`
 }
 
 function getWelcomeMessage(): string {
@@ -1005,22 +1005,22 @@ function clearChat() {
 }
 
 function showHelp() {
-  const helpText = `Keyboard Shortcuts (Ctrl+X then...):
+  const helpText = `Direct Shortcuts:
+Ctrl+Y  Cycle safety level (strict/moderate/relaxed)
+Ctrl+Z  Exit magic-shell
+Ctrl+C  Cancel / Close popup
+
+Chord Shortcuts (Ctrl+X then...):
 P  Command palette    M  Change model
 S  Switch provider    D  Toggle dry-run
-T  Change theme       Y  Cycle safety level
-R  Toggle repo context
+T  Change theme       R  Toggle repo context
 H  Show history       L  Clear chat
 C  Show config        ?  This help
-Q  Exit
 
 Safety Levels:
 - strict:   Confirm ALL potentially dangerous commands
 - moderate: Confirm high/critical severity commands (default)
 - relaxed:  Only confirm critical commands
-
-Other:
-Ctrl+C  Exit / Cancel     Esc  Close palette
 
 Tips:
 - Type naturally: "list all files" -> ls -la
@@ -1530,6 +1530,30 @@ function closeCommandPalette() {
 function handleKeypress(key: KeyEvent) {
   const commands = getCommandPaletteOptions()
   
+  // Handle Ctrl+Y - direct safety level toggle (no chord needed)
+  if (key.ctrl && key.name === "y") {
+    // Cycle: moderate -> strict -> relaxed -> moderate
+    const levels: Array<"strict" | "moderate" | "relaxed"> = ["moderate", "strict", "relaxed"]
+    const currentIndex = levels.indexOf(config.safetyLevel)
+    const nextIndex = (currentIndex + 1) % levels.length
+    config.safetyLevel = levels[nextIndex]
+    saveConfig(config)
+    statusBarText.content = getStatusBarContent()
+    const descriptions: Record<string, string> = {
+      strict: "confirms ALL potentially dangerous commands",
+      moderate: "confirms high/critical severity commands",
+      relaxed: "only confirms critical commands",
+    }
+    addSystemMessage(`Safety level: ${config.safetyLevel} (${descriptions[config.safetyLevel]})`)
+    return
+  }
+  
+  // Handle Ctrl+Z - exit the TUI
+  if (key.ctrl && key.name === "z") {
+    renderer.destroy()
+    process.exit(0)
+  }
+  
   // Handle Ctrl+X chord mode
   if (key.ctrl && key.name === "x") {
     chordMode = "ctrl-x"
@@ -1567,7 +1591,7 @@ function handleKeypress(key: KeyEvent) {
     }
   }
 
-  // Global exit - Ctrl+C
+  // Ctrl+C - close popups/cancel operations, but don't exit
   if (key.ctrl && key.name === "c") {
     if (commandPalette) {
       closeCommandPalette()
@@ -1579,12 +1603,26 @@ function handleKeypress(key: KeyEvent) {
       inputField.focus()
       return
     }
+    if (themeSelector) {
+      renderer.root.remove("theme-selector-container")
+      themeSelector = null
+      inputField.focus()
+      return
+    }
+    if (awaitingConfirmation && pendingMessageId) {
+      clearCommandState()
+      addSystemMessage("Command cancelled.")
+      inputField.focus()
+      return
+    }
+    // During initial setup, allow Ctrl+C to exit
     if (providerSelector) {
       renderer.destroy()
       process.exit(0)
     }
-    renderer.destroy()
-    process.exit(0)
+    // Otherwise just show hint about how to exit
+    addSystemMessage("Press Ctrl+Z to exit.")
+    return
   }
 
   // Escape to cancel/close
