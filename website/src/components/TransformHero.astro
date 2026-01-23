@@ -165,6 +165,8 @@
   let tuiIndex = 0;
   let currentMode: 'cli' | 'tui' = 'cli';
   let animationId = 0; // Used to cancel stale animations
+  let cycleCount = 0; // Track cycles to auto-switch modes
+  const CYCLES_BEFORE_SWITCH = 2; // Switch modes after this many examples
 
   // DOM Elements - CLI
   const typingInput = document.getElementById('typing-input');
@@ -183,30 +185,36 @@
   const tabs = document.querySelectorAll('.demo-tab');
   const demos = document.querySelectorAll('.demo-window');
 
+  function switchToMode(mode: 'cli' | 'tui') {
+    if (mode === currentMode) return;
+    
+    currentMode = mode;
+    cycleCount = 0; // Reset cycle count on mode switch
+    
+    tabs.forEach(t => t.classList.remove('active'));
+    const activeTab = document.querySelector(`.demo-tab[data-mode="${mode}"]`);
+    activeTab?.classList.add('active');
+    
+    demos.forEach(d => {
+      if (d.getAttribute('data-demo') === mode) {
+        d.classList.add('active');
+      } else {
+        d.classList.remove('active');
+      }
+    });
+
+    // Reset and start the appropriate demo
+    if (mode === 'cli') {
+      runCliDemo();
+    } else {
+      runTuiDemo();
+    }
+  }
+
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const mode = tab.getAttribute('data-mode') as 'cli' | 'tui';
-      if (mode === currentMode) return;
-      
-      currentMode = mode;
-      
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      
-      demos.forEach(d => {
-        if (d.getAttribute('data-demo') === mode) {
-          d.classList.add('active');
-        } else {
-          d.classList.remove('active');
-        }
-      });
-
-      // Reset and start the appropriate demo
-      if (mode === 'cli') {
-        runCliDemo();
-      } else {
-        runTuiDemo();
-      }
+      switchToMode(mode);
     });
   });
 
@@ -257,7 +265,14 @@
     if (animationId !== myAnimationId) return;
     
     cliIndex = (cliIndex + 1) % cliExamples.length;
-    if (currentMode === 'cli') runCliDemo();
+    cycleCount++;
+    
+    // Auto-switch to TUI mode after a couple cycles
+    if (cycleCount >= CYCLES_BEFORE_SWITCH) {
+      switchToMode('tui');
+    } else if (currentMode === 'cli') {
+      runCliDemo();
+    }
   }
 
   async function runTuiDemo() {
@@ -314,7 +329,14 @@
     if (animationId !== myAnimationId) return;
     
     tuiIndex = (tuiIndex + 1) % tuiExamples.length;
-    if (currentMode === 'tui') runTuiDemo();
+    cycleCount++;
+    
+    // Auto-switch to CLI mode after a couple cycles
+    if (cycleCount >= CYCLES_BEFORE_SWITCH) {
+      switchToMode('cli');
+    } else if (currentMode === 'tui') {
+      runTuiDemo();
+    }
   }
 
   // Start CLI demo on load
