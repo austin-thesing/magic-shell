@@ -1,0 +1,945 @@
+---
+// Hero component with animated typing transformation - CLI and TUI modes
+---
+
+<section class="hero">
+  <div class="hero-bg">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="grid-pattern"></div>
+  </div>
+
+  <div class="hero-content container">
+    <!-- Brand Lockup -->
+    <div class="brand-lockup">
+      <div class="brand-icon">
+        <span class="icon-text">$_</span>
+      </div>
+      <span class="brand-name">magic-shell</span>
+    </div>
+
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      <span>Open Source CLI Tool</span>
+    </div>
+
+    <h1 class="hero-title">
+      Type what you mean.<br/>
+      <span class="highlight">Execute what you need.</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Transform natural language into terminal commands with AI-powered translation 
+      and built-in safety features.
+    </p>
+
+    <div class="hero-demo">
+      <!-- Mode Tabs -->
+      <div class="demo-tabs">
+        <button class="demo-tab active" data-mode="cli">CLI Mode</button>
+        <button class="demo-tab" data-mode="tui">TUI Mode</button>
+      </div>
+
+      <!-- CLI Demo -->
+      <div class="demo-window cli-demo active" data-demo="cli">
+        <div class="demo-header">
+          <div class="demo-lights">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="demo-title">terminal</span>
+        </div>
+        <div class="demo-body">
+          <div class="demo-input-line">
+            <span class="prompt">$</span>
+            <span class="typing-container">
+              <span class="typing-text" id="typing-input"></span>
+              <span class="cursor"></span>
+            </span>
+          </div>
+          <div class="demo-output-line" id="demo-output">
+            <span class="output-arrow">-></span>
+            <span class="output-text" id="output-text"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TUI Demo -->
+      <div class="demo-window tui-demo" data-demo="tui">
+        <div class="demo-header">
+          <div class="demo-lights">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="demo-title">magic-shell</span>
+          <div class="demo-header-right">
+            <span class="model-badge">grok-code</span>
+          </div>
+        </div>
+        <div class="tui-body">
+          <!-- TUI Status Bar -->
+          <div class="tui-status-bar">
+            <span class="status-item"><span class="status-key">Provider:</span> opencode-zen</span>
+            <span class="status-item"><span class="status-key">Model:</span> grok-code</span>
+            <span class="status-item mode-safe"><span class="status-dot"></span> Safe Mode</span>
+          </div>
+
+          <!-- TUI Output Area -->
+          <div class="tui-output">
+            <div class="tui-message user-message" id="tui-user-msg">
+              <span class="msg-prefix">></span>
+              <span class="msg-text" id="tui-query"></span>
+            </div>
+            <div class="tui-message ai-message" id="tui-ai-msg">
+              <div class="ai-response">
+                <div class="response-label">Command:</div>
+                <code class="response-command" id="tui-command"></code>
+              </div>
+              <div class="safety-badge" id="tui-safety">
+                <span class="safety-dot"></span>
+                <span class="safety-text">Low risk</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- TUI Input Area -->
+          <div class="tui-input-area">
+            <span class="tui-prompt">~></span>
+            <span class="tui-input-text" id="tui-input"></span>
+            <span class="tui-cursor"></span>
+          </div>
+
+          <!-- TUI Help Bar -->
+          <div class="tui-help-bar">
+            <span class="help-item"><kbd>Ctrl+X M</kbd> Model</span>
+            <span class="help-item"><kbd>Ctrl+X T</kbd> Theme</span>
+            <span class="help-item"><kbd>Ctrl+X D</kbd> Dry-run</span>
+            <span class="help-item"><kbd>Ctrl+X ?</kbd> Help</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a href="/getting-started/installation/" class="btn btn-primary">
+        Get Started
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+      <a href="https://github.com/austin-thesing/magic-shell" class="btn btn-secondary" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // CLI Examples
+  const cliExamples = [
+    { input: 'msh "find all large files"', output: 'find . -type f -size +100M' },
+    { input: 'msh "undo my last commit"', output: 'git reset --soft HEAD~1' },
+    { input: 'msh "what process uses port 3000"', output: 'lsof -i :3000' },
+    { input: 'msh "compress this folder"', output: 'tar -czvf archive.tar.gz .' },
+    { input: 'msh "show disk usage"', output: 'df -h' },
+  ];
+
+  // TUI Examples
+  const tuiExamples = [
+    { query: 'find files modified today', command: 'find . -mtime 0 -type f', safety: 'Low risk' },
+    { query: 'kill process on port 8080', command: 'kill $(lsof -t -i:8080)', safety: 'Medium risk' },
+    { query: 'show git log with graph', command: 'git log --oneline --graph --all', safety: 'Low risk' },
+    { query: 'list all docker images', command: 'docker images --format "table {{.Repository}}\\t{{.Tag}}\\t{{.Size}}"', safety: 'Low risk' },
+    { query: 'find and delete node_modules', command: 'find . -name "node_modules" -type d -prune -exec rm -rf {} +', safety: 'High risk' },
+  ];
+
+  let cliIndex = 0;
+  let tuiIndex = 0;
+  let currentMode: 'cli' | 'tui' = 'cli';
+  let isAnimating = false;
+
+  // DOM Elements - CLI
+  const typingInput = document.getElementById('typing-input');
+  const outputText = document.getElementById('output-text');
+  const outputLine = document.getElementById('demo-output');
+
+  // DOM Elements - TUI
+  const tuiQuery = document.getElementById('tui-query');
+  const tuiCommand = document.getElementById('tui-command');
+  const tuiInput = document.getElementById('tui-input');
+  const tuiUserMsg = document.getElementById('tui-user-msg');
+  const tuiAiMsg = document.getElementById('tui-ai-msg');
+  const tuiSafety = document.getElementById('tui-safety');
+
+  // Tab switching
+  const tabs = document.querySelectorAll('.demo-tab');
+  const demos = document.querySelectorAll('.demo-window');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const mode = tab.getAttribute('data-mode') as 'cli' | 'tui';
+      if (mode === currentMode) return;
+      
+      currentMode = mode;
+      
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      demos.forEach(d => {
+        if (d.getAttribute('data-demo') === mode) {
+          d.classList.add('active');
+        } else {
+          d.classList.remove('active');
+        }
+      });
+
+      // Reset and start the appropriate demo
+      if (mode === 'cli') {
+        runCliDemo();
+      } else {
+        runTuiDemo();
+      }
+    });
+  });
+
+  async function typeText(element: HTMLElement | null, text: string, speed = 50) {
+    if (!element) return;
+    element.textContent = '';
+    for (let i = 0; i < text.length; i++) {
+      element.textContent += text[i];
+      await new Promise(r => setTimeout(r, speed));
+    }
+  }
+
+  async function runCliDemo() {
+    if (currentMode !== 'cli') return;
+    
+    const example = cliExamples[cliIndex];
+    
+    // Reset
+    outputLine?.classList.remove('visible');
+    if (outputText) outputText.textContent = '';
+    
+    // Type input
+    if (typingInput) {
+      await typeText(typingInput, example.input, 40);
+    }
+
+    if (currentMode !== 'cli') return;
+    
+    // Show output
+    await new Promise(r => setTimeout(r, 500));
+    if (outputText) {
+      outputText.textContent = '';
+      outputLine?.classList.add('visible');
+      await new Promise(r => setTimeout(r, 200));
+      outputText.textContent = example.output;
+    }
+    
+    // Wait before next
+    await new Promise(r => setTimeout(r, 3000));
+    
+    cliIndex = (cliIndex + 1) % cliExamples.length;
+    if (currentMode === 'cli') runCliDemo();
+  }
+
+  async function runTuiDemo() {
+    if (currentMode !== 'tui') return;
+
+    const example = tuiExamples[tuiIndex];
+    
+    // Reset
+    tuiUserMsg?.classList.remove('visible');
+    tuiAiMsg?.classList.remove('visible');
+    if (tuiQuery) tuiQuery.textContent = '';
+    if (tuiCommand) tuiCommand.textContent = '';
+    if (tuiInput) tuiInput.textContent = '';
+
+    // Update safety badge color
+    if (tuiSafety) {
+      tuiSafety.className = 'safety-badge';
+      if (example.safety === 'High risk') {
+        tuiSafety.classList.add('high');
+      } else if (example.safety === 'Medium risk') {
+        tuiSafety.classList.add('medium');
+      } else {
+        tuiSafety.classList.add('low');
+      }
+      const safetyText = tuiSafety.querySelector('.safety-text');
+      if (safetyText) safetyText.textContent = example.safety;
+    }
+
+    // Type in input area
+    await typeText(tuiInput, example.query, 35);
+    
+    if (currentMode !== 'tui') return;
+
+    // Simulate "enter" - move to output
+    await new Promise(r => setTimeout(r, 300));
+    if (tuiInput) tuiInput.textContent = '';
+    
+    // Show user message
+    if (tuiQuery) tuiQuery.textContent = example.query;
+    tuiUserMsg?.classList.add('visible');
+    
+    await new Promise(r => setTimeout(r, 400));
+    if (currentMode !== 'tui') return;
+
+    // Show AI response
+    if (tuiCommand) tuiCommand.textContent = example.command;
+    tuiAiMsg?.classList.add('visible');
+
+    // Wait before next
+    await new Promise(r => setTimeout(r, 4000));
+    
+    tuiIndex = (tuiIndex + 1) % tuiExamples.length;
+    if (currentMode === 'tui') runTuiDemo();
+  }
+
+  // Start CLI demo on load
+  setTimeout(runCliDemo, 1000);
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: var(--space-20) 0;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .gradient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+  }
+
+  .orb-1 {
+    width: 600px;
+    height: 600px;
+    background: var(--color-primary);
+    top: -200px;
+    right: -100px;
+    opacity: 0.15;
+  }
+
+  .orb-2 {
+    width: 400px;
+    height: 400px;
+    background: var(--color-secondary);
+    bottom: -100px;
+    left: -100px;
+    opacity: 0.1;
+  }
+
+  .grid-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(var(--border-subtle) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.3;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 70%);
+  }
+
+  .hero-content {
+    position: relative;
+    text-align: center;
+    max-width: 900px;
+  }
+
+  /* Brand Lockup */
+  .brand-lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+    animation: fadeInUp 0.6s ease forwards;
+  }
+
+  .brand-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--bg-terminal);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-subtle);
+    box-shadow: 
+      0 0 0 1px rgba(250, 178, 131, 0.1),
+      0 4px 24px rgba(0, 0, 0, 0.5),
+      0 0 40px rgba(250, 178, 131, 0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-icon::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(250, 178, 131, 0.1) 0%,
+      transparent 50%
+    );
+    pointer-events: none;
+  }
+
+  .icon-text {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-shadow: 0 0 20px rgba(250, 178, 131, 0.5);
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-name {
+    font-family: var(--font-mono);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    background: linear-gradient(
+      135deg,
+      var(--text-primary) 0%,
+      var(--color-primary) 50%,
+      var(--text-primary) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { background-position: 200% 0; }
+    50% { background-position: 0% 0; }
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-6);
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.1s;
+    opacity: 0;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-success);
+    box-shadow: 0 0 8px var(--color-success);
+  }
+
+  .hero-title {
+    font-size: var(--text-5xl);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: var(--space-6);
+    letter-spacing: -0.03em;
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
+  }
+
+  .hero-title .highlight {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-warning) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto var(--space-10);
+    line-height: 1.7;
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.3s;
+    opacity: 0;
+  }
+
+  /* Demo Tabs */
+  .hero-demo {
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.4s;
+    opacity: 0;
+  }
+
+  .demo-tabs {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .demo-tab {
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .demo-tab:hover {
+    color: var(--text-secondary);
+  }
+
+  .demo-tab.active {
+    color: var(--color-primary);
+    background: var(--bg-elevated);
+    border-color: var(--border-subtle);
+  }
+
+  /* Demo Window */
+  .hero-demo {
+    margin-bottom: var(--space-10);
+  }
+
+  .demo-window {
+    background: var(--bg-terminal);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    text-align: left;
+    max-width: 650px;
+    margin: 0 auto;
+    box-shadow: var(--shadow-deep), var(--shadow-glow);
+    display: none;
+  }
+
+  .demo-window.active {
+    display: block;
+  }
+
+  .demo-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .demo-header-right {
+    margin-left: auto;
+  }
+
+  .model-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-primary);
+    background: rgba(250, 178, 131, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(250, 178, 131, 0.2);
+  }
+
+  .demo-lights {
+    display: flex;
+    gap: 6px;
+  }
+
+  .demo-lights span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .demo-lights span:nth-child(1) { background: #ff5f56; }
+  .demo-lights span:nth-child(2) { background: #ffbd2e; }
+  .demo-lights span:nth-child(3) { background: #27ca3f; }
+
+  .demo-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  /* CLI Demo */
+  .demo-body {
+    padding: var(--space-5) var(--space-6);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    min-height: 100px;
+  }
+
+  .demo-input-line {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .prompt {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .typing-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .typing-text {
+    color: var(--text-primary);
+  }
+
+  .cursor {
+    width: 8px;
+    height: 18px;
+    background: var(--color-primary);
+    margin-left: 2px;
+    animation: blink 1s step-end infinite;
+  }
+
+  .demo-output-line {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.3s ease;
+  }
+
+  .demo-output-line.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .output-arrow {
+    color: var(--color-success);
+  }
+
+  .output-text {
+    color: var(--text-secondary);
+  }
+
+  /* TUI Demo */
+  .tui-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 280px;
+  }
+
+  .tui-status-bar {
+    display: flex;
+    gap: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: 10px;
+  }
+
+  .status-item {
+    color: var(--text-muted);
+  }
+
+  .status-key {
+    color: var(--text-dim);
+  }
+
+  .mode-safe {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-success);
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-success);
+  }
+
+  .tui-output {
+    flex: 1;
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    overflow: hidden;
+  }
+
+  .tui-message {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+  }
+
+  .tui-message.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .user-message {
+    display: flex;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .msg-prefix {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .msg-text {
+    color: var(--text-primary);
+  }
+
+  .ai-message {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+  }
+
+  .ai-response {
+    margin-bottom: var(--space-2);
+  }
+
+  .response-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .response-command {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-secondary);
+    background: none;
+    padding: 0;
+    word-break: break-all;
+  }
+
+  .safety-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .safety-badge.low {
+    color: var(--color-success);
+    background: rgba(127, 216, 143, 0.1);
+  }
+
+  .safety-badge.medium {
+    color: var(--color-warning);
+    background: rgba(245, 167, 66, 0.1);
+  }
+
+  .safety-badge.high {
+    color: var(--color-error);
+    background: rgba(224, 108, 117, 0.1);
+  }
+
+  .safety-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .tui-input-area {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .tui-prompt {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .tui-input-text {
+    color: var(--text-primary);
+  }
+
+  .tui-cursor {
+    width: 8px;
+    height: 16px;
+    background: var(--color-primary);
+    animation: blink 1s step-end infinite;
+  }
+
+  .tui-help-bar {
+    display: flex;
+    gap: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: 10px;
+  }
+
+  .help-item {
+    color: var(--text-dim);
+  }
+
+  .help-item kbd {
+    color: var(--text-muted);
+    background: var(--bg-surface);
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin-right: 4px;
+  }
+
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  /* Actions */
+  .hero-actions {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.5s;
+    opacity: 0;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--bg-void);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-primary-dim);
+    color: var(--bg-void);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px var(--color-primary-glow);
+  }
+
+  .btn-secondary {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--border-active);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+  }
+
+  .btn svg {
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding: var(--space-16) 0;
+      min-height: auto;
+    }
+
+    .brand-lockup {
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+    }
+
+    .icon-text {
+      font-size: 18px;
+    }
+
+    .hero-title {
+      font-size: var(--text-3xl);
+    }
+
+    .hero-subtitle {
+      font-size: var(--text-base);
+    }
+
+    .demo-body {
+      padding: var(--space-4);
+      font-size: var(--text-xs);
+    }
+
+    .tui-help-bar {
+      display: none;
+    }
+
+    .tui-status-bar {
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .btn {
+      width: 100%;
+      max-width: 280px;
+      justify-content: center;
+    }
+  }
+</style>
