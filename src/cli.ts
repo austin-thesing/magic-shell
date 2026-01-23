@@ -8,6 +8,7 @@ import {
   InputRenderableEvents,
   SelectRenderable,
   SelectRenderableEvents,
+  ScrollBoxRenderable,
   type CliRenderer,
   type KeyEvent,
   type SelectOption,
@@ -27,6 +28,8 @@ import {
   type CommandHistory,
   type Config,
   type Provider,
+  type ChatMessage,
+  type SafetyAnalysis,
 } from "./lib/types"
 import { loadConfig, saveConfig, getApiKey, setApiKey, loadHistory, addToHistory } from "./lib/config"
 import { analyzeCommand, getSeverityColor } from "./lib/safety"
@@ -41,24 +44,29 @@ let history: CommandHistory[] = []
 let currentCwd = getCwd()
 let dryRunMode = false
 
+// Chat state
+let chatMessages: ChatMessage[] = []
+let messageIdCounter = 0
+let selectedMessageIndex = -1 // -1 means input is focused, >= 0 means a message is selected
+
 // UI Elements
 let mainContainer: BoxRenderable
 let headerText: TextRenderable
-let cwdText: TextRenderable
-let modelText: TextRenderable
+let statusBarText: TextRenderable
+let chatScrollBox: ScrollBoxRenderable
 let inputField: InputRenderable
-let outputContainer: BoxRenderable
-let outputText: TextRenderable
-let statusText: TextRenderable
-let commandPreview: TextRenderable
-let safetyWarning: TextRenderable
-let confirmPrompt: BoxRenderable
+let helpBarText: TextRenderable
 let modelSelector: SelectRenderable | null = null
 let providerSelector: SelectRenderable | null = null
 
-// Pending command state
-let pendingCommand: string | null = null
+// Pending command state (for the most recent assistant message awaiting confirmation)
+let pendingMessageId: string | null = null
 let awaitingConfirmation = false
+
+// Helper to generate message IDs
+function generateMessageId(): string {
+  return `msg-${++messageIdCounter}`
+}
 
 async function main() {
   config = loadConfig()
@@ -257,7 +265,7 @@ ${fg("#64748b")("Press Enter to save | Ctrl+C to exit")}`,
 function createMainUI() {
   const theme = getTheme()
   
-  // Main container
+  // Main container - full screen flex column
   mainContainer = new BoxRenderable(renderer, {
     id: "main-container",
     flexDirection: "column",
@@ -267,57 +275,82 @@ function createMainUI() {
   })
   renderer.root.add(mainContainer)
 
-  // Header row
+  // === Header Row ===
   const headerRow = new BoxRenderable(renderer, {
     id: "header-row",
     flexDirection: "row",
     width: "100%",
+    alignItems: "center",
     marginBottom: 1,
   })
   mainContainer.add(headerRow)
 
   headerText = new TextRenderable(renderer, {
     id: "header-text",
-    content: t`${bold(fg(theme.colors.primary)("magic-shell"))} ${fg(theme.colors.textMuted)("- natural language to terminal commands")}`,
+    content: t`${bold(fg(theme.colors.primary)("magic-shell"))}`,
     flexGrow: 1,
   })
   headerRow.add(headerText)
 
-  // Status indicators
-  const statusRow = new BoxRenderable(renderer, {
-    id: "status-row",
-    flexDirection: "row",
-    width: "100%",
-    marginBottom: 1,
-  })
-  mainContainer.add(statusRow)
-
-  cwdText = new TextRenderable(renderer, {
-    id: "cwd-text",
-    content: t`${fg(theme.colors.textMuted)("cwd:")} ${fg(theme.colors.success)(currentCwd)}`,
-    flexGrow: 1,
-  })
-  statusRow.add(cwdText)
-
-  modelText = new TextRenderable(renderer, {
-    id: "model-text",
+  // Model badge on the right
+  const modelBadge = new TextRenderable(renderer, {
+    id: "model-badge",
     content: getModelDisplay(),
   })
-  statusRow.add(modelText)
+  headerRow.add(modelBadge)
 
-  // Input area
+  // === Status Bar (provider, model info, safe indicator) ===
+  statusBarText = new TextRenderable(renderer, {
+    id: "status-bar-text",
+    content: getStatusBarContent(),
+    marginBottom: 1,
+  })
+  mainContainer.add(statusBarText)
+
+  // === Chat History (scrollable) ===
+  chatScrollBox = new ScrollBoxRenderable(renderer, {
+    id: "chat-scroll-box",
+    flexGrow: 1,
+    width: "100%",
+    scrollY: true,
+    scrollX: false,
+    stickyScroll: true,
+    stickyStart: "bottom",
+    rootOptions: {
+      border: true,
+      borderColor: theme.colors.border,
+      borderStyle: "single",
+    },
+    viewportOptions: {
+      backgroundColor: theme.colors.background,
+      paddingLeft: 1,
+      paddingRight: 1,
+      paddingTop: 1,
+    },
+    contentOptions: {
+      flexDirection: "column",
+      gap: 1,
+    },
+  })
+  mainContainer.add(chatScrollBox)
+
+  // Add welcome message
+  addSystemMessage(getWelcomeMessage())
+
+  // === Input Row (at bottom) ===
   const inputRow = new BoxRenderable(renderer, {
     id: "input-row",
     flexDirection: "row",
     width: "100%",
-    marginBottom: 1,
+    marginTop: 1,
+    alignItems: "center",
   })
   mainContainer.add(inputRow)
 
   const promptText = new TextRenderable(renderer, {
     id: "prompt-text",
-    content: t`${fg(theme.colors.success)(">")} `,
-    width: 2,
+    content: t`${fg(theme.colors.primary)("~>")} `,
+    width: 3,
   })
   inputRow.add(promptText)
 
@@ -331,80 +364,336 @@ function createMainUI() {
     textColor: theme.colors.text,
     placeholderColor: theme.colors.textMuted,
     cursorColor: theme.colors.primary,
-    // Enable paste support
     onPaste: (event) => {
       inputField.insertText(event.text)
     },
   })
   inputRow.add(inputField)
 
-  // Command preview
-  commandPreview = new TextRenderable(renderer, {
-    id: "command-preview",
-    content: "",
-    marginBottom: 1,
-  })
-  mainContainer.add(commandPreview)
-
-  // Safety warning
-  safetyWarning = new TextRenderable(renderer, {
-    id: "safety-warning",
-    content: "",
-  })
-  mainContainer.add(safetyWarning)
-
-  // Confirmation prompt (hidden by default)
-  confirmPrompt = new BoxRenderable(renderer, {
-    id: "confirm-prompt",
-    flexDirection: "row",
-    visible: false,
-    marginBottom: 1,
-  })
-  mainContainer.add(confirmPrompt)
-
-  const confirmText = new TextRenderable(renderer, {
-    id: "confirm-text",
-    content: t`${fg(theme.colors.warning)("[Enter] Execute")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.error)("[Esc] Cancel")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.primary)("[e] Edit")}`,
-  })
-  confirmPrompt.add(confirmText)
-
-  // Output area
-  outputContainer = new BoxRenderable(renderer, {
-    id: "output-container",
-    flexGrow: 1,
-    border: true,
-    borderColor: theme.colors.border,
-    borderStyle: "single",
-    title: "Output",
-    padding: 1,
-  })
-  mainContainer.add(outputContainer)
-
-  const providerName = config.provider === "opencode-zen" ? "OpenCode Zen" : "OpenRouter"
-  const freeModelsNote = config.provider === "opencode-zen" ? `\n${fg(theme.colors.success)("Free models available!")} Try: grok-code, glm-4.7-free` : ""
-
-  outputText = new TextRenderable(renderer, {
-    id: "output-text",
-    content: t`${fg(theme.colors.textMuted)(`Ready. Using ${providerName}.`)}${freeModelsNote}
-
-${fg(theme.colors.textMuted)("Type what you want to do, or press")} ${fg(theme.colors.primary)("Ctrl+X P")} ${fg(theme.colors.textMuted)("for command palette.")}`,
-  })
-  outputContainer.add(outputText)
-
-  // Status bar
-  statusText = new TextRenderable(renderer, {
-    id: "status-text",
-    content: getDryRunStatus(),
+  // === Help Bar (bottom) ===
+  helpBarText = new TextRenderable(renderer, {
+    id: "help-bar-text",
+    content: getHelpBarContent(),
     marginTop: 1,
   })
-  mainContainer.add(statusText)
+  mainContainer.add(helpBarText)
 
   // Event handlers
   inputField.on(InputRenderableEvents.ENTER, handleInput)
-
   renderer.keyInput.on("keypress", handleKeypress)
 
   inputField.focus()
+}
+
+// === Chat Message Rendering Helpers ===
+
+function getStatusBarContent(): StyledText {
+  const theme = getTheme()
+  const providerName = config.provider === "opencode-zen" ? "OpenCode Zen" : "OpenRouter"
+  const safeModeIndicator = dryRunMode 
+    ? fg(theme.colors.warning)("[DRY RUN]")
+    : fg(theme.colors.success)("Safe")
+  
+  return t`${fg(theme.colors.textMuted)("Provider:")} ${fg(theme.colors.text)(providerName)}  ${fg(theme.colors.textMuted)("Model:")} ${fg(theme.colors.text)(currentModel.name)}  ${safeModeIndicator}`
+}
+
+function getHelpBarContent(): StyledText {
+  const theme = getTheme()
+  if (awaitingConfirmation) {
+    return t`${fg(theme.colors.warning)("[Enter] Run")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.error)("[Esc] Cancel")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.primary)("[e] Edit")}`
+  }
+  return t`${fg(theme.colors.textMuted)("Ctrl+X")} ${fg(theme.colors.primary)("P")}${fg(theme.colors.textMuted)(" Palette")}  ${fg(theme.colors.primary)("M")}${fg(theme.colors.textMuted)(" Model")}  ${fg(theme.colors.primary)("T")}${fg(theme.colors.textMuted)(" Theme")}  ${fg(theme.colors.primary)("D")}${fg(theme.colors.textMuted)(" Dry-run")}  ${fg(theme.colors.primary)("?")}${fg(theme.colors.textMuted)(" Help")}`
+}
+
+function getWelcomeMessage(): string {
+  const providerName = config.provider === "opencode-zen" ? "OpenCode Zen" : "OpenRouter"
+  const freeNote = config.provider === "opencode-zen" 
+    ? "\nFree models: grok-code, glm-4.7-free" 
+    : ""
+  return `Ready. Using ${providerName}.${freeNote}\nType what you want to do, or press Ctrl+X P for command palette.`
+}
+
+function addSystemMessage(content: string): ChatMessage {
+  const msg: ChatMessage = {
+    id: generateMessageId(),
+    type: "system",
+    content,
+    timestamp: Date.now(),
+  }
+  chatMessages.push(msg)
+  renderMessage(msg)
+  return msg
+}
+
+function addUserMessage(content: string): ChatMessage {
+  const msg: ChatMessage = {
+    id: generateMessageId(),
+    type: "user",
+    content,
+    timestamp: Date.now(),
+  }
+  chatMessages.push(msg)
+  renderMessage(msg)
+  return msg
+}
+
+function addAssistantMessage(content: string, command: string, safety: SafetyAnalysis): ChatMessage {
+  const msg: ChatMessage = {
+    id: generateMessageId(),
+    type: "assistant",
+    content,
+    command,
+    safety,
+    timestamp: Date.now(),
+    executed: false,
+  }
+  chatMessages.push(msg)
+  renderMessage(msg)
+  return msg
+}
+
+function addResultMessage(content: string, exitCode?: number): ChatMessage {
+  const msg: ChatMessage = {
+    id: generateMessageId(),
+    type: "result",
+    content,
+    timestamp: Date.now(),
+    exitCode,
+  }
+  chatMessages.push(msg)
+  renderMessage(msg)
+  return msg
+}
+
+function renderMessage(msg: ChatMessage): void {
+  const theme = getTheme()
+  const msgBox = createMessageRenderable(msg, theme)
+  chatScrollBox.add(msgBox)
+}
+
+function createMessageRenderable(msg: ChatMessage, theme: ReturnType<typeof getTheme>): BoxRenderable {
+  switch (msg.type) {
+    case "user":
+      return createUserMessageRenderable(msg, theme)
+    case "assistant":
+      return createAssistantMessageRenderable(msg, theme)
+    case "result":
+      return createResultMessageRenderable(msg, theme)
+    case "system":
+    default:
+      return createSystemMessageRenderable(msg, theme)
+  }
+}
+
+function createUserMessageRenderable(msg: ChatMessage, theme: ReturnType<typeof getTheme>): BoxRenderable {
+  const box = new BoxRenderable(renderer, {
+    id: `msg-${msg.id}`,
+    flexDirection: "row",
+    width: "100%",
+  })
+  
+  const text = new TextRenderable(renderer, {
+    id: `msg-${msg.id}-text`,
+    content: t`${fg(theme.colors.success)(">")} ${fg(theme.colors.text)(msg.content)}`,
+  })
+  box.add(text)
+  
+  return box
+}
+
+function createAssistantMessageRenderable(msg: ChatMessage, theme: ReturnType<typeof getTheme>): BoxRenderable {
+  const isSelected = pendingMessageId === msg.id
+  
+  // Card container
+  const card = new BoxRenderable(renderer, {
+    id: `msg-${msg.id}`,
+    flexDirection: "column",
+    width: "100%",
+    border: true,
+    borderColor: isSelected ? theme.colors.primary : theme.colors.border,
+    borderStyle: "single",
+    paddingLeft: 1,
+    paddingRight: 1,
+    paddingTop: 0,
+    paddingBottom: 0,
+    backgroundColor: theme.colors.backgroundPanel,
+  })
+  
+  // Command line
+  const commandText = new TextRenderable(renderer, {
+    id: `msg-${msg.id}-cmd`,
+    content: t`${fg(theme.colors.textMuted)("Command:")} ${fg(theme.colors.text)(msg.command || "")}`,
+  })
+  card.add(commandText)
+  
+  // Safety badge
+  if (msg.safety) {
+    const severityColor = getSeverityColor(msg.safety.severity)
+    const severityText = msg.safety.isDangerous 
+      ? `${msg.safety.severity.toUpperCase()} risk${msg.safety.reason ? ` - ${msg.safety.reason}` : ""}`
+      : "Low risk"
+    
+    const safetyText = new TextRenderable(renderer, {
+      id: `msg-${msg.id}-safety`,
+      content: t`${fg(severityColor)("●")} ${fg(theme.colors.textMuted)(severityText)}`,
+    })
+    card.add(safetyText)
+  }
+  
+  // Actions hint (only if awaiting confirmation for this message)
+  if (isSelected && !msg.executed) {
+    const actionsText = new TextRenderable(renderer, {
+      id: `msg-${msg.id}-actions`,
+      content: t`${fg(theme.colors.warning)("[Enter]")} ${fg(theme.colors.textMuted)("Run")}  ${fg(theme.colors.primary)("[c]")} ${fg(theme.colors.textMuted)("Copy")}  ${fg(theme.colors.primary)("[e]")} ${fg(theme.colors.textMuted)("Edit")}`,
+    })
+    card.add(actionsText)
+  }
+  
+  // Executed badge
+  if (msg.executed) {
+    const execText = new TextRenderable(renderer, {
+      id: `msg-${msg.id}-exec`,
+      content: t`${fg(theme.colors.success)("Executed")}`,
+    })
+    card.add(execText)
+  }
+  
+  return card
+}
+
+function createResultMessageRenderable(msg: ChatMessage, theme: ReturnType<typeof getTheme>): BoxRenderable {
+  const isSuccess = msg.exitCode === undefined || msg.exitCode === 0
+  const isExpanded = msg.expanded ?? false
+  const hasOutput = msg.content && msg.content.trim().length > 0
+  const outputLines = hasOutput ? msg.content.trim().split("\n") : []
+  const isLongOutput = outputLines.length > 5
+  const PREVIEW_LINES = 3
+  
+  const card = new BoxRenderable(renderer, {
+    id: `msg-${msg.id}`,
+    flexDirection: "column",
+    width: "100%",
+    border: true,
+    borderColor: isSuccess ? theme.colors.success : theme.colors.error,
+    borderStyle: "single",
+    paddingLeft: 1,
+    paddingRight: 1,
+    backgroundColor: theme.colors.backgroundPanel,
+    // Click to expand/collapse
+    onMouseDown: isLongOutput ? () => {
+      toggleResultExpand(msg.id)
+    } : undefined,
+  })
+  
+  // Status line with expand/collapse indicator
+  const statusIcon = isSuccess ? "✓" : "✗"
+  const statusColor = isSuccess ? theme.colors.success : theme.colors.error
+  const statusLabel = isSuccess ? "Executed successfully" : `Exit code: ${msg.exitCode}`
+  const expandIcon = isLongOutput ? (isExpanded ? "▼" : "▶") : ""
+  const lineCount = isLongOutput ? ` (${outputLines.length} lines)` : ""
+  
+  const statusText = new TextRenderable(renderer, {
+    id: `msg-${msg.id}-status`,
+    content: t`${fg(statusColor)(statusIcon)} ${fg(theme.colors.text)(statusLabel)}${fg(theme.colors.textMuted)(lineCount)} ${fg(theme.colors.primary)(expandIcon)}`,
+  })
+  card.add(statusText)
+  
+  // Output display
+  if (hasOutput) {
+    let displayContent: string
+    
+    if (isExpanded || !isLongOutput) {
+      // Show full output
+      displayContent = msg.content.trim()
+    } else {
+      // Show preview with truncation indicator
+      const previewLines = outputLines.slice(0, PREVIEW_LINES)
+      displayContent = previewLines.join("\n") + `\n... ${outputLines.length - PREVIEW_LINES} more lines`
+    }
+    
+    const outputText = new TextRenderable(renderer, {
+      id: `msg-${msg.id}-output`,
+      content: t`${fg(theme.colors.textMuted)(displayContent)}`,
+    })
+    card.add(outputText)
+    
+    // Show expand/collapse hint for long output
+    if (isLongOutput) {
+      const hintText = new TextRenderable(renderer, {
+        id: `msg-${msg.id}-hint`,
+        content: t`${fg(theme.colors.primary)("[o]")} ${fg(theme.colors.textMuted)(isExpanded ? "Collapse" : "Expand output")}`,
+      })
+      card.add(hintText)
+    }
+  }
+  
+  return card
+}
+
+function createSystemMessageRenderable(msg: ChatMessage, theme: ReturnType<typeof getTheme>): BoxRenderable {
+  const box = new BoxRenderable(renderer, {
+    id: `msg-${msg.id}`,
+    flexDirection: "column",
+    width: "100%",
+  })
+  
+  const text = new TextRenderable(renderer, {
+    id: `msg-${msg.id}-text`,
+    content: t`${fg(theme.colors.textMuted)(msg.content)}`,
+  })
+  box.add(text)
+  
+  return box
+}
+
+function updateAssistantMessage(msgId: string, updates: Partial<ChatMessage>): void {
+  const msgIndex = chatMessages.findIndex(m => m.id === msgId)
+  if (msgIndex === -1) return
+  
+  const msg = chatMessages[msgIndex]
+  Object.assign(msg, updates)
+  
+  // Re-render the message by removing and re-adding
+  chatScrollBox.remove(`msg-${msgId}`)
+  const theme = getTheme()
+  const newBox = createMessageRenderable(msg, theme)
+  // Insert at correct position (after user message)
+  chatScrollBox.add(newBox)
+}
+
+function updateResultMessage(msgId: string, updates: Partial<ChatMessage>): void {
+  const msgIndex = chatMessages.findIndex(m => m.id === msgId)
+  if (msgIndex === -1) return
+  
+  const msg = chatMessages[msgIndex]
+  Object.assign(msg, updates)
+  
+  // Re-render the message
+  chatScrollBox.remove(`msg-${msgId}`)
+  const theme = getTheme()
+  const newBox = createMessageRenderable(msg, theme)
+  chatScrollBox.add(newBox)
+}
+
+function toggleResultExpand(msgId: string): void {
+  const msg = chatMessages.find(m => m.id === msgId)
+  if (!msg || msg.type !== "result") return
+  
+  // Only toggle if it has content worth expanding
+  const outputLines = msg.content?.trim().split("\n") || []
+  if (outputLines.length <= 5) return // Not long enough to need expand
+  
+  // Toggle expanded state
+  updateResultMessage(msgId, { expanded: !msg.expanded })
+}
+
+function toggleLastResultExpand(): void {
+  // Find the most recent result message
+  const resultMessages = chatMessages.filter(m => m.type === "result")
+  if (resultMessages.length === 0) return
+  
+  const lastResult = resultMessages[resultMessages.length - 1]
+  toggleResultExpand(lastResult.id)
 }
 
 function getModelDisplay(): StyledText {
@@ -420,14 +709,6 @@ function getModelDisplay(): StyledText {
   return t`${providerBadge} ${fg(categoryColor)(currentModel.name)}${freeBadge}`
 }
 
-function getDryRunStatus(): StyledText {
-  const theme = getTheme()
-  if (dryRunMode) {
-    return t`${fg(theme.colors.warning)("[DRY RUN]")} ${fg(theme.colors.textMuted)("Ctrl+X P palette | Ctrl+X M model | Ctrl+X D dry-run")}`
-  }
-  return t`${fg(theme.colors.textMuted)("Ctrl+X P palette | Ctrl+X M model | Ctrl+X ? help")}`
-}
-
 // Refresh all UI elements with current theme colors
 function refreshThemeColors() {
   const theme = getTheme()
@@ -437,27 +718,24 @@ function refreshThemeColors() {
   
   // Update header
   if (headerText) {
-    headerText.content = t`${bold(fg(theme.colors.primary)("magic-shell"))} ${fg(theme.colors.textMuted)("- natural language to terminal commands")}`
-  }
-  
-  // Update cwd display
-  if (cwdText) {
-    cwdText.content = t`${fg(theme.colors.textMuted)("cwd:")} ${fg(theme.colors.success)(currentCwd)}`
-  }
-  
-  // Update model display
-  if (modelText) {
-    modelText.content = getModelDisplay()
+    headerText.content = t`${bold(fg(theme.colors.primary)("magic-shell"))}`
   }
   
   // Update status bar
-  if (statusText) {
-    statusText.content = getDryRunStatus()
+  if (statusBarText) {
+    statusBarText.content = getStatusBarContent()
   }
   
-  // Update output container border
-  if (outputContainer) {
-    outputContainer.borderColor = theme.colors.border
+  // Update help bar
+  if (helpBarText) {
+    helpBarText.content = getHelpBarContent()
+  }
+  
+  // Update chat scroll box border
+  if (chatScrollBox) {
+    chatScrollBox.rootOptions = {
+      borderColor: theme.colors.border,
+    }
   }
   
   // Update input field colors
@@ -466,16 +744,6 @@ function refreshThemeColors() {
     inputField.textColor = theme.colors.text
     inputField.placeholderColor = theme.colors.textMuted
     inputField.cursorColor = theme.colors.primary
-  }
-  
-  // Update the welcome message
-  const providerName = config.provider === "opencode-zen" ? "OpenCode Zen" : "OpenRouter"
-  const freeModelsNote = config.provider === "opencode-zen" ? `\n${fg(theme.colors.success)("Free models available!")} Try: grok-code, glm-4.7-free` : ""
-  
-  if (outputText) {
-    outputText.content = t`${fg(theme.colors.textMuted)(`Ready. Using ${providerName}.`)}${freeModelsNote}
-
-${fg(theme.colors.textMuted)("Type what you want to do, or press")} ${fg(theme.colors.primary)("Ctrl+X P")} ${fg(theme.colors.textMuted)("for command palette.")}`
   }
 }
 
@@ -491,9 +759,12 @@ async function handleInput(value: string) {
     return
   }
 
+  // Add user message to chat
+  addUserMessage(input)
+
   // Check if it looks like a direct shell command
   if (isDirectCommand(input)) {
-    await processCommand(input, input)
+    await processDirectCommand(input, input)
     return
   }
 
@@ -536,37 +807,62 @@ function isDirectCommand(input: string): boolean {
 async function translateAndProcess(input: string) {
   const apiKey = await getApiKey(config.provider)
   if (!apiKey) {
-    setOutput(t`${fg("#ef4444")("Error: No API key configured. Run !provider to set up.")}`)
+    addSystemMessage("Error: No API key configured. Run !provider to set up.")
     return
   }
 
-  setOutput(t`${fg("#64748b")("Translating...")}`)
+  // Show a temporary "translating" system message
+  const loadingMsg = addSystemMessage("Translating...")
 
   try {
     const command = await translateToCommand(apiKey, currentModel, input, currentCwd, history)
 
-    commandPreview.content = t`${fg("#64748b")("Command:")} ${fg("#f8fafc")(command)}`
+    // Remove the loading message
+    chatScrollBox.remove(`msg-${loadingMsg.id}`)
+    chatMessages = chatMessages.filter(m => m.id !== loadingMsg.id)
 
     // Analyze safety
     const safety = analyzeCommand(command, config)
 
+    // Add assistant message with the translated command
+    const assistantMsg = addAssistantMessage(input, command, safety)
+
     if (safety.isDangerous) {
-      safetyWarning.content = t`${fg(getSeverityColor(safety.severity))(`[${safety.severity.toUpperCase()}] ${safety.reason}`)}`
-      pendingCommand = command
+      // Mark this message as pending confirmation
+      pendingMessageId = assistantMsg.id
       awaitingConfirmation = true
-      confirmPrompt.visible = true
-      setOutput(t`${fg("#fbbf24")("Command requires confirmation. Press Enter to execute or Esc to cancel.")}`)
+      helpBarText.content = getHelpBarContent()
     } else {
-      safetyWarning.content = ""
-      await processCommand(input, command)
+      // Safe command - execute immediately
+      await executeAndShowResult(input, command, assistantMsg.id)
     }
   } catch (error) {
+    // Remove loading message on error
+    chatScrollBox.remove(`msg-${loadingMsg.id}`)
+    chatMessages = chatMessages.filter(m => m.id !== loadingMsg.id)
+    
     const message = error instanceof Error ? error.message : String(error)
-    setOutput(t`${fg("#ef4444")(`Error: ${message}`)}`)
+    addSystemMessage(`Error: ${message}`)
   }
 }
 
-async function processCommand(input: string, command: string) {
+// Process a direct shell command (not translated)
+async function processDirectCommand(input: string, command: string) {
+  // Analyze safety even for direct commands
+  const safety = analyzeCommand(command, config)
+  const assistantMsg = addAssistantMessage(input, command, safety)
+  
+  if (safety.isDangerous) {
+    pendingMessageId = assistantMsg.id
+    awaitingConfirmation = true
+    helpBarText.content = getHelpBarContent()
+  } else {
+    await executeAndShowResult(input, command, assistantMsg.id)
+  }
+}
+
+// Execute a command and show result in chat
+async function executeAndShowResult(input: string, command: string, assistantMsgId: string) {
   // Handle cd specially
   if (command.startsWith("cd ")) {
     const path = command.slice(3).trim().replace(/^["']|["']$/g, "")
@@ -574,8 +870,11 @@ async function processCommand(input: string, command: string) {
       const expandedPath = path.startsWith("~") ? path.replace("~", process.env.HOME || "") : path
       process.chdir(expandedPath)
       currentCwd = getCwd()
-      cwdText.content = t`${fg("#64748b")("cwd:")} ${fg("#22c55e")(currentCwd)}`
-      setOutput(t`${fg("#22c55e")(`Changed directory to ${currentCwd}`)}`)
+      
+      // Update status bar with new cwd info
+      statusBarText.content = getStatusBarContent()
+      
+      addResultMessage(`Changed directory to ${currentCwd}`, 0)
 
       addToHistory({
         input,
@@ -584,42 +883,52 @@ async function processCommand(input: string, command: string) {
         timestamp: Date.now(),
       })
       history = loadHistory()
+      
+      // Mark assistant message as executed
+      updateAssistantMessage(assistantMsgId, { executed: true })
     } catch (err) {
-      setOutput(t`${fg("#ef4444")(`cd: ${err instanceof Error ? err.message : String(err)}`)}`)
+      addResultMessage(`cd: ${err instanceof Error ? err.message : String(err)}`, 1)
     }
     clearCommandState()
     return
   }
 
   if (dryRunMode) {
-    setOutput(t`${fg("#fbbf24")("[DRY RUN]")} Would execute: ${fg("#f8fafc")(command)}`)
+    addResultMessage(`[DRY RUN] Would execute: ${command}`, 0)
+    updateAssistantMessage(assistantMsgId, { executed: true })
     clearCommandState()
     return
   }
 
   // Execute command
-  setOutput(t`${fg("#64748b")("Executing...")}`)
-
   try {
-    const result = await executeCommand(command)
-    setOutput(result || t`${fg("#22c55e")("Command completed successfully")}`)
+    const { output, exitCode } = await executeCommandWithCode(command)
+    addResultMessage(output || "Command completed successfully", exitCode)
 
     addToHistory({
       input,
       command,
-      output: result.slice(0, 500),
+      output: output.slice(0, 500),
       timestamp: Date.now(),
     })
     history = loadHistory()
+    
+    // Mark assistant message as executed
+    updateAssistantMessage(assistantMsgId, { executed: true })
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    setOutput(t`${fg("#ef4444")(`Error: ${message}`)}`)
+    addResultMessage(`Error: ${message}`, 1)
   }
 
   clearCommandState()
 }
 
-function executeCommand(command: string): Promise<string> {
+interface CommandResult {
+  output: string
+  exitCode: number
+}
+
+function executeCommandWithCode(command: string): Promise<CommandResult> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, {
       shell: true,
@@ -643,25 +952,17 @@ function executeCommand(command: string): Promise<string> {
     })
 
     child.on("close", (code) => {
-      if (code === 0) {
-        resolve(stdout || stderr)
-      } else {
-        resolve(stderr || stdout || `Command exited with code ${code}`)
-      }
+      const exitCode = code ?? 0
+      const output = stdout || stderr || (exitCode === 0 ? "" : `Command exited with code ${exitCode}`)
+      resolve({ output, exitCode })
     })
   })
 }
 
 function clearCommandState() {
-  pendingCommand = null
+  pendingMessageId = null
   awaitingConfirmation = false
-  confirmPrompt.visible = false
-  commandPreview.content = ""
-  safetyWarning.content = ""
-}
-
-function setOutput(content: string | StyledText) {
-  outputText.content = content
+  helpBarText.content = getHelpBarContent()
 }
 
 async function handleSpecialCommand(input: string) {
@@ -679,8 +980,8 @@ async function handleSpecialCommand(input: string) {
       break
     case "dry":
       dryRunMode = !dryRunMode
-      statusText.content = getDryRunStatus()
-      setOutput(t`${fg("#22c55e")(`Dry-run mode: ${dryRunMode ? "ON" : "OFF"}`)}`)
+      statusBarText.content = getStatusBarContent()
+      addSystemMessage(`Dry-run mode: ${dryRunMode ? "ON" : "OFF"}`)
       break
     case "config":
       await showConfig()
@@ -689,74 +990,84 @@ async function handleSpecialCommand(input: string) {
       showHistory()
       break
     case "clear":
-      setOutput("")
+      clearChat()
       break
     default:
       // Try to execute as shell command
       if (cmd) {
-        await processCommand(input, cmd)
+        addUserMessage(cmd)
+        await processDirectCommand(input, cmd)
       }
   }
 }
 
+function clearChat() {
+  // Remove all messages from scroll box and array
+  for (const msg of chatMessages) {
+    chatScrollBox.remove(`msg-${msg.id}`)
+  }
+  chatMessages = []
+  // Add fresh welcome message
+  addSystemMessage(getWelcomeMessage())
+}
+
 function showHelp() {
-  const theme = getTheme()
-  setOutput(t`${bold(fg(theme.colors.primary)("Magic Shell"))}
+  const helpText = `Keyboard Shortcuts (Ctrl+X then...):
+P  Command palette    M  Change model
+S  Switch provider    D  Toggle dry-run
+T  Change theme       H  Show history
+C  Show config        L  Clear chat
+?  This help          Q  Exit
 
-${bold(fg(theme.colors.textMuted)("Keyboard Shortcuts (Ctrl+X then...):"))}
-${fg(theme.colors.primary)("P")}  ${fg(theme.colors.textMuted)("Command palette")}    ${fg(theme.colors.primary)("M")}  ${fg(theme.colors.textMuted)("Change model")}
-${fg(theme.colors.primary)("S")}  ${fg(theme.colors.textMuted)("Switch provider")}    ${fg(theme.colors.primary)("D")}  ${fg(theme.colors.textMuted)("Toggle dry-run")}
-${fg(theme.colors.primary)("T")}  ${fg(theme.colors.textMuted)("Change theme")}       ${fg(theme.colors.primary)("H")}  ${fg(theme.colors.textMuted)("Show history")}
-${fg(theme.colors.primary)("C")}  ${fg(theme.colors.textMuted)("Show config")}        ${fg(theme.colors.primary)("L")}  ${fg(theme.colors.textMuted)("Clear output")}
-${fg(theme.colors.primary)("?")}  ${fg(theme.colors.textMuted)("This help")}          ${fg(theme.colors.primary)("Q")}  ${fg(theme.colors.textMuted)("Exit")}
+Other:
+Ctrl+C  Exit / Cancel     Esc  Close palette
 
-${bold(fg(theme.colors.textMuted)("Other:"))}
-${fg(theme.colors.primary)("Ctrl+C")}  ${fg(theme.colors.textMuted)("Exit / Cancel")}     ${fg(theme.colors.primary)("Esc")}  ${fg(theme.colors.textMuted)("Close palette")}
-
-${bold(fg(theme.colors.textMuted)("Tips:"))}
+Tips:
 - Type naturally: "list all files" -> ls -la
 - Reference history: "do that again", "undo"
-- ${fg(theme.colors.success)("Free models:")} gpt-5-nano, grok-code, glm-4.7-free`)
+- Free models: gpt-5-nano, grok-code, glm-4.7-free`
+  
+  addSystemMessage(helpText)
 }
 
 async function showConfig() {
   const theme = getTheme()
   const providerName = config.provider === "opencode-zen" ? "OpenCode Zen" : "OpenRouter"
   const apiKey = await getApiKey(config.provider)
-  const apiKeyStatus = apiKey ? fg(theme.colors.success)("configured") : fg(theme.colors.error)("not set")
-  const freeBadge = currentModel.free ? fg(theme.colors.success)(" (FREE)") : ""
+  const apiKeyStatus = apiKey ? "configured" : "not set"
+  const freeBadge = currentModel.free ? " (FREE)" : ""
   const shellInfo = getShellInfo()
 
-  setOutput(t`${bold(fg(theme.colors.primary)("Current Configuration"))}
+  const configText = `Current Configuration
 
-${fg(theme.colors.textMuted)("Provider:")}     ${fg(theme.colors.text)(providerName)}
-${fg(theme.colors.textMuted)("Model:")}        ${fg(theme.colors.text)(currentModel.name)}${freeBadge}
-${fg(theme.colors.textMuted)("Model ID:")}     ${fg(theme.colors.textMuted)(currentModel.id)}
-${fg(theme.colors.textMuted)("Category:")}     ${fg(theme.colors.text)(currentModel.category)}
-${fg(theme.colors.textMuted)("Theme:")}        ${fg(theme.colors.text)(theme.name)}
-${fg(theme.colors.textMuted)("Shell:")}        ${fg(theme.colors.text)(shellInfo.shell)} ${fg(theme.colors.textMuted)(`(${shellInfo.shellPath})`)}
-${fg(theme.colors.textMuted)("Platform:")}     ${fg(theme.colors.text)(shellInfo.platform)}${shellInfo.isWSL ? fg(theme.colors.textMuted)(" (WSL)") : ""}
-${fg(theme.colors.textMuted)("Safety:")}       ${fg(theme.colors.text)(config.safetyLevel)}
-${fg(theme.colors.textMuted)("Dry-run:")}      ${fg(theme.colors.text)(dryRunMode ? "ON" : "OFF")}
-${fg(theme.colors.textMuted)("API Key:")}      ${apiKeyStatus}
-${fg(theme.colors.textMuted)("History:")}      ${fg(theme.colors.text)(`${history.length} commands`)}`)
+Provider:     ${providerName}
+Model:        ${currentModel.name}${freeBadge}
+Model ID:     ${currentModel.id}
+Category:     ${currentModel.category}
+Theme:        ${theme.name}
+Shell:        ${shellInfo.shell} (${shellInfo.shellPath})
+Platform:     ${shellInfo.platform}${shellInfo.isWSL ? " (WSL)" : ""}
+Safety:       ${config.safetyLevel}
+Dry-run:      ${dryRunMode ? "ON" : "OFF"}
+API Key:      ${apiKeyStatus}
+History:      ${history.length} commands`
+
+  addSystemMessage(configText)
 }
 
 function showHistory() {
   if (history.length === 0) {
-    setOutput(t`${fg("#64748b")("No command history yet.")}`)
+    addSystemMessage("No command history yet.")
     return
   }
 
   const recent = history.slice(-10)
   const lines = recent.map((entry, i) => {
     const date = new Date(entry.timestamp).toLocaleTimeString()
-    return t`${fg("#64748b")(`${i + 1}.`)} ${fg("#94a3b8")(`[${date}]`)} ${fg("#f8fafc")(entry.command)}`
+    return `${i + 1}. [${date}] ${entry.command}`
   })
 
-  setOutput(t`${bold(fg("#60a5fa")("Recent Command History"))}
-
-${lines.join("\n")}`)
+  addSystemMessage(`Recent Command History\n\n${lines.join("\n")}`)
 }
 
 async function switchProvider() {
@@ -831,11 +1142,12 @@ async function switchProvider() {
       config.defaultModel = currentModel.id
       saveConfig(config)
 
-      modelText.content = getModelDisplay()
+      // Update status bar to show new provider/model
+      statusBarText.content = getStatusBarContent()
       closeSelector()
 
       const providerName = newProvider === "opencode-zen" ? "OpenCode Zen" : "OpenRouter"
-      setOutput(t`${fg("#22c55e")(`Switched to ${providerName}. Model: ${currentModel.name}`)}`)
+      addSystemMessage(`Switched to ${providerName}. Model: ${currentModel.name}`)
     } else {
       // Need to set up API key - go to full setup
       closeSelector()
@@ -912,14 +1224,16 @@ function showModelSelector() {
     currentModel = option.value as Model
     config.defaultModel = currentModel.id
     saveConfig(config)
-    modelText.content = getModelDisplay()
+    
+    // Update status bar to show new model
+    statusBarText.content = getStatusBarContent()
 
     renderer.root.remove("model-selector-container")
     modelSelector = null
     inputField.focus()
 
     const freeBadge = currentModel.free ? " (FREE)" : ""
-    setOutput(t`${fg("#22c55e")(`Model changed to ${currentModel.name}${freeBadge}`)}`)
+    addSystemMessage(`Model changed to ${currentModel.name}${freeBadge}`)
   })
 
   modelSelector.focus()
@@ -993,8 +1307,7 @@ function showThemeSelector() {
     // Refresh all UI elements with new theme colors
     refreshThemeColors()
     
-    const newTheme = getTheme()
-    setOutput(t`${fg(newTheme.colors.success)(`Theme changed to ${themeName}`)}`)
+    addSystemMessage(`Theme changed to ${themeName}`)
     
     inputField.focus()
   })
@@ -1055,8 +1368,8 @@ function getCommandPaletteOptions(): PaletteCommand[] {
       chord: "d",
       action: () => {
         dryRunMode = !dryRunMode
-        statusText.content = getDryRunStatus()
-        setOutput(t`${fg("#22c55e")(`Dry-run mode: ${dryRunMode ? "ON" : "OFF"}`)}`)
+        statusBarText.content = getStatusBarContent()
+        addSystemMessage(`Dry-run mode: ${dryRunMode ? "ON" : "OFF"}`)
       },
     },
     {
@@ -1081,11 +1394,11 @@ function getCommandPaletteOptions(): PaletteCommand[] {
       action: () => showThemeSelector(),
     },
     {
-      name: "Clear Output",
-      description: "Clear the output area",
+      name: "Clear Chat",
+      description: "Clear the chat history",
       key: "l",
       chord: "l",
-      action: () => setOutput(""),
+      action: () => clearChat(),
     },
     {
       name: "Show Help",
@@ -1254,25 +1567,50 @@ function handleKeypress(key: KeyEvent) {
       return
     }
 
-    if (awaitingConfirmation) {
+    if (awaitingConfirmation && pendingMessageId) {
       clearCommandState()
-      setOutput(t`${fg("#64748b")("Command cancelled.")}`)
+      addSystemMessage("Command cancelled.")
       inputField.focus()
     }
   }
 
   // Enter to confirm dangerous command
-  if (key.name === "return" && awaitingConfirmation && pendingCommand) {
-    const cmd = pendingCommand
-    clearCommandState()
-    processCommand("", cmd)
+  if (key.name === "return" && awaitingConfirmation && pendingMessageId) {
+    const msg = chatMessages.find(m => m.id === pendingMessageId)
+    if (msg && msg.command) {
+      const command = msg.command
+      const msgId = pendingMessageId
+      clearCommandState()
+      executeAndShowResult(msg.content, command, msgId)
+    }
   }
 
   // 'e' to edit command
-  if (key.name === "e" && awaitingConfirmation && pendingCommand) {
-    inputField.value = pendingCommand
-    clearCommandState()
-    inputField.focus()
+  if (key.name === "e" && awaitingConfirmation && pendingMessageId) {
+    const msg = chatMessages.find(m => m.id === pendingMessageId)
+    if (msg && msg.command) {
+      inputField.value = msg.command
+      clearCommandState()
+      inputField.focus()
+    }
+  }
+  
+  // 'c' to copy command to clipboard (macOS)
+  if (key.name === "c" && awaitingConfirmation && pendingMessageId) {
+    const msg = chatMessages.find(m => m.id === pendingMessageId)
+    if (msg && msg.command) {
+      // Use pbcopy on macOS, or xclip on Linux
+      const copyCmd = process.platform === "darwin" ? "pbcopy" : "xclip -selection clipboard"
+      const child = spawn(copyCmd, { shell: true })
+      child.stdin?.write(msg.command)
+      child.stdin?.end()
+      addSystemMessage(`Copied to clipboard: ${msg.command}`)
+    }
+  }
+  
+  // 'o' to toggle expand/collapse on the most recent result message
+  if (key.name === "o" && !awaitingConfirmation && !commandPalette && !modelSelector) {
+    toggleLastResultExpand()
   }
 }
 

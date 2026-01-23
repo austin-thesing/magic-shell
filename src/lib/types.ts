@@ -335,3 +335,22 @@ export interface SafetyAnalysis {
   reason?: string
   patterns: string[]
 }
+
+// Chat-style TUI message types
+export type ChatMessageType = "user" | "assistant" | "system" | "result"
+
+export interface ChatMessage {
+  id: string
+  type: ChatMessageType
+  content: string
+  timestamp: number
+  // For assistant messages (translated commands)
+  command?: string
+  safety?: SafetyAnalysis
+  // For result messages (after execution)
+  executed?: boolean
+  output?: string
+  exitCode?: number
+  // For expandable output view
+  expanded?: boolean
+}
