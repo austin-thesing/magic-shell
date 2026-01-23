@@ -264,6 +264,8 @@ export interface ChatMessage {
   executed?: boolean
   output?: string
   exitCode?: number
+  executionKind?: "auto" | "manual" | "dry-run"
+  parentMessageId?: string
   // For expandable output view
   expanded?: boolean
 }

@@ -422,7 +422,7 @@ function getStatusBarContent(): StyledText {
 function getHelpBarContent(): StyledText {
   const theme = getTheme()
   if (awaitingConfirmation) {
-    return t`${fg(theme.colors.warning)(">>> Press Enter to execute command <<<")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.error)("Esc")}${fg(theme.colors.textMuted)(" Cancel")} ${fg(theme.colors.primary)("e")}${fg(theme.colors.textMuted)(" Edit")} ${fg(theme.colors.primary)("c")}${fg(theme.colors.textMuted)(" Copy")}`
+    return t`${fg(theme.colors.warning)(">>> Cmd+Enter or Enter to execute <<<")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.error)("Esc")}${fg(theme.colors.textMuted)(" Cancel")} ${fg(theme.colors.primary)("e")}${fg(theme.colors.textMuted)(" Edit")} ${fg(theme.colors.primary)("c")}${fg(theme.colors.textMuted)(" Copy")}`
   }
   return t`${fg(theme.colors.primary)("Ctrl+X P")}${fg(theme.colors.textMuted)(" Commands")}  ${fg(theme.colors.primary)("Ctrl+Y")}${fg(theme.colors.textMuted)(" Safety")}  ${fg(theme.colors.primary)("Ctrl+Z")}${fg(theme.colors.textMuted)(" Exit")}`
 }
@@ -479,13 +479,20 @@ function addAssistantMessage(content: string, command: string, safety: SafetyAna
   return msg
 }
 
-function addResultMessage(content: string, exitCode?: number): ChatMessage {
+function addResultMessage(
+  content: string,
+  exitCode: number | undefined,
+  executionKind: ChatMessage["executionKind"],
+  parentMessageId?: string
+): ChatMessage {
   const msg: ChatMessage = {
     id: generateMessageId(),
     type: "result",
     content,
     timestamp: Date.now(),
     exitCode,
+    executionKind,
+    parentMessageId,
   }
   chatMessages.push(msg)
   renderMessage(msg)
@@ -538,7 +545,7 @@ function createAssistantMessageRenderable(msg: ChatMessage, theme: ReturnType<ty
     width: "100%",
     border: true,
     borderColor: isSelected ? theme.colors.primary : theme.colors.border,
-    borderStyle: "single",
+    borderStyle: "rounded",
     paddingLeft: 1,
     paddingRight: 1,
     paddingTop: 0,
@@ -549,42 +556,39 @@ function createAssistantMessageRenderable(msg: ChatMessage, theme: ReturnType<ty
   // Command line
   const commandText = new TextRenderable(renderer, {
     id: `msg-${msg.id}-cmd`,
-    content: t`${fg(theme.colors.textMuted)("Command:")} ${fg(theme.colors.text)(msg.command || "")}`,
+    content: t`${fg(theme.colors.textMuted)("Command:")} ${fg(theme.colors.secondary)(msg.command || "")}`,
   })
   card.add(commandText)
   
   // Safety badge
   if (msg.safety) {
     const severityColor = getSeverityColor(msg.safety.severity)
-    const severityText = msg.safety.isDangerous 
-      ? `${msg.safety.severity.toUpperCase()} risk${msg.safety.reason ? ` - ${msg.safety.reason}` : ""}`
-      : "Low risk"
+    const severityLabel = msg.safety.severity === "low"
+      ? "Low risk"
+      : `${msg.safety.severity[0].toUpperCase()}${msg.safety.severity.slice(1)} risk`
     
     const safetyText = new TextRenderable(renderer, {
       id: `msg-${msg.id}-safety`,
-      content: t`${fg(severityColor)("●")} ${fg(theme.colors.textMuted)(severityText)}`,
+      content: t`${fg(severityColor)(severityLabel)}`,
     })
     card.add(safetyText)
+    
+    if (msg.safety.isDangerous && msg.safety.reason) {
+      const reasonText = new TextRenderable(renderer, {
+        id: `msg-${msg.id}-safety-reason`,
+        content: t`${fg(theme.colors.textMuted)(msg.safety.reason)}`,
+      })
+      card.add(reasonText)
+    }
   }
   
   // Actions hint (only if awaiting confirmation for this message)
   if (isSelected && !msg.executed) {
     const actionsText = new TextRenderable(renderer, {
       id: `msg-${msg.id}-actions`,
-      content: t`${fg(theme.colors.warning)("Press Enter to run")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.primary)("[c]")} ${fg(theme.colors.textMuted)("Copy")} ${fg(theme.colors.primary)("[e]")} ${fg(theme.colors.textMuted)("Edit")} ${fg(theme.colors.error)("[Esc]")} ${fg(theme.colors.textMuted)("Cancel")}`,
+      content: t`${fg(theme.colors.warning)("Cmd+Enter or Enter to run")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.primary)("[c]")} ${fg(theme.colors.textMuted)("Copy")} ${fg(theme.colors.primary)("[e]")} ${fg(theme.colors.textMuted)("Edit")} ${fg(theme.colors.error)("[Esc]")} ${fg(theme.colors.textMuted)("Cancel")}`,
     })
     card.add(actionsText)
-  }
-  
-  // Executed badge
-  if (msg.executed) {
-    const wasAutoRun = !msg.safety?.isDangerous
-    const execLabel = wasAutoRun ? "Auto-executed (safe)" : "Executed"
-    const execText = new TextRenderable(renderer, {
-      id: `msg-${msg.id}-exec`,
-      content: t`${fg(theme.colors.success)("✓")} ${fg(theme.colors.success)(execLabel)}`,
-    })
-    card.add(execText)
   }
   
   return card
@@ -597,16 +601,19 @@ function createResultMessageRenderable(msg: ChatMessage, theme: ReturnType<typeo
   const outputLines = hasOutput ? msg.content.trim().split("\n") : []
   const isLongOutput = outputLines.length > 5
   const PREVIEW_LINES = 3
+  const executionKind = msg.executionKind || "manual"
   
   const card = new BoxRenderable(renderer, {
     id: `msg-${msg.id}`,
     flexDirection: "column",
     width: "100%",
     border: true,
-    borderColor: isSuccess ? theme.colors.success : theme.colors.error,
-    borderStyle: "single",
+    borderColor: theme.colors.border,
+    borderStyle: "rounded",
     paddingLeft: 1,
     paddingRight: 1,
+    paddingTop: 0,
+    paddingBottom: 0,
     backgroundColor: theme.colors.backgroundPanel,
     // Click to expand/collapse
     onMouseDown: isLongOutput ? () => {
@@ -615,15 +622,20 @@ function createResultMessageRenderable(msg: ChatMessage, theme: ReturnType<typeo
   })
   
   // Status line with expand/collapse indicator
-  const statusIcon = isSuccess ? "✓" : "✗"
   const statusColor = isSuccess ? theme.colors.success : theme.colors.error
-  const statusLabel = isSuccess ? "Executed successfully" : `Exit code: ${msg.exitCode}`
+  const statusLabel = isSuccess
+    ? executionKind === "auto"
+      ? "Auto-executed (safe command)"
+      : executionKind === "dry-run"
+        ? "Dry run (not executed)"
+        : "Executed (confirmed)"
+    : `Command failed (exit code: ${msg.exitCode})`
   const expandIcon = isLongOutput ? (isExpanded ? "▼" : "▶") : ""
   const lineCount = isLongOutput ? ` (${outputLines.length} lines)` : ""
   
   const statusText = new TextRenderable(renderer, {
     id: `msg-${msg.id}-status`,
-    content: t`${fg(statusColor)(statusIcon)} ${fg(theme.colors.text)(statusLabel)}${fg(theme.colors.textMuted)(lineCount)} ${fg(theme.colors.primary)(expandIcon)}`,
+    content: t`${fg(statusColor)(">")} ${fg(statusColor)(statusLabel)}${fg(theme.colors.textMuted)(lineCount)} ${fg(theme.colors.primary)(expandIcon)}`,
   })
   card.add(statusText)
   
@@ -640,11 +652,27 @@ function createResultMessageRenderable(msg: ChatMessage, theme: ReturnType<typeo
       displayContent = previewLines.join("\n") + `\n... ${outputLines.length - PREVIEW_LINES} more lines`
     }
     
+    const outputBox = new BoxRenderable(renderer, {
+      id: `msg-${msg.id}-output-box`,
+      flexDirection: "column",
+      width: "100%",
+      border: true,
+      borderColor: theme.colors.borderSubtle,
+      borderStyle: "single",
+      paddingLeft: 1,
+      paddingRight: 1,
+      paddingTop: 0,
+      paddingBottom: 0,
+      backgroundColor: theme.colors.backgroundElement,
+      marginTop: 1,
+    })
+    
     const outputText = new TextRenderable(renderer, {
       id: `msg-${msg.id}-output`,
       content: t`${fg(theme.colors.textMuted)(displayContent)}`,
     })
-    card.add(outputText)
+    outputBox.add(outputText)
+    card.add(outputBox)
     
     // Show expand/collapse hint for long output
     if (isLongOutput) {
@@ -886,6 +914,8 @@ async function processDirectCommand(input: string, command: string) {
 
 // Execute a command and show result in chat
 async function executeAndShowResult(input: string, command: string, assistantMsgId: string) {
+  const executionKind = getExecutionKind(assistantMsgId, dryRunMode)
+  updateAssistantMessage(assistantMsgId, { executed: true })
   // Handle cd specially
   if (command.startsWith("cd ")) {
     const path = command.slice(3).trim().replace(/^["']|["']$/g, "")
@@ -897,7 +927,7 @@ async function executeAndShowResult(input: string, command: string, assistantMsg
       // Update status bar with new cwd info
       statusBarText.content = getStatusBarContent()
       
-      addResultMessage(`Changed directory to ${currentCwd}`, 0)
+      addResultMessage(`Changed directory to ${currentCwd}`, 0, executionKind, assistantMsgId)
 
       addToHistory({
         input,
@@ -907,18 +937,15 @@ async function executeAndShowResult(input: string, command: string, assistantMsg
       })
       history = loadHistory()
       
-      // Mark assistant message as executed
-      updateAssistantMessage(assistantMsgId, { executed: true })
     } catch (err) {
-      addResultMessage(`cd: ${err instanceof Error ? err.message : String(err)}`, 1)
+      addResultMessage(`cd: ${err instanceof Error ? err.message : String(err)}`, 1, executionKind, assistantMsgId)
     }
     clearCommandState()
     return
   }
 
   if (dryRunMode) {
-    addResultMessage(`[DRY RUN] Would execute: ${command}`, 0)
-    updateAssistantMessage(assistantMsgId, { executed: true })
+    addResultMessage(`[DRY RUN] Would execute: ${command}`, 0, executionKind, assistantMsgId)
     clearCommandState()
     return
   }
@@ -926,7 +953,7 @@ async function executeAndShowResult(input: string, command: string, assistantMsg
   // Execute command
   try {
     const { output, exitCode } = await executeCommandWithCode(command)
-    addResultMessage(output || "Command completed successfully", exitCode)
+    addResultMessage(output || "Command completed successfully", exitCode, executionKind, assistantMsgId)
 
     addToHistory({
       input,
@@ -936,14 +963,22 @@ async function executeAndShowResult(input: string, command: string, assistantMsg
     })
     history = loadHistory()
     
-    // Mark assistant message as executed
-    updateAssistantMessage(assistantMsgId, { executed: true })
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    addResultMessage(`Error: ${message}`, 1)
+    addResultMessage(`Error: ${message}`, 1, executionKind, assistantMsgId)
   }
 
   clearCommandState()
+}
+
+function getExecutionKind(
+  assistantMsgId: string,
+  isDryRun: boolean
+): ChatMessage["executionKind"] {
+  if (isDryRun) return "dry-run"
+  const assistantMsg = chatMessages.find((msg) => msg.id === assistantMsgId)
+  if (!assistantMsg || assistantMsg.type !== "assistant") return "manual"
+  return assistantMsg.safety?.isDangerous ? "manual" : "auto"
 }
 
 interface CommandResult {
