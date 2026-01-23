@@ -1,5 +1,7 @@
 name: Release
 
+# This workflow runs automatically when a version tag (v*) is pushed.
+# The CI workflow's auto-tag job creates these tags when package.json version changes.
 on:
   push:
     tags:
@@ -14,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
@@ -43,6 +47,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
