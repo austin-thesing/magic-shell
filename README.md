@@ -354,13 +354,12 @@ src/
    ```json
    {
      "name": "@austinthesing/magic-shell",
-     "version": "0.1.0",
+     "version": "0.2.2",
      "description": "Natural language to terminal commands with safety features",
      "main": "dist/index.js",
      "bin": {
-       "magic-shell": "./dist/index.js",
        "msh": "./dist/index.js",
-       "ms": "./dist/index.js"
+       "mshell": "./dist/tui.js"
      },
      "files": [
        "dist",
