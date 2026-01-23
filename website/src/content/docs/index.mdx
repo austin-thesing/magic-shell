@@ -20,21 +20,28 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 ```bash
 # Install Magic Shell
-curl -fsSL https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.sh | bash
+bun add -g @austinthesing/magic-shell
 
 # Configure your API key
 msh --setup
 
-# Try your first command
+# Launch the interactive TUI
+mshell
+
+# Or use quick CLI mode
 msh "find all files larger than 100MB"
 ```
 
 ## Explore
 
 <CardGrid stagger>
-  <Card title="Installation" icon="rocket">
-    Get Magic Shell running in seconds on macOS, Linux, or Windows.
-    [Install now →](/getting-started/installation/)
+  <Card title="TUI Mode" icon="laptop">
+    Launch `mshell` for a full interactive terminal interface with themes, history, and shortcuts.
+    [Explore TUI →](/features/tui-mode/)
+  </Card>
+  <Card title="CLI Mode" icon="rocket">
+    Quick one-liners with `msh` for fast translations and script integration.
+    [Get started →](/getting-started/first-command/)
   </Card>
   <Card title="AI Providers" icon="star">
     Choose between OpenCode Zen (with free models!) and OpenRouter.
@@ -43,9 +50,5 @@ msh "find all files larger than 100MB"
   <Card title="Safety System" icon="warning">
     Every command is analyzed for risk before execution.
     [See safety levels →](/features/safety-levels/)
-  </Card>
-  <Card title="TUI Mode" icon="laptop">
-    Full interactive terminal interface with themes and shortcuts.
-    [Explore TUI →](/features/tui-mode/)
   </Card>
 </CardGrid>

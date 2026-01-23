@@ -61,60 +61,60 @@ import TerminalWindow from "../components/TerminalWindow.astro";
     </div>
   </section>
 
-  <!-- How It Works -->
-  <section class="section how-it-works">
+  <!-- Two Ways to Use -->
+  <section class="section two-modes">
     <div class="container">
       <div class="section-header">
-        <h2>How it works</h2>
+        <h2>Two ways to use</h2>
         <p class="section-subtitle">
-          Three simple steps from thought to execution.
+          Choose the workflow that fits your style.
         </p>
       </div>
 
-      <div class="steps">
-        <div class="step">
-          <div class="step-number">1</div>
-          <div class="step-content">
-            <h3>Describe</h3>
-            <p>Type what you want to do in natural language.</p>
-            <TerminalWindow title="input">
-              <code class="step-code"><span class="prompt">$</span> msh "find files larger than 100MB"</code>
-            </TerminalWindow>
+      <div class="modes-grid">
+        <!-- TUI Mode -->
+        <div class="mode-card">
+          <div class="mode-header">
+            <span class="mode-icon">[]</span>
+            <h3>Interactive TUI</h3>
+            <span class="mode-badge">Recommended</span>
           </div>
+          <p class="mode-description">
+            A full terminal interface with themes, history, model switching, and safety analysis. 
+            Perfect for exploration and extended sessions.
+          </p>
+          <TerminalWindow title="launch">
+            <code class="step-code"><span class="prompt">$</span> mshell</code>
+          </TerminalWindow>
+          <ul class="mode-features">
+            <li>8 beautiful themes</li>
+            <li>Command history</li>
+            <li>Switch models on the fly</li>
+            <li>Keyboard shortcuts</li>
+          </ul>
         </div>
 
-        <div class="step-connector">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M5 12l7 7 7-7"/>
-          </svg>
-        </div>
-
-        <div class="step">
-          <div class="step-number">2</div>
-          <div class="step-content">
-            <h3>Review</h3>
-            <p>Magic Shell translates and shows you the command.</p>
-            <TerminalWindow title="output">
-              <code class="step-code"><span class="output-text">find . -type f -size +100M</span></code>
-            </TerminalWindow>
+        <!-- CLI Mode -->
+        <div class="mode-card">
+          <div class="mode-header">
+            <span class="mode-icon">$_</span>
+            <h3>Quick CLI</h3>
           </div>
-        </div>
-
-        <div class="step-connector">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 5v14M5 12l7 7 7-7"/>
-          </svg>
-        </div>
-
-        <div class="step">
-          <div class="step-number">3</div>
-          <div class="step-content">
-            <h3>Execute</h3>
-            <p>Run immediately with <code>-x</code> or copy to clipboard.</p>
-            <TerminalWindow title="execute">
-              <code class="step-code"><span class="prompt">$</span> msh -x "show disk usage"</code>
-            </TerminalWindow>
-          </div>
+          <p class="mode-description">
+            One-shot commands for fast translations. Pipe output, use in scripts, 
+            or execute directly with <code>-x</code>.
+          </p>
+          <TerminalWindow title="examples">
+            <code class="step-code"><span class="prompt">$</span> msh "find large files"</code>
+            <code class="step-code"><span class="output-text">find . -type f -size +100M</span></code>
+            <code class="step-code" style="margin-top: 8px;"><span class="prompt">$</span> msh -x "show disk usage"</code>
+          </TerminalWindow>
+          <ul class="mode-features">
+            <li>Quick one-liners</li>
+            <li>Pipe to clipboard</li>
+            <li>Script-friendly</li>
+            <li>Dry-run with <code>-n</code></li>
+          </ul>
         </div>
       </div>
     </div>
@@ -165,7 +165,7 @@ import TerminalWindow from "../components/TerminalWindow.astro";
       </div>
 
       <div class="install-note">
-        <p>Then run <code>msh --setup</code> to configure your API key.</p>
+        <p>Then run <code>msh --setup</code> to configure your API key, and <code>mshell</code> to launch the TUI.</p>
       </div>
     </div>
   </section>
@@ -249,52 +249,116 @@ import TerminalWindow from "../components/TerminalWindow.astro";
     }
   }
 
-  /* How it works */
-  .how-it-works {
+  /* Two Modes */
+  .two-modes {
     background: var(--bg-base);
   }
 
-  .steps {
-    max-width: 600px;
+  .modes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+    max-width: 900px;
     margin: 0 auto;
   }
 
-  .step {
-    display: flex;
-    gap: var(--space-5);
-    align-items: flex-start;
+  @media (max-width: 768px) {
+    .modes-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
-  .step-number {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .mode-card {
     background: var(--bg-elevated);
     border: 1px solid var(--border-subtle);
-    border-radius: 50%;
-    font-family: var(--font-mono);
-    font-weight: 600;
-    color: var(--color-primary);
-    flex-shrink: 0;
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    transition: all var(--transition-fast);
   }
 
-  .step-content {
-    flex: 1;
-    padding-bottom: var(--space-4);
+  .mode-card:hover {
+    border-color: var(--border-active);
+    transform: translateY(-2px);
   }
 
-  .step-content h3 {
+  .mode-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .mode-icon {
     font-family: var(--font-mono);
     font-size: var(--text-lg);
+    font-weight: 700;
     color: var(--color-primary);
-    margin-bottom: var(--space-2);
+    background: var(--bg-terminal);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
   }
 
-  .step-content p {
+  .mode-header h3 {
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .mode-badge {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-success);
+    background: rgba(127, 216, 143, 0.1);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(127, 216, 143, 0.2);
+  }
+
+  .mode-description {
     color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: 1.6;
     margin-bottom: var(--space-4);
+  }
+
+  .mode-description code {
+    background: var(--bg-terminal);
+    padding: 0.1em 0.3em;
+    border-radius: var(--radius-sm);
+    font-size: 0.9em;
+  }
+
+  .mode-features {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0 0 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+  }
+
+  .mode-features li {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .mode-features li::before {
+    content: ">";
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .mode-features li code {
+    background: var(--bg-terminal);
+    padding: 0.1em 0.3em;
+    border-radius: var(--radius-sm);
   }
 
   .step-code {
@@ -311,13 +375,6 @@ import TerminalWindow from "../components/TerminalWindow.astro";
 
   .step-code .output-text {
     color: var(--text-secondary);
-  }
-
-  .step-connector {
-    display: flex;
-    justify-content: center;
-    padding: var(--space-2) 0 var(--space-2) calc(20px + var(--space-5));
-    color: var(--border-active);
   }
 
   /* Safety */
