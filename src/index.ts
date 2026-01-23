@@ -7,9 +7,10 @@
  *   msh "list all files"           # Translate and print command
  *   msh -x "delete node_modules"   # Translate and execute
  *   msh -n "find large files"      # Dry run (show what would execute)
- *   msh -i                         # Interactive TUI mode
  *   msh --setup                    # Configure API keys
  *   msh --help                     # Show help
+ *   
+ *   mshell                         # Interactive TUI mode (separate command)
  */
 
 import { spawn } from "child_process"
@@ -56,7 +57,6 @@ ${colors.bold}USAGE${colors.reset}
   msh <query>              Translate query to command and print it
   msh -x <query>           Translate and execute the command
   msh -n <query>           Dry run - show command with safety analysis
-  msh -i, --interactive    Launch interactive TUI mode
   msh --setup              Configure API keys and provider
   msh --models             List available models
   msh --model <id>         Set default model
@@ -69,6 +69,9 @@ ${colors.bold}USAGE${colors.reset}
   msh --check-update       Check for updates
   msh --help               Show this help
 
+${colors.bold}TUI MODE${colors.reset}
+  mshell                   Launch interactive TUI with themes, history, shortcuts
+
 ${colors.bold}EXAMPLES${colors.reset}
   ${colors.dim}# Just get the command${colors.reset}
   msh "list all javascript files"
@@ -80,7 +83,7 @@ ${colors.bold}EXAMPLES${colors.reset}
   msh -n "delete all log files"
   
   ${colors.dim}# Use project context (knows your npm scripts, etc)${colors.reset}
-  msh --repo-context "run the dev server"
+  msh -r "run the dev server"
   
   ${colors.dim}# Pipe to clipboard (macOS)${colors.reset}
   msh "find large files" | pbcopy
@@ -447,10 +450,17 @@ async function main() {
     ? showUpdateNotification() 
     : Promise.resolve()
   
-  if (args.length === 0 || args[0] === "-i" || args[0] === "--interactive") {
-    // Launch interactive TUI
-    const { default: runTui } = await import("./cli")
-    await runTui()
+  if (args.length === 0) {
+    // No args - show help pointing to mshell
+    console.log(`${colors.bold}${colors.primary}magic-shell${colors.reset} - Natural language to terminal commands\n`)
+    console.log(`${colors.bold}Quick CLI:${colors.reset}`)
+    console.log(`  msh "your query"     Translate and print command`)
+    console.log(`  msh -x "query"       Translate and execute`)
+    console.log(`  msh -n "query"       Dry run with safety analysis`)
+    console.log(`  msh --setup          Configure API key`)
+    console.log(`  msh --help           Full help\n`)
+    console.log(`${colors.bold}Interactive TUI:${colors.reset}`)
+    console.log(`  ${colors.primary}mshell${colors.reset}               Launch TUI with themes, history, shortcuts\n`)
     return
   }
   

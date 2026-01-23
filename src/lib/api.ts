@@ -31,7 +31,7 @@ function getZenEndpoint(modelId: string): string {
     case "anthropic":
       return "https://opencode.ai/zen/v1/messages"
     case "google":
-      return `https://opencode.ai/zen/v1/models/${modelId}`
+      return `https://opencode.ai/zen/v1/models/${modelId}:generateContent`
     case "openai-compatible":
       return "https://opencode.ai/zen/v1/chat/completions"
   }
@@ -397,13 +397,22 @@ async function callZenOpenAICompatible(
 }
 
 // OpenCode Zen - Google (Gemini)
+// Gemini uses the generateContent endpoint format
 async function callZenGoogle(
   apiKey: string,
   modelId: string,
   systemPrompt: string,
   userInput: string
 ): Promise<string> {
-  const endpoint = `https://opencode.ai/zen/v1/models/${modelId}`
+  // Gemini endpoint format: /v1/models/{model}:generateContent
+  const endpoint = `https://opencode.ai/zen/v1/models/${modelId}:generateContent`
+  
+  if (DEBUG_API) {
+    console.error(`[DEBUG] Calling Google Gemini API`)
+    console.error(`[DEBUG] Model: ${modelId}`)
+    console.error(`[DEBUG] Endpoint: ${endpoint}`)
+  }
+  
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -422,11 +431,17 @@ async function callZenGoogle(
     }),
   })
 
+  const responseText = await response.text()
+  
+  if (DEBUG_API) {
+    console.error(`[DEBUG] Gemini API Status: ${response.status}`)
+    console.error(`[DEBUG] Gemini API Response: ${responseText.slice(0, 1000)}`)
+  }
+
   if (!response.ok) {
-    const errorText = await response.text()
     let errorMessage = `API request failed: ${response.status}`
     try {
-      const errorData = JSON.parse(errorText)
+      const errorData = JSON.parse(responseText)
       if (errorData.error?.message) {
         errorMessage = errorData.error.message
       }
@@ -434,7 +449,13 @@ async function callZenGoogle(
     throw new Error(errorMessage)
   }
 
-  const data = await response.json()
+  let data: any
+  try {
+    data = JSON.parse(responseText)
+  } catch (e) {
+    throw new Error(`Invalid JSON response: ${responseText.slice(0, 200)}`)
+  }
+  
   if (data.error) {
     throw new Error(data.error.message)
   }

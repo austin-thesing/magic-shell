@@ -20,7 +20,7 @@ ms [options] [query]
 | `<query>` | Natural language query to translate |
 | `-x, --execute` | Translate and execute the command immediately |
 | `-n, --dry-run` | Show command with safety analysis, don't execute |
-| `-i, --interactive` | Launch interactive TUI mode |
+| `-r, --repo-context` | Use project context for this query |
 
 ### Configuration
 
@@ -73,14 +73,11 @@ msh -n "delete all node_modules folders"
 # Reason: Recursive deletion operation
 ```
 
-### Interactive Mode
+### Interactive TUI Mode
 
 ```bash
-# Launch TUI directly
+# Launch the interactive TUI
 mshell
-
-# Or with the -i flag
-msh -i
 ```
 
 ### Change Provider
@@ -140,10 +137,9 @@ msh --setup
 
 ## Commands
 
-Magic Shell installs four commands:
-- `magic-shell` - Full name (CLI mode)
-- `msh` - Short alias (CLI mode)
-- `ms` - Shortest alias (CLI mode)
-- `mshell` - TUI mode (launches interactive interface directly)
+Magic Shell installs two main commands:
 
-The first three are identical CLI commands. Use `mshell` to launch the TUI directly without flags.
+| Command | Purpose |
+|---------|---------|
+| `msh` (or `ms`, `magic-shell`) | CLI mode - quick one-off translations |
+| `mshell` | TUI mode - interactive interface with themes, history, shortcuts |

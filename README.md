@@ -83,8 +83,6 @@ msh -x "show disk usage"
 msh -n "delete all node_modules folders"
 
 # Launch interactive TUI mode
-msh -i
-# or directly with
 mshell
 ```
 
@@ -95,7 +93,7 @@ mshell
 | `msh <query>` | Translate query to command and print it |
 | `msh -x <query>` | Translate and execute the command |
 | `msh -n <query>` | Dry run - show command with safety analysis |
-| `msh -i, --interactive` | Launch interactive TUI mode |
+| `mshell` | Launch interactive TUI mode |
 | `msh --setup` | Configure API keys and provider |
 | `msh --models` | List available models |
 | `msh --model <id>` | Set default model |
@@ -135,7 +133,7 @@ msh "compress this folder to a zip file" | pbcopy
 
 ## Interactive TUI Mode
 
-Launch with `mshell` or `msh -i` for a full interactive experience.
+Launch with `mshell` for a full interactive experience.
 
 ### Keyboard Shortcuts
 
