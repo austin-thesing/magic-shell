@@ -76,11 +76,11 @@ msh -n "delete all node_modules folders"
 ### Interactive Mode
 
 ```bash
-# Launch TUI
-msh -i
+# Launch TUI directly
+mshell
 
-# Or simply (TUI is default with no query)
-msh
+# Or with the -i flag
+msh -i
 ```
 
 ### Change Provider
@@ -138,11 +138,12 @@ msh --setup
 | `OPENROUTER_API_KEY` | API key for OpenRouter provider |
 | `DEBUG_API=1` | Enable API debugging output |
 
-## Shell Aliases
+## Commands
 
-Magic Shell installs three commands:
-- `magic-shell` - Full name
-- `msh` - Short alias
-- `ms` - Shortest alias
+Magic Shell installs four commands:
+- `magic-shell` - Full name (CLI mode)
+- `msh` - Short alias (CLI mode)
+- `ms` - Shortest alias (CLI mode)
+- `mshell` - TUI mode (launches interactive interface directly)
 
-All three are identical in functionality.
+The first three are identical CLI commands. Use `mshell` to launch the TUI directly without flags.

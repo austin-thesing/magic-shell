@@ -67,7 +67,7 @@ export OPENCODE_ZEN_API_KEY="your-key-here"
 
 ## Usage
 
-Magic Shell can be invoked using `magic-shell`, `msh`, or `ms`.
+Magic Shell can be invoked using `magic-shell`, `msh`, or `ms`. For TUI mode directly, use `mshell`.
 
 ### Basic Commands
 
@@ -84,8 +84,8 @@ msh -n "delete all node_modules folders"
 
 # Launch interactive TUI mode
 msh -i
-# or just
-msh
+# or directly with
+mshell
 ```
 
 ### Command Reference
@@ -135,7 +135,7 @@ msh "compress this folder to a zip file" | pbcopy
 
 ## Interactive TUI Mode
 
-Launch with `msh` or `msh -i` for a full interactive experience.
+Launch with `mshell` or `msh -i` for a full interactive experience.
 
 ### Keyboard Shortcuts
 
