@@ -1,5 +1,5 @@
 {
-  "name": "magic-shell",
+  "name": "@austinthesing/magic-shell",
   "version": "0.1.0",
   "description": "Natural language to terminal commands with safety features. Supports OpenCode Zen (with free models) and OpenRouter.",
   "type": "module",

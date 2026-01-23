@@ -143,21 +143,21 @@ install_via_npm() {
     
     if command -v bun &> /dev/null; then
         info "Using bun..."
-        bun add -g magic-shell
+        bun add -g @austinthesing/magic-shell
     elif command -v npm &> /dev/null; then
         info "Using npm..."
-        npm install -g magic-shell
+        npm install -g @austinthesing/magic-shell
     elif command -v yarn &> /dev/null; then
         info "Using yarn..."
-        yarn global add magic-shell
+        yarn global add @austinthesing/magic-shell
     elif command -v pnpm &> /dev/null; then
         info "Using pnpm..."
-        pnpm add -g magic-shell
+        pnpm add -g @austinthesing/magic-shell
     else
         error "No package manager found. Please install Node.js/npm, Bun, Yarn, or pnpm first."
     fi
     
-    success "Installed magic-shell via npm"
+    success "Installed @austinthesing/magic-shell via npm"
 }
 
 # Add to PATH

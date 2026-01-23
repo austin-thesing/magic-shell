@@ -76,25 +76,25 @@ function Install-ViaNpm {
     # Check for package managers in order of preference
     if (Get-Command bun -ErrorAction SilentlyContinue) {
         Write-Info "Using bun..."
-        bun add -g magic-shell
+        bun add -g @austinthesing/magic-shell
     }
     elseif (Get-Command npm -ErrorAction SilentlyContinue) {
         Write-Info "Using npm..."
-        npm install -g magic-shell
+        npm install -g @austinthesing/magic-shell
     }
     elseif (Get-Command yarn -ErrorAction SilentlyContinue) {
         Write-Info "Using yarn..."
-        yarn global add magic-shell
+        yarn global add @austinthesing/magic-shell
     }
     elseif (Get-Command pnpm -ErrorAction SilentlyContinue) {
         Write-Info "Using pnpm..."
-        pnpm add -g magic-shell
+        pnpm add -g @austinthesing/magic-shell
     }
     else {
         Write-Error-Custom "No package manager found. Please install Node.js/npm, Bun, Yarn, or pnpm first."
     }
     
-    Write-Success "Installed magic-shell via npm"
+    Write-Success "Installed @austinthesing/magic-shell via npm"
     return $true
 }
 

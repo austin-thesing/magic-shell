@@ -30,20 +30,20 @@ curl -fsSL https://raw.githubusercontent.com/austin-thesing/magic-shell/main/ins
 irm https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.ps1 | iex
 ```
 
-### Via npm
+### Via Package Manager
 
 ```bash
-# Install globally with npm
-npm install -g magic-shell
+# Install globally with bun (recommended)
+bun add -g @austinthesing/magic-shell
+
+# Or with npm
+npm install -g @austinthesing/magic-shell
 
 # Or with yarn
-yarn global add magic-shell
+yarn global add @austinthesing/magic-shell
 
 # Or with pnpm
-pnpm add -g magic-shell
-
-# Or with bun
-bun add -g magic-shell
+pnpm add -g @austinthesing/magic-shell
 ```
 
 ### Via Homebrew (macOS/Linux)
@@ -365,7 +365,7 @@ src/
 
    ```json
    {
-     "name": "magic-shell",
+     "name": "@austinthesing/magic-shell",
      "version": "0.1.0",
      "description": "Natural language to terminal commands with safety features",
      "main": "dist/index.js",

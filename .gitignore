@@ -1,1 +1,23 @@
 node_modules/
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Debug
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# Package tarballs
+*.tgz
