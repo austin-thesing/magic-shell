@@ -10,30 +10,51 @@
   </div>
 
   <div class="hero-content container">
-    <!-- Brand Lockup -->
-    <div class="brand-lockup">
-      <div class="brand-icon">
-        <span class="icon-text">$_</span>
+    <div class="hero-grid">
+      <!-- Left Column: Text Content -->
+      <div class="hero-text">
+        <!-- Badge above brand -->
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          <span>Open Source Tool</span>
+        </div>
+
+        <!-- Brand Lockup -->
+        <div class="brand-lockup">
+          <div class="brand-icon">
+            <span class="icon-text">$_</span>
+          </div>
+          <span class="brand-name">magic-shell</span>
+        </div>
+
+        <h1 class="hero-title">
+          <span class="title-line">Type what you mean.</span>
+          <span class="highlight">Execute what you need.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Transform natural language into terminal commands with AI-powered translation 
+          and built-in safety features.
+        </p>
+
+        <div class="hero-actions">
+          <a href="/getting-started/installation/" class="btn btn-primary">
+            Get Started
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <a href="https://github.com/austin-thesing/magic-shell" class="btn btn-secondary" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
       </div>
-      <span class="brand-name">magic-shell</span>
-    </div>
 
-    <div class="hero-badge">
-      <span class="badge-dot"></span>
-      <span>Open Source CLI Tool</span>
-    </div>
-
-    <h1 class="hero-title">
-      Type what you mean.<br/>
-      <span class="highlight">Execute what you need.</span>
-    </h1>
-
-    <p class="hero-subtitle">
-      Transform natural language into terminal commands with AI-powered translation 
-      and built-in safety features.
-    </p>
-
-    <div class="hero-demo">
+      <!-- Right Column: Demo -->
+      <div class="hero-demo">
       <!-- Mode Tabs -->
       <div class="demo-tabs">
         <button class="demo-tab active" data-mode="cli">CLI Mode</button>
@@ -117,20 +138,6 @@
         </div>
       </div>
     </div>
-
-    <div class="hero-actions">
-      <a href="/getting-started/installation/" class="btn btn-primary">
-        Get Started
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-      </a>
-      <a href="https://github.com/austin-thesing/magic-shell" class="btn btn-secondary" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-        </svg>
-        GitHub
-      </a>
     </div>
   </div>
 </section>
@@ -356,24 +363,35 @@
 
   .hero-content {
     position: relative;
-    text-align: center;
-    max-width: 900px;
+    max-width: 1200px;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  .hero-text {
+    text-align: left;
   }
 
   /* Brand Lockup */
   .brand-lockup {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-4);
-    margin-bottom: var(--space-8);
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
     animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.1s;
   }
 
   .brand-icon {
-    width: 56px;
-    height: 56px;
+    width: 40px;
+    height: 40px;
     background: var(--bg-terminal);
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -400,7 +418,7 @@
 
   .icon-text {
     font-family: var(--font-mono);
-    font-size: 22px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--color-primary);
     text-shadow: 0 0 20px rgba(250, 178, 131, 0.5);
@@ -410,7 +428,7 @@
 
   .brand-name {
     font-family: var(--font-mono);
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.03em;
@@ -436,16 +454,15 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--space-4);
+    padding: var(--space-1) var(--space-3);
     background: var(--bg-elevated);
     border: 1px solid var(--border-subtle);
     border-radius: 100px;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     color: var(--text-secondary);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-4);
     animation: fadeInUp 0.6s ease forwards;
-    animation-delay: 0.1s;
     opacity: 0;
   }
 
@@ -458,9 +475,9 @@
   }
 
   .hero-title {
-    font-size: var(--text-5xl);
+    font-size: clamp(2.5rem, 6vw, 4rem);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.15;
     margin-bottom: var(--space-6);
     letter-spacing: -0.03em;
     animation: fadeInUp 0.6s ease forwards;
@@ -468,28 +485,44 @@
     opacity: 0;
   }
 
+  .hero-title .title-line {
+    display: block;
+  }
+
   .hero-title .highlight {
+    display: block;
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-warning) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    white-space: nowrap;
   }
 
   .hero-subtitle {
     font-size: var(--text-lg);
     color: var(--text-secondary);
-    max-width: 600px;
-    margin: 0 auto var(--space-10);
+    max-width: 500px;
+    margin: 0 0 var(--space-8);
     line-height: 1.7;
     animation: fadeInUp 0.6s ease forwards;
     animation-delay: 0.3s;
     opacity: 0;
   }
 
+  /* Actions in left column */
+  .hero-actions {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: 0.4s;
+    opacity: 0;
+  }
+
   /* Demo Tabs */
   .hero-demo {
     animation: fadeInUp 0.6s ease forwards;
-    animation-delay: 0.4s;
+    animation-delay: 0.5s;
     opacity: 0;
   }
 
@@ -523,18 +556,12 @@
   }
 
   /* Demo Window */
-  .hero-demo {
-    margin-bottom: var(--space-10);
-  }
-
   .demo-window {
     background: var(--bg-terminal);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
     overflow: hidden;
     text-align: left;
-    max-width: 650px;
-    margin: 0 auto;
     box-shadow: var(--shadow-deep), var(--shadow-glow);
     display: none;
   }
@@ -836,17 +863,6 @@
     51%, 100% { opacity: 0; }
   }
 
-  /* Actions */
-  .hero-actions {
-    display: flex;
-    gap: var(--space-4);
-    justify-content: center;
-    flex-wrap: wrap;
-    animation: fadeInUp 0.6s ease forwards;
-    animation-delay: 0.5s;
-    opacity: 0;
-  }
-
   .btn {
     display: inline-flex;
     align-items: center;
@@ -888,6 +904,25 @@
     flex-shrink: 0;
   }
 
+  @media (max-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-10);
+    }
+
+    .hero-text {
+      text-align: center;
+    }
+
+    .hero-subtitle {
+      margin: 0 auto var(--space-8);
+    }
+
+    .hero-actions {
+      justify-content: center;
+    }
+  }
+
   @media (max-width: 768px) {
     .hero {
       padding: var(--space-16) 0;
@@ -895,22 +930,27 @@
     }
 
     .brand-lockup {
-      gap: var(--space-3);
-      margin-bottom: var(--space-6);
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+      justify-content: center;
     }
 
     .brand-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
     }
 
     .icon-text {
-      font-size: 18px;
+      font-size: 14px;
     }
 
     .hero-title {
-      font-size: var(--text-3xl);
+      font-size: clamp(1.75rem, 8vw, 2.5rem);
+    }
+
+    .hero-title .highlight {
+      white-space: normal;
     }
 
     .hero-subtitle {
