@@ -3,16 +3,23 @@
   "version": "0.1.0",
   "description": "Natural language to terminal commands with safety features. Supports OpenCode Zen (with free models) and OpenRouter.",
   "type": "module",
+  "main": "dist/index.js",
   "bin": {
     "magic-shell": "./dist/index.js",
     "msh": "./dist/index.js",
     "ms": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "bun run src/index.ts",
     "dev:tui": "bun run src/index.ts -i",
     "build": "bun build src/index.ts src/cli.ts --outdir dist --target node",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run build"
   },
   "keywords": [
     "cli",
@@ -22,10 +29,26 @@
     "ai",
     "openrouter",
     "opencode",
-    "zen"
+    "zen",
+    "command-line",
+    "nlp",
+    "gpt",
+    "claude",
+    "llm"
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/austin-thesing/magic-shell.git"
+  },
+  "homepage": "https://github.com/austin-thesing/magic-shell#readme",
+  "bugs": {
+    "url": "https://github.com/austin-thesing/magic-shell/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@opentui/core": "^0.1.74"
   },
