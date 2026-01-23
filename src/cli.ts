@@ -351,6 +351,7 @@ function createMainUI() {
     id: "prompt-text",
     content: t`${fg(theme.colors.primary)("~>")} `,
     width: 3,
+    height: 1,
   })
   inputRow.add(promptText)
 
