@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 1200px;
+      height: 630px;
+      background: #030303;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'SF Mono', 'Monaco', 'Menlo', 'Courier New', monospace;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* Subtle grid pattern */
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(37, 37, 37, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37, 37, 37, 0.3) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.2;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 70%);
+    }
+    
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      z-index: 1;
+      padding: 80px;
+    }
+    
+    .brand-icon {
+      width: 80px;
+      height: 80px;
+      background: #0a0a0a;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(250, 178, 131, 0.2);
+      box-shadow: 
+        0 0 0 1px rgba(250, 178, 131, 0.1),
+        0 8px 40px rgba(0, 0, 0, 0.7),
+        0 0 40px rgba(250, 178, 131, 0.08);
+    }
+    
+    .icon-text {
+      font-size: 32px;
+      font-weight: 700;
+      color: #fab283;
+      text-shadow: 0 0 20px rgba(250, 178, 131, 0.5);
+    }
+    
+    .brand-name {
+      font-size: 72px;
+      font-weight: 700;
+      color: #eeeeee;
+      letter-spacing: -0.03em;
+    }
+    
+    .tagline {
+      font-size: 28px;
+      color: #b0b0b0;
+      text-align: center;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+    
+    .terminal-preview {
+      margin-top: 16px;
+      background: #0a0a0a;
+      border: 1px solid rgba(37, 37, 37, 0.8);
+      border-radius: 8px;
+      padding: 20px 24px;
+      font-size: 18px;
+      color: #b0b0b0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .prompt {
+      color: #fab283;
+      font-weight: 600;
+    }
+    
+    .command {
+      color: #5c9cf5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="brand-icon">
+      <span class="icon-text">$_</span>
+    </div>
+    <h1 class="brand-name">magic-shell</h1>
+    <p class="tagline">Type what you mean.<br>Execute what you need.</p>
+    <div class="terminal-preview">
+      <span class="prompt">$</span>
+      <span class="command">msh "find all large files"</span>
+    </div>
+  </div>
+</body>
+</html>
