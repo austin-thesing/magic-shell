@@ -6,6 +6,7 @@ import {
   TextRenderable,
   InputRenderable,
   InputRenderableEvents,
+  TextareaRenderable,
   SelectRenderable,
   SelectRenderableEvents,
   ScrollBoxRenderable,
@@ -13,6 +14,7 @@ import {
   type KeyEvent,
   type SelectOption,
   type StyledText,
+  type PasteEvent,
   t,
   fg,
   bold,
@@ -54,7 +56,9 @@ let mainContainer: BoxRenderable
 let headerText: TextRenderable
 let statusBarText: TextRenderable
 let chatScrollBox: ScrollBoxRenderable
-let inputField: InputRenderable
+let inputField: TextareaRenderable
+let inputContainer: BoxRenderable
+let inputHintText: TextRenderable
 let helpBarText: TextRenderable
 let modelSelector: SelectRenderable | null = null
 let providerSelector: SelectRenderable | null = null
@@ -330,39 +334,55 @@ function createMainUI() {
   // Add welcome message
   addSystemMessage(getWelcomeMessage())
 
-  // === Input Row (at bottom) ===
-  const inputRow = new BoxRenderable(renderer, {
-    id: "input-row",
-    flexDirection: "row",
+  // === Input Container (at bottom) - OpenCode style ===
+  inputContainer = new BoxRenderable(renderer, {
+    id: "input-container",
+    flexDirection: "column",
     width: "100%",
     marginTop: 1,
-    alignItems: "center",
+    border: true,
+    borderColor: theme.colors.primary, // Use primary color for accent
+    borderStyle: "rounded",
+    paddingLeft: 1,
+    paddingRight: 1,
+    paddingTop: 0,
+    paddingBottom: 0,
+    backgroundColor: theme.colors.backgroundPanel,
   })
-  mainContainer.add(inputRow)
+  mainContainer.add(inputContainer)
 
-  const promptText = new TextRenderable(renderer, {
-    id: "prompt-text",
-    content: t`${fg(theme.colors.primary)("~>")} `,
-    width: 3,
-    height: 1,
-  })
-  inputRow.add(promptText)
-
-  inputField = new InputRenderable(renderer, {
+  // Textarea input field (multiline)
+  // Custom keybindings: Enter = submit, Shift+Enter = newline
+  inputField = new TextareaRenderable(renderer, {
     id: "input-field",
-    flexGrow: 1,
-    height: 1,
-    placeholder: "describe what you want to do...",
+    width: "100%",
+    height: 3,
+    placeholder: t`${fg(theme.colors.textMuted)("Describe what you want to do...")}`,
     backgroundColor: "transparent",
-    focusedBackgroundColor: theme.colors.backgroundPanel,
+    focusedBackgroundColor: "transparent",
     textColor: theme.colors.text,
-    placeholderColor: theme.colors.textMuted,
-    cursorColor: theme.colors.primary,
-    onPaste: (event) => {
-      inputField.insertText(event.text)
+    keyBindings: [
+      // Override defaults: Enter submits, Shift+Enter adds newline
+      { name: "return", action: "submit" },
+      { name: "linefeed", action: "submit" },
+      { name: "return", shift: true, action: "newline" },
+      { name: "linefeed", shift: true, action: "newline" },
+      // Keep meta+return as submit too for muscle memory
+      { name: "return", meta: true, action: "submit" },
+    ],
+    onSubmit: () => {
+      const value = inputField.editBuffer.getText()
+      handleInput(value)
     },
   })
-  inputRow.add(inputField)
+  inputContainer.add(inputField)
+
+  // Input hint bar (inside the container, below textarea)
+  inputHintText = new TextRenderable(renderer, {
+    id: "input-hint",
+    content: getInputHintContent(),
+  })
+  inputContainer.add(inputHintText)
 
   // === Help Bar (bottom) ===
   helpBarText = new TextRenderable(renderer, {
@@ -373,7 +393,6 @@ function createMainUI() {
   mainContainer.add(helpBarText)
 
   // Event handlers
-  inputField.on(InputRenderableEvents.ENTER, handleInput)
   renderer.keyInput.on("keypress", handleKeypress)
 
   inputField.focus()
@@ -406,6 +425,11 @@ function getHelpBarContent(): StyledText {
     return t`${fg(theme.colors.warning)(">>> Press Enter to execute command <<<")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.error)("Esc")}${fg(theme.colors.textMuted)(" Cancel")} ${fg(theme.colors.primary)("e")}${fg(theme.colors.textMuted)(" Edit")} ${fg(theme.colors.primary)("c")}${fg(theme.colors.textMuted)(" Copy")}`
   }
   return t`${fg(theme.colors.primary)("Ctrl+X P")}${fg(theme.colors.textMuted)(" Commands")}  ${fg(theme.colors.primary)("Ctrl+Y")}${fg(theme.colors.textMuted)(" Safety")}  ${fg(theme.colors.primary)("Ctrl+Z")}${fg(theme.colors.textMuted)(" Exit")}`
+}
+
+function getInputHintContent(): StyledText {
+  const theme = getTheme()
+  return t`${fg(theme.colors.textMuted)("Enter")}${fg(theme.colors.border)(" send")}  ${fg(theme.colors.textMuted)("Shift+Enter")}${fg(theme.colors.border)(" newline")}`
 }
 
 function getWelcomeMessage(): string {
@@ -731,12 +755,18 @@ function refreshThemeColors() {
     }
   }
   
-  // Update input field colors
+  // Update input field and container colors
   if (inputField) {
-    inputField.focusedBackgroundColor = theme.colors.backgroundPanel
+    inputField.focusedBackgroundColor = "transparent"
     inputField.textColor = theme.colors.text
-    inputField.placeholderColor = theme.colors.textMuted
-    inputField.cursorColor = theme.colors.primary
+    inputField.placeholder = t`${fg(theme.colors.textMuted)("Describe what you want to do...")}`
+  }
+  if (inputContainer) {
+    inputContainer.borderColor = theme.colors.primary
+    inputContainer.backgroundColor = theme.colors.backgroundPanel
+  }
+  if (inputHintText) {
+    inputHintText.content = getInputHintContent()
   }
 }
 
@@ -744,7 +774,7 @@ async function handleInput(value: string) {
   const input = value.trim()
   if (!input) return
 
-  inputField.value = ""
+  inputField.setText("")
 
   // Handle special commands
   if (input.startsWith("!")) {
@@ -1661,7 +1691,7 @@ function handleKeypress(key: KeyEvent) {
   if (key.name === "e" && awaitingConfirmation && pendingMessageId) {
     const msg = chatMessages.find(m => m.id === pendingMessageId)
     if (msg && msg.command) {
-      inputField.value = msg.command
+      inputField.setText(msg.command)
       clearCommandState()
       inputField.focus()
     }
