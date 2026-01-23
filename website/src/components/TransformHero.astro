@@ -164,7 +164,7 @@
   let cliIndex = 0;
   let tuiIndex = 0;
   let currentMode: 'cli' | 'tui' = 'cli';
-  let isAnimating = false;
+  let animationId = 0; // Used to cancel stale animations
 
   // DOM Elements - CLI
   const typingInput = document.getElementById('typing-input');
@@ -210,42 +210,51 @@
     });
   });
 
-  async function typeText(element: HTMLElement | null, text: string, speed = 50) {
-    if (!element) return;
+  async function typeText(element: HTMLElement | null, text: string, speed = 50, myAnimationId: number) {
+    if (!element) return false;
     element.textContent = '';
     for (let i = 0; i < text.length; i++) {
+      if (animationId !== myAnimationId) return false; // Animation was cancelled
       element.textContent += text[i];
       await new Promise(r => setTimeout(r, speed));
     }
+    return true;
   }
 
   async function runCliDemo() {
     if (currentMode !== 'cli') return;
     
+    const myAnimationId = ++animationId;
     const example = cliExamples[cliIndex];
     
     // Reset
     outputLine?.classList.remove('visible');
     if (outputText) outputText.textContent = '';
+    if (typingInput) typingInput.textContent = '';
     
     // Type input
     if (typingInput) {
-      await typeText(typingInput, example.input, 40);
+      const completed = await typeText(typingInput, example.input, 40, myAnimationId);
+      if (!completed) return;
     }
 
-    if (currentMode !== 'cli') return;
+    if (currentMode !== 'cli' || animationId !== myAnimationId) return;
     
     // Show output
     await new Promise(r => setTimeout(r, 500));
+    if (animationId !== myAnimationId) return;
+    
     if (outputText) {
       outputText.textContent = '';
       outputLine?.classList.add('visible');
       await new Promise(r => setTimeout(r, 200));
+      if (animationId !== myAnimationId) return;
       outputText.textContent = example.output;
     }
     
     // Wait before next
     await new Promise(r => setTimeout(r, 3000));
+    if (animationId !== myAnimationId) return;
     
     cliIndex = (cliIndex + 1) % cliExamples.length;
     if (currentMode === 'cli') runCliDemo();
@@ -254,6 +263,7 @@
   async function runTuiDemo() {
     if (currentMode !== 'tui') return;
 
+    const myAnimationId = ++animationId;
     const example = tuiExamples[tuiIndex];
     
     // Reset
@@ -278,12 +288,14 @@
     }
 
     // Type in input area
-    await typeText(tuiInput, example.query, 35);
+    const completed = await typeText(tuiInput, example.query, 35, myAnimationId);
+    if (!completed) return;
     
-    if (currentMode !== 'tui') return;
+    if (currentMode !== 'tui' || animationId !== myAnimationId) return;
 
     // Simulate "enter" - move to output
     await new Promise(r => setTimeout(r, 300));
+    if (animationId !== myAnimationId) return;
     if (tuiInput) tuiInput.textContent = '';
     
     // Show user message
@@ -291,7 +303,7 @@
     tuiUserMsg?.classList.add('visible');
     
     await new Promise(r => setTimeout(r, 400));
-    if (currentMode !== 'tui') return;
+    if (currentMode !== 'tui' || animationId !== myAnimationId) return;
 
     // Show AI response
     if (tuiCommand) tuiCommand.textContent = example.command;
@@ -299,6 +311,7 @@
 
     // Wait before next
     await new Promise(r => setTimeout(r, 4000));
+    if (animationId !== myAnimationId) return;
     
     tuiIndex = (tuiIndex + 1) % tuiExamples.length;
     if (currentMode === 'tui') runTuiDemo();
