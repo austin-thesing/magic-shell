@@ -1,3 +1,9 @@
+import { createAnthropic } from "@ai-sdk/anthropic"
+import { createGoogleGenerativeAI } from "@ai-sdk/google"
+import { createOpenAI } from "@ai-sdk/openai"
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible"
+import { generateText, type LanguageModel } from "ai"
+
 import type { CommandHistory, Model, Config } from "./types"
 import { detectShell, getShellSyntaxHints, getPlatformPaths, type ShellInfo } from "./shell"
 import { detectRepoContext, formatRepoContext } from "./repo-context"
@@ -23,19 +29,7 @@ function getZenApiType(modelId: string): ZenApiType {
   return "openai-compatible"
 }
 
-function getZenEndpoint(modelId: string): string {
-  const apiType = getZenApiType(modelId)
-  switch (apiType) {
-    case "openai-responses":
-      return "https://opencode.ai/zen/v1/responses"
-    case "anthropic":
-      return "https://opencode.ai/zen/v1/messages"
-    case "google":
-      return `https://opencode.ai/zen/v1/models/${modelId}`
-    case "openai-compatible":
-      return "https://opencode.ai/zen/v1/chat/completions"
-  }
-}
+const ZEN_BASE_URL = "https://opencode.ai/zen/v1"
 
 function buildSystemPrompt(cwd: string, history: CommandHistory[], shellInfo: ShellInfo, repoContextEnabled?: boolean): string {
   const historyContext = formatHistory(history)
@@ -197,10 +191,20 @@ async function callOpenRouter(
 // Debug flag - set to true to see API responses
 const DEBUG_API = process.env.DEBUG_API === "1"
 
-function appendDebugInfo(message: string, status: number, responseText: string): string {
-  if (!DEBUG_API) return message
-  const snippet = responseText.slice(0, 1000)
-  return `${message}\n[DEBUG] status=${status} response=${snippet}`
+async function generateZenText(
+  model: LanguageModel,
+  systemPrompt: string,
+  userInput: string
+): Promise<string> {
+  const { text } = await generateText({
+    model,
+    system: systemPrompt,
+    prompt: userInput,
+    maxTokens: 500,
+    temperature: 0.1,
+  })
+
+  return text.trim()
 }
 
 // OpenCode Zen - OpenAI Responses API
@@ -215,93 +219,20 @@ async function callZenOpenAIResponses(
     console.error(`[DEBUG] Model: ${modelId}`)
     console.error(`[DEBUG] API Key prefix: ${apiKey.slice(0, 10)}...`)
   }
-
-  const response = await fetch("https://opencode.ai/zen/v1/responses", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: modelId,
-      instructions: systemPrompt,
-      input: userInput,
-      max_output_tokens: 500,
-      temperature: 0.1,
-      stream: false,
-    }),
+  const openai = createOpenAI({
+    apiKey,
+    baseURL: ZEN_BASE_URL,
   })
 
-  const responseText = await response.text()
-  
-  if (DEBUG_API) {
-    console.error(`[DEBUG] OpenAI Responses API Status: ${response.status}`)
-    console.error(`[DEBUG] OpenAI Responses API Response: ${responseText.slice(0, 1000)}`)
-  }
-
-  if (!response.ok) {
-    let errorMessage = `API request failed: ${response.status}`
-    try {
-      const errorData = JSON.parse(responseText)
-      if (errorData.error?.message) {
-        errorMessage = errorData.error.message
-      } else if (errorData.message) {
-        errorMessage = errorData.message
-      }
-    } catch {}
-    throw new Error(appendDebugInfo(errorMessage, response.status, responseText))
-  }
-
-  let data: any
   try {
-    data = JSON.parse(responseText)
-  } catch (e) {
-    throw new Error(`Invalid JSON response: ${responseText.slice(0, 200)}`)
-  }
-  
-  if (data.error) {
-    const errorMessage = data.error.message || data.error
-    throw new Error(appendDebugInfo(errorMessage, response.status, responseText))
-  }
-
-  // OpenAI Responses API structure:
-  // { output: [{ type: "message", content: [{ type: "output_text", text: "..." }] }], ... }
-  // or sometimes: { output_text: "..." }
-  
-  // Try output_text first (simpler response format)
-  if (typeof data.output_text === "string") {
-    return data.output_text.trim()
-  }
-
-  // Try the output array format
-  const output = data.output || []
-  
-  // Look for message type output
-  const messageOutput = output.find((o: any) => o.type === "message")
-  if (messageOutput?.content) {
-    // Content can be array of content blocks
-    const textBlock = Array.isArray(messageOutput.content) 
-      ? messageOutput.content.find((c: any) => c.type === "output_text" || c.type === "text")
-      : messageOutput.content
-    
-    if (textBlock?.text) {
-      return textBlock.text.trim()
+    return await generateZenText(openai(modelId), systemPrompt, userInput)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    if (DEBUG_API) {
+      console.error(`[DEBUG] OpenAI Responses API Error: ${message}`)
     }
-    // Sometimes text is directly on the content object
-    if (typeof textBlock === "string") {
-      return textBlock.trim()
-    }
+    throw new Error(message)
   }
-
-  // Try looking for any text in the output array
-  for (const item of output) {
-    if (item.text) return item.text.trim()
-    if (item.content?.text) return item.content.text.trim()
-  }
-
-  // Last resort - stringify and look for text
-  const jsonStr = JSON.stringify(data)
-  throw new Error(`Unexpected API response format: ${jsonStr.slice(0, 200)}`)
 }
 
 // OpenCode Zen - Anthropic Messages API
@@ -316,43 +247,20 @@ async function callZenAnthropic(
     console.error(`[DEBUG] Model: ${modelId}`)
     console.error(`[DEBUG] API Key prefix: ${apiKey.slice(0, 10)}...`)
   }
-
-  const response = await fetch("https://opencode.ai/zen/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: modelId,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userInput }],
-      max_tokens: 500,
-      temperature: 0.1,
-    }),
+  const anthropic = createAnthropic({
+    apiKey,
+    baseURL: ZEN_BASE_URL,
   })
 
-  if (!response.ok) {
-    const errorText = await response.text()
-    let errorMessage = `API request failed: ${response.status}`
-    try {
-      const errorData = JSON.parse(errorText)
-      if (errorData.error?.message) {
-        errorMessage = errorData.error.message
-      }
-    } catch {}
-    throw new Error(appendDebugInfo(errorMessage, response.status, errorText))
+  try {
+    return await generateZenText(anthropic(modelId), systemPrompt, userInput)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    if (DEBUG_API) {
+      console.error(`[DEBUG] Anthropic Messages API Error: ${message}`)
+    }
+    throw new Error(message)
   }
-
-  const data = await response.json()
-  if (data.error) {
-    throw new Error(data.error.message)
-  }
-
-  // Anthropic Messages API returns content array
-  const textContent = data.content?.find((c: any) => c.type === "text")
-  return textContent?.text?.trim() || ""
 }
 
 // OpenCode Zen - OpenAI-compatible Chat Completions
@@ -366,59 +274,21 @@ async function callZenOpenAICompatible(
     console.error(`[DEBUG] Calling OpenAI-compatible Chat Completions API`)
     console.error(`[DEBUG] Model: ${modelId}`)
   }
-
-  const response = await fetch("https://opencode.ai/zen/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: modelId,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userInput },
-      ],
-      max_tokens: 500,
-      temperature: 0.1,
-    }),
+  const openaiCompatible = createOpenAICompatible({
+    name: "opencode-zen",
+    apiKey,
+    baseURL: ZEN_BASE_URL,
   })
 
-  if (!response.ok) {
-    const errorText = await response.text()
-    let errorMessage = `API request failed: ${response.status}`
-    try {
-      const errorData = JSON.parse(errorText)
-      if (errorData.error?.message) {
-        errorMessage = errorData.error.message
-      }
-    } catch {}
-    throw new Error(appendDebugInfo(errorMessage, response.status, errorText))
-  }
-
-  const data = await response.json()
-  if (data.error) {
-    throw new Error(data.error.message)
-  }
-
-  const choice = data.choices?.[0]
-  const messageContent = choice?.message?.content
-  if (typeof messageContent === "string") {
-    return messageContent.trim()
-  }
-  if (Array.isArray(messageContent)) {
-    const textBlocks = messageContent
-      .map((block) => (typeof block === "string" ? block : block?.text))
-      .filter(Boolean)
-    if (textBlocks.length > 0) {
-      return textBlocks.join("").trim()
+  try {
+    return await generateZenText(openaiCompatible(modelId), systemPrompt, userInput)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    if (DEBUG_API) {
+      console.error(`[DEBUG] OpenAI-compatible API Error: ${message}`)
     }
+    throw new Error(message)
   }
-  if (typeof choice?.text === "string") {
-    return choice.text.trim()
-  }
-
-  return ""
 }
 
 // OpenCode Zen - Google (Gemini)
@@ -429,66 +299,24 @@ async function callZenGoogle(
   systemPrompt: string,
   userInput: string
 ): Promise<string> {
-  // Zen Gemini endpoint: /v1/models/{model}
-  const endpoint = `https://opencode.ai/zen/v1/models/${modelId}`
-  
   if (DEBUG_API) {
     console.error(`[DEBUG] Calling Google Gemini API`)
     console.error(`[DEBUG] Model: ${modelId}`)
-    console.error(`[DEBUG] Endpoint: ${endpoint}`)
   }
-  
-  const prompt = `${systemPrompt}\n\nUser request: ${userInput}`
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      contents: [
-        { role: "user", parts: [{ text: prompt }] },
-      ],
-      generationConfig: {
-        maxOutputTokens: 500,
-        temperature: 0.1,
-      },
-    }),
+  const google = createGoogleGenerativeAI({
+    apiKey,
+    baseURL: ZEN_BASE_URL,
   })
 
-  const responseText = await response.text()
-  
-  if (DEBUG_API) {
-    console.error(`[DEBUG] Gemini API Status: ${response.status}`)
-    console.error(`[DEBUG] Gemini API Response: ${responseText.slice(0, 1000)}`)
-  }
-
-  if (!response.ok) {
-    let errorMessage = `API request failed: ${response.status}`
-    try {
-      const errorData = JSON.parse(responseText)
-      if (errorData.error?.message) {
-        errorMessage = errorData.error.message
-      }
-    } catch {}
-    throw new Error(appendDebugInfo(errorMessage, response.status, responseText))
-  }
-
-  let data: any
   try {
-    data = JSON.parse(responseText)
-  } catch (e) {
-    throw new Error(`Invalid JSON response: ${responseText.slice(0, 200)}`)
+    return await generateZenText(google(modelId), systemPrompt, userInput)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    if (DEBUG_API) {
+      console.error(`[DEBUG] Google Gemini API Error: ${message}`)
+    }
+    throw new Error(message)
   }
-  
-  if (data.error) {
-    throw new Error(appendDebugInfo(data.error.message, response.status, responseText))
-  }
-
-  // Google returns candidates array
-  const candidate = data.candidates?.[0]
-  const textPart = candidate?.content?.parts?.find((p: any) => p.text)
-  return textPart?.text?.trim() || ""
 }
 
 // Cache shell info to avoid repeated detection

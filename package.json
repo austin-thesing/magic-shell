@@ -1,6 +1,6 @@
 {
   "name": "@austinthesing/magic-shell",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "Natural language to terminal commands with safety features. Supports OpenCode Zen (with free models) and OpenRouter.",
   "type": "module",
   "main": "dist/index.js",
@@ -49,6 +49,11 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.0",
+    "@ai-sdk/google": "^3.0.0",
+    "@ai-sdk/openai": "^3.0.0",
+    "@ai-sdk/openai-compatible": "^2.0.0",
+    "ai": "^6.0.0",
     "@opentui/core": "^0.1.74"
   },
   "devDependencies": {
