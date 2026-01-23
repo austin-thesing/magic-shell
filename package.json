@@ -1,0 +1,36 @@
+{
+  "name": "magic-shell",
+  "version": "0.1.0",
+  "description": "Natural language to terminal commands with safety features. Supports OpenCode Zen (with free models) and OpenRouter.",
+  "type": "module",
+  "bin": {
+    "magic-shell": "./dist/index.js",
+    "msh": "./dist/index.js",
+    "ms": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "dev:tui": "bun run src/index.ts -i",
+    "build": "bun build src/index.ts src/cli.ts --outdir dist --target node",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "cli",
+    "terminal",
+    "natural-language",
+    "shell",
+    "ai",
+    "openrouter",
+    "opencode",
+    "zen"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@opentui/core": "^0.1.74"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.0.0"
+  }
+}
