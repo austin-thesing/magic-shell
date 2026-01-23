@@ -108,13 +108,12 @@ export const OPENCODE_ZEN_MODELS: Model[] = [
     free: true,
   },
   {
-    id: "glm-4.7-free",
+    id: "glm-4.7",
     name: "GLM 4.7",
-    description: "Free GLM model (limited time)",
+    description: "GLM model",
     category: "fast",
     provider: "opencode-zen",
     contextLength: 128000,
-    free: true,
   },
   {
     id: "minimax-m2.1-free",
