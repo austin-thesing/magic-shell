@@ -346,13 +346,13 @@ function createMainUI() {
     paddingLeft: 1,
     paddingRight: 1,
     paddingTop: 0,
-    paddingBottom: 0,
+    paddingBottom: 1,
     backgroundColor: theme.colors.backgroundPanel,
   })
   mainContainer.add(inputContainer)
 
   // Textarea input field (multiline)
-  // Custom keybindings: Enter = submit, Shift+Enter = newline
+  // Custom keybindings: Enter = submit
   inputField = new TextareaRenderable(renderer, {
     id: "input-field",
     width: "100%",
@@ -362,11 +362,11 @@ function createMainUI() {
     focusedBackgroundColor: "transparent",
     textColor: theme.colors.text,
     keyBindings: [
-      // Override defaults: Enter submits, Shift+Enter adds newline
+      // Override defaults: Enter submits
       { name: "return", action: "submit" },
       { name: "linefeed", action: "submit" },
-      { name: "return", shift: true, action: "newline" },
-      { name: "linefeed", shift: true, action: "newline" },
+      { name: "return", shift: true, action: "submit" },
+      { name: "linefeed", shift: true, action: "submit" },
       // Keep meta+return as submit too for muscle memory
       { name: "return", meta: true, action: "submit" },
     ],
@@ -381,6 +381,7 @@ function createMainUI() {
   inputHintText = new TextRenderable(renderer, {
     id: "input-hint",
     content: getInputHintContent(),
+    marginTop: 1,
   })
   inputContainer.add(inputHintText)
 
@@ -429,7 +430,7 @@ function getHelpBarContent(): StyledText {
 
 function getInputHintContent(): StyledText {
   const theme = getTheme()
-  return t`${fg(theme.colors.textMuted)("Enter")}${fg(theme.colors.border)(" send")}  ${fg(theme.colors.textMuted)("Shift+Enter")}${fg(theme.colors.border)(" newline")}`
+  return t`${fg(theme.colors.primary)("Enter")} ${fg(theme.colors.textMuted)("to send")}`
 }
 
 function getWelcomeMessage(): string {
