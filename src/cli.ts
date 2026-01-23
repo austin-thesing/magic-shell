@@ -386,12 +386,18 @@ function getStatusBarContent(): StyledText {
   const providerName = config.provider === "opencode-zen" ? "OpenCode Zen" : "OpenRouter"
   const safeModeIndicator = dryRunMode 
     ? fg(theme.colors.warning)("[DRY RUN]")
-    : fg(theme.colors.success)("Safe")
+    : ""
+  const safetyLevelColor = config.safetyLevel === "strict" 
+    ? theme.colors.warning 
+    : config.safetyLevel === "relaxed" 
+      ? theme.colors.error 
+      : theme.colors.success
+  const safetyIndicator = fg(safetyLevelColor)(`[${config.safetyLevel}]`)
   const repoContextIndicator = config.repoContext
     ? fg(theme.colors.info)("[Repo]")
     : ""
   
-  return t`${fg(theme.colors.textMuted)("Provider:")} ${fg(theme.colors.text)(providerName)}  ${fg(theme.colors.textMuted)("Model:")} ${fg(theme.colors.text)(currentModel.name)}  ${safeModeIndicator}${repoContextIndicator ? " " : ""}${repoContextIndicator}`
+  return t`${fg(theme.colors.textMuted)("Provider:")} ${fg(theme.colors.text)(providerName)}  ${fg(theme.colors.textMuted)("Model:")} ${fg(theme.colors.text)(currentModel.name)}  ${safetyIndicator}${safeModeIndicator ? " " : ""}${safeModeIndicator}${repoContextIndicator ? " " : ""}${repoContextIndicator}`
 }
 
 function getHelpBarContent(): StyledText {
@@ -399,7 +405,7 @@ function getHelpBarContent(): StyledText {
   if (awaitingConfirmation) {
     return t`${fg(theme.colors.warning)(">>> Press Enter to execute command <<<")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.error)("Esc")}${fg(theme.colors.textMuted)(" Cancel")} ${fg(theme.colors.primary)("e")}${fg(theme.colors.textMuted)(" Edit")} ${fg(theme.colors.primary)("c")}${fg(theme.colors.textMuted)(" Copy")}`
   }
-  return t`${fg(theme.colors.textMuted)("Ctrl+X")} ${fg(theme.colors.primary)("P")}${fg(theme.colors.textMuted)(" Palette")}  ${fg(theme.colors.primary)("M")}${fg(theme.colors.textMuted)(" Model")}  ${fg(theme.colors.primary)("T")}${fg(theme.colors.textMuted)(" Theme")}  ${fg(theme.colors.primary)("D")}${fg(theme.colors.textMuted)(" Dry-run")}  ${fg(theme.colors.primary)("?")}${fg(theme.colors.textMuted)(" Help")}`
+  return t`${fg(theme.colors.textMuted)("Ctrl+X")} ${fg(theme.colors.primary)("P")}${fg(theme.colors.textMuted)(" Palette")}  ${fg(theme.colors.primary)("M")}${fg(theme.colors.textMuted)(" Model")}  ${fg(theme.colors.primary)("T")}${fg(theme.colors.textMuted)(" Theme")}  ${fg(theme.colors.primary)("Y")}${fg(theme.colors.textMuted)(" Safety")}  ${fg(theme.colors.primary)("D")}${fg(theme.colors.textMuted)(" Dry-run")}  ${fg(theme.colors.primary)("?")}${fg(theme.colors.textMuted)(" Help")}`
 }
 
 function getWelcomeMessage(): string {
@@ -1002,10 +1008,16 @@ function showHelp() {
   const helpText = `Keyboard Shortcuts (Ctrl+X then...):
 P  Command palette    M  Change model
 S  Switch provider    D  Toggle dry-run
-T  Change theme       R  Toggle repo context
+T  Change theme       Y  Cycle safety level
+R  Toggle repo context
 H  Show history       L  Clear chat
 C  Show config        ?  This help
 Q  Exit
+
+Safety Levels:
+- strict:   Confirm ALL potentially dangerous commands
+- moderate: Confirm high/critical severity commands (default)
+- relaxed:  Only confirm critical commands
 
 Other:
 Ctrl+C  Exit / Cancel     Esc  Close palette
@@ -1359,6 +1371,27 @@ function getCommandPaletteOptions(): PaletteCommand[] {
         dryRunMode = !dryRunMode
         statusBarText.content = getStatusBarContent()
         addSystemMessage(`Dry-run mode: ${dryRunMode ? "ON" : "OFF"}`)
+      },
+    },
+    {
+      name: "Cycle Safety Level",
+      description: `Current: ${config.safetyLevel}`,
+      key: "y",
+      chord: "y",
+      action: () => {
+        // Cycle: moderate -> strict -> relaxed -> moderate
+        const levels: Array<"strict" | "moderate" | "relaxed"> = ["moderate", "strict", "relaxed"]
+        const currentIndex = levels.indexOf(config.safetyLevel)
+        const nextIndex = (currentIndex + 1) % levels.length
+        config.safetyLevel = levels[nextIndex]
+        saveConfig(config)
+        statusBarText.content = getStatusBarContent()
+        const descriptions: Record<string, string> = {
+          strict: "confirms ALL potentially dangerous commands",
+          moderate: "confirms high/critical severity commands",
+          relaxed: "only confirms critical commands",
+        }
+        addSystemMessage(`Safety level: ${config.safetyLevel} (${descriptions[config.safetyLevel]})`)
       },
     },
     {

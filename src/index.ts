@@ -65,6 +65,7 @@ ${colors.bold}USAGE${colors.reset}
   msh --theme <name>       Set color theme
   msh --repo-context       Enable project context detection
   msh --no-repo-context    Disable project context detection
+  msh --safety <level>     Set safety level (strict, moderate, relaxed)
   msh --version            Show version
   msh --check-update       Check for updates
   msh --help               Show this help
@@ -578,6 +579,23 @@ async function main() {
     config.repoContext = false
     saveConfig(config)
     console.log(`${colors.success}✓ Project context disabled${colors.reset}`)
+    return
+  }
+  
+  if (args[0] === "--safety" && args[1]) {
+    const level = args[1].toLowerCase()
+    if (level !== "strict" && level !== "moderate" && level !== "relaxed") {
+      console.error(`${colors.error}Unknown safety level: ${level}${colors.reset}`)
+      console.error(`Valid levels: strict, moderate, relaxed`)
+      console.error(`  strict   - Confirm all potentially dangerous commands`)
+      console.error(`  moderate - Confirm high/critical severity commands (default)`)
+      console.error(`  relaxed  - Only confirm critical commands`)
+      process.exit(1)
+    }
+    const config = loadConfig()
+    config.safetyLevel = level as "strict" | "moderate" | "relaxed"
+    saveConfig(config)
+    console.log(`${colors.success}✓ Safety level set to ${level}${colors.reset}`)
     return
   }
   
