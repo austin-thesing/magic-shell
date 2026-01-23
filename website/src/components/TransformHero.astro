@@ -11,142 +11,130 @@ import InstallBlock from "./InstallBlock.astro";
   </div>
 
   <div class="hero-content container">
-    <div class="hero-grid">
-      <!-- Left Column: Text Content -->
-      <div class="hero-text">
-        <!-- Badge above brand -->
-        <div class="hero-badge">
-          <span class="badge-dot"></span>
-          <span>Open Source Tool</span>
-        </div>
-
-        <!-- Brand Lockup -->
-        <div class="brand-lockup">
-          <div class="brand-icon">
-            <span class="icon-text">$_</span>
-          </div>
-          <span class="brand-name">magic-shell</span>
-        </div>
-
-        <h1 class="hero-title">
-          <span class="title-line">Type what you mean.</span>
-          <span class="highlight">Execute what you need.</span>
-        </h1>
-
-        <p class="hero-subtitle">
-          Transform natural language into terminal commands with AI-powered translation 
-          and built-in safety features.
-        </p>
-
-        <div class="hero-actions">
-          <a href="/getting-started/installation/" class="btn btn-primary">
-            Get Started
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </a>
-          <a href="https://github.com/austin-thesing/magic-shell" class="btn btn-secondary" target="_blank" rel="noopener">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
-            GitHub
-          </a>
-        </div>
+    <!-- Centered header content -->
+    <div class="hero-header">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>Open Source CLI Tool</span>
       </div>
 
-      <!-- Right Column: Demo -->
-      <div class="hero-demo">
-      <!-- Mode Tabs -->
+      <h1 class="hero-title">
+        <span class="title-line">Type what you mean.</span>
+        <span class="highlight">Execute what you need.</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Transform natural language into terminal commands with AI-powered translation and built-in safety analysis.
+      </p>
+
+      <div class="hero-actions">
+        <a href="/getting-started/installation/" class="btn btn-primary">
+          Get Started
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+        <a href="https://github.com/austin-thesing/magic-shell" class="btn btn-secondary" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+
+    <!-- Demo section -->
+    <div class="hero-demo">
       <div class="demo-tabs">
         <button class="demo-tab active" data-mode="cli">CLI Mode</button>
         <button class="demo-tab" data-mode="tui">TUI Mode</button>
       </div>
 
-      <!-- CLI Demo -->
-      <div class="demo-window cli-demo active" data-demo="cli">
-        <div class="demo-header">
-          <div class="demo-lights">
-            <span></span><span></span><span></span>
-          </div>
-          <span class="demo-title">terminal</span>
-        </div>
-        <div class="demo-body">
-          <div class="demo-input-line">
-            <span class="prompt">$</span>
-            <span class="typing-container">
-              <span class="typing-text" id="typing-input"></span>
-              <span class="cursor"></span>
-            </span>
-          </div>
-          <div class="demo-output-line" id="demo-output">
-            <span class="output-arrow">-></span>
-            <span class="output-text" id="output-text"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- TUI Demo -->
-      <div class="demo-window tui-demo" data-demo="tui">
-        <div class="demo-header">
-          <div class="demo-lights">
-            <span></span><span></span><span></span>
-          </div>
-          <span class="demo-title">magic-shell</span>
-          <div class="demo-header-right">
-            <span class="model-badge">grok-code</span>
-          </div>
-        </div>
-        <div class="tui-body">
-          <!-- TUI Status Bar -->
-          <div class="tui-status-bar">
-            <span class="status-item"><span class="status-key">Provider:</span> opencode-zen</span>
-            <span class="status-item"><span class="status-key">Model:</span> grok-code</span>
-            <span class="status-item mode-safe"><span class="status-dot"></span> Safe Mode</span>
-          </div>
-
-          <!-- TUI Output Area -->
-          <div class="tui-output">
-            <div class="tui-message user-message" id="tui-user-msg">
-              <span class="msg-prefix">></span>
-              <span class="msg-text" id="tui-query"></span>
+      <div class="demo-container">
+        <!-- CLI Demo -->
+        <div class="demo-window cli-demo active" data-demo="cli">
+          <div class="demo-header">
+            <div class="demo-lights">
+              <span></span><span></span><span></span>
             </div>
-            <div class="tui-message ai-message" id="tui-ai-msg">
-              <div class="ai-response">
-                <div class="response-label">Command:</div>
-                <code class="response-command" id="tui-command"></code>
-              </div>
-              <div class="safety-badge" id="tui-safety">
-                <span class="safety-dot"></span>
-                <span class="safety-text">Low risk</span>
-              </div>
+            <span class="demo-title">terminal</span>
+          </div>
+          <div class="demo-body">
+            <div class="demo-input-line">
+              <span class="prompt">$</span>
+              <span class="typing-container">
+                <span class="typing-text" id="typing-input"></span>
+                <span class="cursor"></span>
+              </span>
+            </div>
+            <div class="demo-output-line" id="demo-output">
+              <span class="output-arrow">-></span>
+              <span class="output-text" id="output-text"></span>
             </div>
           </div>
+        </div>
 
-          <!-- TUI Input Area -->
-          <div class="tui-input-area">
-            <span class="tui-prompt">~></span>
-            <span class="tui-input-text" id="tui-input"></span>
-            <span class="tui-cursor"></span>
+        <!-- TUI Demo -->
+        <div class="demo-window tui-demo" data-demo="tui">
+          <div class="demo-header">
+            <div class="demo-lights">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="demo-title">magic-shell</span>
+            <div class="demo-header-right">
+              <span class="model-badge">grok-3</span>
+            </div>
           </div>
+          <div class="tui-body">
+            <div class="tui-status-bar">
+              <span class="status-item"><span class="status-key">Provider:</span> opencode-zen</span>
+              <span class="status-item"><span class="status-key">Model:</span> grok-3</span>
+              <span class="status-item mode-safe"><span class="status-dot"></span> Safe Mode</span>
+            </div>
 
-          <!-- TUI Help Bar -->
-          <div class="tui-help-bar">
-            <span class="help-item"><kbd>Ctrl+X M</kbd> Model</span>
-            <span class="help-item"><kbd>Ctrl+X T</kbd> Theme</span>
-            <span class="help-item"><kbd>Ctrl+X D</kbd> Dry-run</span>
-            <span class="help-item"><kbd>Ctrl+X ?</kbd> Help</span>
+            <div class="tui-output">
+              <div class="tui-message user-message" id="tui-user-msg">
+                <span class="msg-prefix">></span>
+                <span class="msg-text" id="tui-query"></span>
+              </div>
+              <div class="tui-message ai-message" id="tui-ai-msg">
+                <div class="ai-response">
+                  <div class="response-label">Command:</div>
+                  <code class="response-command" id="tui-command"></code>
+                </div>
+                <div class="safety-badge" id="tui-safety">
+                  <span class="safety-dot"></span>
+                  <span class="safety-text">Low risk</span>
+                </div>
+              </div>
+              <div class="tui-message exec-message" id="tui-exec-msg">
+                <div class="exec-header">
+                  <span class="exec-icon">></span>
+                  <span class="exec-label">Auto-executed (safe command)</span>
+                </div>
+                <pre class="exec-output" id="tui-exec-output"></pre>
+              </div>
+            </div>
+
+            <div class="tui-input-area">
+              <span class="tui-prompt">~></span>
+              <span class="tui-input-text" id="tui-input"></span>
+              <span class="tui-cursor"></span>
+            </div>
+
+            <div class="tui-help-bar">
+              <span class="help-item"><kbd>Enter</kbd> Execute</span>
+              <span class="help-item"><kbd>Ctrl+T</kbd> Theme</span>
+              <span class="help-item"><kbd>Ctrl+D</kbd> Dry-run</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    </div>
 
+    <!-- Install block -->
     <div class="hero-install">
-      <span class="hero-install-label">Install in one line</span>
       <InstallBlock platform="bun" variant="compact" />
-      <p class="hero-install-note">
-        Then run <code>msh --setup</code> to configure your API key, and <code>mshell</code> to launch the TUI.
-      </p>
     </div>
   </div>
 </section>
@@ -161,21 +149,46 @@ import InstallBlock from "./InstallBlock.astro";
     { input: 'msh "show disk usage"', output: 'df -h' },
   ];
 
-  // TUI Examples
+  // TUI Examples - with sample output for safe commands
   const tuiExamples = [
-    { query: 'find files modified today', command: 'find . -mtime 0 -type f', safety: 'Low risk' },
-    { query: 'kill process on port 8080', command: 'kill $(lsof -t -i:8080)', safety: 'Medium risk' },
-    { query: 'show git log with graph', command: 'git log --oneline --graph --all', safety: 'Low risk' },
-    { query: 'list all docker images', command: 'docker images --format "table {{.Repository}}\\t{{.Tag}}\\t{{.Size}}"', safety: 'Low risk' },
-    { query: 'find and delete node_modules', command: 'find . -name "node_modules" -type d -prune -exec rm -rf {} +', safety: 'High risk' },
+    { 
+      query: 'find files modified today', 
+      command: 'find . -mtime 0 -type f', 
+      safety: 'Low risk',
+      output: './src/components/Hero.tsx\n./package.json\n./README.md'
+    },
+    { 
+      query: 'kill process on port 8080', 
+      command: 'kill $(lsof -t -i:8080)', 
+      safety: 'Medium risk',
+      output: null // No auto-execute for medium risk
+    },
+    { 
+      query: 'show git log with graph', 
+      command: 'git log --oneline --graph --all', 
+      safety: 'Low risk',
+      output: '* a3f2c1d feat: add hero component\n* 8b1e4a2 fix: button styles\n* 2c9f0e1 init: project setup'
+    },
+    { 
+      query: 'show disk usage', 
+      command: 'df -h', 
+      safety: 'Low risk',
+      output: 'Filesystem      Size  Used Avail Use%\n/dev/sda1       256G  180G   76G  70%'
+    },
+    { 
+      query: 'find and delete node_modules', 
+      command: 'find . -name "node_modules" -type d -prune -exec rm -rf {} +', 
+      safety: 'High risk',
+      output: null // No auto-execute for high risk
+    },
   ];
 
   let cliIndex = 0;
   let tuiIndex = 0;
   let currentMode: 'cli' | 'tui' = 'cli';
-  let animationId = 0; // Used to cancel stale animations
-  let cycleCount = 0; // Track cycles to auto-switch modes
-  const CYCLES_BEFORE_SWITCH = 2; // Switch modes after this many examples
+  let animationId = 0;
+  let cycleCount = 0;
+  const CYCLES_BEFORE_SWITCH = 3;
 
   // DOM Elements - CLI
   const typingInput = document.getElementById('typing-input');
@@ -189,35 +202,56 @@ import InstallBlock from "./InstallBlock.astro";
   const tuiUserMsg = document.getElementById('tui-user-msg');
   const tuiAiMsg = document.getElementById('tui-ai-msg');
   const tuiSafety = document.getElementById('tui-safety');
+  const tuiExecMsg = document.getElementById('tui-exec-msg');
+  const tuiExecOutput = document.getElementById('tui-exec-output');
 
   // Tab switching
   const tabs = document.querySelectorAll('.demo-tab');
   const demos = document.querySelectorAll('.demo-window');
 
+  // Smooth easing for typing - variable speed that feels more natural
+  function getTypingDelay(baseSpeed: number, charIndex: number, totalLength: number): number {
+    // Slightly faster in the middle, slower at start/end
+    const progress = charIndex / totalLength;
+    const curve = Math.sin(progress * Math.PI) * 0.3 + 0.85;
+    // Add small random variation for natural feel
+    const jitter = 0.9 + Math.random() * 0.2;
+    return baseSpeed * curve * jitter;
+  }
+
   function switchToMode(mode: 'cli' | 'tui') {
     if (mode === currentMode) return;
     
+    // Cancel current animation
+    animationId++;
     currentMode = mode;
-    cycleCount = 0; // Reset cycle count on mode switch
+    cycleCount = 0;
     
     tabs.forEach(t => t.classList.remove('active'));
     const activeTab = document.querySelector(`.demo-tab[data-mode="${mode}"]`);
     activeTab?.classList.add('active');
     
+    // Crossfade transition
     demos.forEach(d => {
-      if (d.getAttribute('data-demo') === mode) {
+      const isTarget = d.getAttribute('data-demo') === mode;
+      if (isTarget) {
         d.classList.add('active');
       } else {
-        d.classList.remove('active');
+        d.classList.add('fading-out');
+        setTimeout(() => {
+          d.classList.remove('active', 'fading-out');
+        }, 300);
       }
     });
 
-    // Reset and start the appropriate demo
-    if (mode === 'cli') {
-      runCliDemo();
-    } else {
-      runTuiDemo();
-    }
+    // Small delay before starting new demo for smooth transition
+    setTimeout(() => {
+      if (mode === 'cli') {
+        runCliDemo();
+      } else {
+        runTuiDemo();
+      }
+    }, 150);
   }
 
   tabs.forEach(tab => {
@@ -227,14 +261,32 @@ import InstallBlock from "./InstallBlock.astro";
     });
   });
 
-  async function typeText(element: HTMLElement | null, text: string, speed = 50, myAnimationId: number) {
+  async function typeText(element: HTMLElement | null, text: string, baseSpeed = 45, myAnimationId: number) {
     if (!element) return false;
     element.textContent = '';
+    
     for (let i = 0; i < text.length; i++) {
-      if (animationId !== myAnimationId) return false; // Animation was cancelled
+      if (animationId !== myAnimationId) return false;
       element.textContent += text[i];
-      await new Promise(r => setTimeout(r, speed));
+      const delay = getTypingDelay(baseSpeed, i, text.length);
+      await new Promise(r => setTimeout(r, delay));
     }
+    return true;
+  }
+
+  // Smooth reveal for output text with typewriter effect
+  async function revealText(element: HTMLElement | null, text: string, myAnimationId: number) {
+    if (!element) return false;
+    element.textContent = '';
+    
+    // Fast reveal - shows competence of the AI
+    const chunkSize = 3;
+    for (let i = 0; i < text.length; i += chunkSize) {
+      if (animationId !== myAnimationId) return false;
+      element.textContent = text.slice(0, i + chunkSize);
+      await new Promise(r => setTimeout(r, 12));
+    }
+    element.textContent = text;
     return true;
   }
 
@@ -244,39 +296,42 @@ import InstallBlock from "./InstallBlock.astro";
     const myAnimationId = ++animationId;
     const example = cliExamples[cliIndex];
     
-    // Reset
+    // Reset with fade
     outputLine?.classList.remove('visible');
     if (outputText) outputText.textContent = '';
     if (typingInput) typingInput.textContent = '';
     
-    // Type input
+    // Brief pause before typing starts
+    await new Promise(r => setTimeout(r, 400));
+    if (animationId !== myAnimationId) return;
+    
+    // Type input with natural feel
     if (typingInput) {
-      const completed = await typeText(typingInput, example.input, 40, myAnimationId);
+      const completed = await typeText(typingInput, example.input, 38, myAnimationId);
       if (!completed) return;
     }
 
     if (currentMode !== 'cli' || animationId !== myAnimationId) return;
     
-    // Show output
-    await new Promise(r => setTimeout(r, 500));
+    // "Processing" pause - feels like AI thinking
+    await new Promise(r => setTimeout(r, 600));
     if (animationId !== myAnimationId) return;
     
+    // Show output with smooth reveal
     if (outputText) {
-      outputText.textContent = '';
       outputLine?.classList.add('visible');
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise(r => setTimeout(r, 150));
       if (animationId !== myAnimationId) return;
-      outputText.textContent = example.output;
+      await revealText(outputText, example.output, myAnimationId);
     }
     
-    // Wait before next
-    await new Promise(r => setTimeout(r, 3000));
+    // Comfortable reading time
+    await new Promise(r => setTimeout(r, 3500));
     if (animationId !== myAnimationId) return;
     
     cliIndex = (cliIndex + 1) % cliExamples.length;
     cycleCount++;
     
-    // Auto-switch to TUI mode after a couple cycles
     if (cycleCount >= CYCLES_BEFORE_SWITCH) {
       switchToMode('tui');
     } else if (currentMode === 'cli') {
@@ -290,14 +345,16 @@ import InstallBlock from "./InstallBlock.astro";
     const myAnimationId = ++animationId;
     const example = tuiExamples[tuiIndex];
     
-    // Reset
+    // Reset with fade
     tuiUserMsg?.classList.remove('visible');
     tuiAiMsg?.classList.remove('visible');
+    tuiExecMsg?.classList.remove('visible');
     if (tuiQuery) tuiQuery.textContent = '';
     if (tuiCommand) tuiCommand.textContent = '';
     if (tuiInput) tuiInput.textContent = '';
+    if (tuiExecOutput) tuiExecOutput.textContent = '';
 
-    // Update safety badge color
+    // Update safety badge
     if (tuiSafety) {
       tuiSafety.className = 'safety-badge';
       if (example.safety === 'High risk') {
@@ -311,36 +368,49 @@ import InstallBlock from "./InstallBlock.astro";
       if (safetyText) safetyText.textContent = example.safety;
     }
 
-    // Type in input area
-    const completed = await typeText(tuiInput, example.query, 35, myAnimationId);
+    // Brief pause before typing
+    await new Promise(r => setTimeout(r, 400));
+    if (animationId !== myAnimationId) return;
+
+    // Type in input area with natural feel
+    const completed = await typeText(tuiInput, example.query, 32, myAnimationId);
     if (!completed) return;
     
     if (currentMode !== 'tui' || animationId !== myAnimationId) return;
 
-    // Simulate "enter" - move to output
-    await new Promise(r => setTimeout(r, 300));
+    // "Enter" pause
+    await new Promise(r => setTimeout(r, 350));
     if (animationId !== myAnimationId) return;
     if (tuiInput) tuiInput.textContent = '';
     
-    // Show user message
+    // Show user message with smooth entrance
     if (tuiQuery) tuiQuery.textContent = example.query;
     tuiUserMsg?.classList.add('visible');
     
-    await new Promise(r => setTimeout(r, 400));
+    // AI "thinking" pause
+    await new Promise(r => setTimeout(r, 500));
     if (currentMode !== 'tui' || animationId !== myAnimationId) return;
 
     // Show AI response
     if (tuiCommand) tuiCommand.textContent = example.command;
     tuiAiMsg?.classList.add('visible');
 
-    // Wait before next
+    // Show execution output for safe commands
+    if (example.output && example.safety === 'Low risk') {
+      await new Promise(r => setTimeout(r, 600));
+      if (animationId !== myAnimationId) return;
+      
+      if (tuiExecOutput) tuiExecOutput.textContent = example.output;
+      tuiExecMsg?.classList.add('visible');
+    }
+
+    // Reading time
     await new Promise(r => setTimeout(r, 4000));
     if (animationId !== myAnimationId) return;
     
     tuiIndex = (tuiIndex + 1) % tuiExamples.length;
     cycleCount++;
     
-    // Auto-switch to CLI mode after a couple cycles
     if (cycleCount >= CYCLES_BEFORE_SWITCH) {
       switchToMode('cli');
     } else if (currentMode === 'tui') {
@@ -348,17 +418,14 @@ import InstallBlock from "./InstallBlock.astro";
     }
   }
 
-  // Start CLI demo on load
-  setTimeout(runCliDemo, 1000);
+  // Start demo after page settles
+  setTimeout(runCliDemo, 800);
 </script>
 
 <style>
   .hero {
     position: relative;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    padding: var(--space-20) 0;
+    padding: var(--space-16) 0 var(--space-12);
     overflow: hidden;
   }
 
@@ -372,7 +439,6 @@ import InstallBlock from "./InstallBlock.astro";
     position: absolute;
     border-radius: 50%;
     filter: blur(120px);
-    opacity: 0.4;
   }
 
   .orb-1 {
@@ -380,8 +446,9 @@ import InstallBlock from "./InstallBlock.astro";
     height: 600px;
     background: var(--color-primary);
     top: -200px;
-    right: -100px;
-    opacity: 0.15;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.12;
   }
 
   .orb-2 {
@@ -389,8 +456,8 @@ import InstallBlock from "./InstallBlock.astro";
     height: 400px;
     background: var(--color-secondary);
     bottom: -100px;
-    left: -100px;
-    opacity: 0.1;
+    left: 20%;
+    opacity: 0.08;
   }
 
   .grid-pattern {
@@ -400,101 +467,22 @@ import InstallBlock from "./InstallBlock.astro";
       linear-gradient(var(--border-subtle) 1px, transparent 1px),
       linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
     background-size: 60px 60px;
-    opacity: 0.3;
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 70%);
-    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 70%);
+    opacity: 0.25;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 10%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 10%, transparent 70%);
   }
 
   .hero-content {
     position: relative;
-    max-width: 1200px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
   }
 
-  .hero-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-12);
-    align-items: center;
-  }
-
-  .hero-text {
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  /* Brand Lockup */
-  .brand-lockup {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-6);
-    animation: fadeInUp 0.6s ease forwards;
-    animation-delay: 0.1s;
-  }
-
-  .brand-icon {
-    width: 40px;
-    height: 40px;
-    background: var(--bg-terminal);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border-subtle);
-    box-shadow: 
-      0 0 0 1px rgba(250, 178, 131, 0.1),
-      0 4px 24px rgba(0, 0, 0, 0.5),
-      0 0 40px rgba(250, 178, 131, 0.08);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .brand-icon::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(250, 178, 131, 0.1) 0%,
-      transparent 50%
-    );
-    pointer-events: none;
-  }
-
-  .icon-text {
-    font-family: var(--font-mono);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--color-primary);
-    text-shadow: 0 0 20px rgba(250, 178, 131, 0.5);
-    position: relative;
-    z-index: 1;
-  }
-
-  .brand-name {
-    font-family: var(--font-mono);
-    font-size: clamp(1.5rem, 4vw, 2.25rem);
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.03em;
-    background: linear-gradient(
-      135deg,
-      var(--text-primary) 0%,
-      var(--color-primary) 50%,
-      var(--text-primary) 100%
-    );
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: shimmer 3s ease-in-out infinite;
-  }
-
-  @keyframes shimmer {
-    0%, 100% { background-position: 200% 0; }
-    50% { background-position: 0% 0; }
+  /* Centered header */
+  .hero-header {
+    text-align: center;
+    margin-bottom: var(--space-10);
   }
 
   .hero-badge {
@@ -508,9 +496,7 @@ import InstallBlock from "./InstallBlock.astro";
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     color: var(--text-secondary);
-    margin-bottom: var(--space-4);
-    animation: fadeInUp 0.6s ease forwards;
-    opacity: 0;
+    margin-bottom: var(--space-5);
   }
 
   .badge-dot {
@@ -519,21 +505,25 @@ import InstallBlock from "./InstallBlock.astro";
     border-radius: 50%;
     background: var(--color-success);
     box-shadow: 0 0 8px var(--color-success);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
   }
 
   .hero-title {
-    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
     font-weight: 700;
-    line-height: 1.15;
-    margin-bottom: var(--space-6);
+    line-height: 1.1;
+    margin-bottom: var(--space-5);
     letter-spacing: -0.03em;
-    animation: fadeInUp 0.6s ease forwards;
-    animation-delay: 0.2s;
-    opacity: 0;
   }
 
   .hero-title .title-line {
     display: block;
+    color: var(--text-primary);
   }
 
   .hero-title .highlight {
@@ -542,71 +532,73 @@ import InstallBlock from "./InstallBlock.astro";
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    white-space: nowrap;
   }
 
   .hero-subtitle {
     font-size: var(--text-lg);
     color: var(--text-secondary);
-    max-width: 500px;
-    margin: 0 0 var(--space-8);
-    line-height: 1.7;
-    animation: fadeInUp 0.6s ease forwards;
-    animation-delay: 0.3s;
-    opacity: 0;
+    max-width: 540px;
+    margin: 0 auto var(--space-7);
+    line-height: 1.6;
   }
 
-  /* Actions in left column */
   .hero-actions {
     display: flex;
-    gap: var(--space-4);
-    flex-wrap: wrap;
-    animation: fadeInUp 0.6s ease forwards;
-    animation-delay: 0.4s;
-    opacity: 0;
-  }
-
-  /* Demo Tabs */
-  .hero-demo {
-    animation: fadeInUp 0.6s ease forwards;
-    animation-delay: 0.5s;
-    opacity: 0;
-  }
-
-  .hero-install {
-    margin-top: var(--space-10);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     gap: var(--space-3);
-    animation: fadeInUp 0.6s ease forwards;
-    animation-delay: 0.6s;
-    opacity: 0;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
-  .hero-install-label {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
     font-family: var(--font-mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-muted);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    text-decoration: none;
   }
 
-  .hero-install .install-block {
-    width: min(760px, 100%);
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--bg-void);
   }
 
-  .hero-install-note {
-    font-size: var(--text-xs);
-    color: var(--text-muted);
-    text-align: center;
-    max-width: 620px;
+  .btn-primary:hover {
+    background: var(--color-primary-dim);
+    color: var(--bg-void);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px var(--color-primary-glow);
+  }
+
+  .btn-secondary {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--border-active);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+  }
+
+  .btn svg {
+    flex-shrink: 0;
+  }
+
+  /* Demo Section */
+  .hero-demo {
+    margin-bottom: var(--space-10);
   }
 
   .demo-tabs {
     display: flex;
     justify-content: center;
-    gap: var(--space-2);
+    gap: var(--space-1);
     margin-bottom: var(--space-4);
   }
 
@@ -619,7 +611,7 @@ import InstallBlock from "./InstallBlock.astro";
     border: 1px solid transparent;
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all 0.2s ease;
   }
 
   .demo-tab:hover {
@@ -632,19 +624,31 @@ import InstallBlock from "./InstallBlock.astro";
     border-color: var(--border-subtle);
   }
 
-  /* Demo Window */
+  .demo-container {
+    position: relative;
+  }
+
   .demo-window {
     background: var(--bg-terminal);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    text-align: left;
-    box-shadow: var(--shadow-deep), var(--shadow-glow);
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.3),
+      0 10px 30px -5px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.03);
     display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
 
   .demo-window.active {
     display: block;
+    opacity: 1;
+  }
+
+  .demo-window.fading-out {
+    opacity: 0;
   }
 
   .demo-header {
@@ -696,7 +700,7 @@ import InstallBlock from "./InstallBlock.astro";
     padding: var(--space-5) var(--space-6);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
-    min-height: 100px;
+    min-height: 90px;
   }
 
   .demo-input-line {
@@ -733,8 +737,8 @@ import InstallBlock from "./InstallBlock.astro";
     align-items: center;
     gap: var(--space-2);
     opacity: 0;
-    transform: translateY(5px);
-    transition: all 0.3s ease;
+    transform: translateY(4px);
+    transition: all 0.25s ease;
   }
 
   .demo-output-line.visible {
@@ -754,7 +758,7 @@ import InstallBlock from "./InstallBlock.astro";
   .tui-body {
     display: flex;
     flex-direction: column;
-    min-height: 280px;
+    min-height: 300px;
   }
 
   .tui-status-bar {
@@ -801,7 +805,7 @@ import InstallBlock from "./InstallBlock.astro";
 
   .tui-message {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
     transition: all 0.3s ease;
   }
 
@@ -886,6 +890,40 @@ import InstallBlock from "./InstallBlock.astro";
     background: currentColor;
   }
 
+  /* Execution output */
+  .exec-message {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    font-family: var(--font-mono);
+  }
+
+  .exec-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .exec-icon {
+    color: var(--color-success);
+    font-weight: 600;
+  }
+
+  .exec-label {
+    font-size: 10px;
+    color: var(--color-success);
+  }
+
+  .exec-output {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    margin: 0;
+    white-space: pre-wrap;
+    line-height: 1.5;
+  }
+
   .tui-input-area {
     display: flex;
     align-items: center;
@@ -940,103 +978,52 @@ import InstallBlock from "./InstallBlock.astro";
     51%, 100% { opacity: 0; }
   }
 
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-6);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    font-weight: 500;
-    border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
-    text-decoration: none;
+  /* Install section */
+  .hero-install {
+    display: flex;
+    justify-content: center;
   }
 
-  .btn-primary {
-    background: var(--color-primary);
-    color: var(--bg-void);
+  .hero-install :global(.install-block) {
+    max-width: 500px;
   }
 
-  .btn-primary:hover {
-    background: var(--color-primary-dim);
-    color: var(--bg-void);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px var(--color-primary-glow);
-  }
-
-  .btn-secondary {
-    background: var(--bg-elevated);
-    color: var(--text-primary);
-    border: 1px solid var(--border-subtle);
-  }
-
-  .btn-secondary:hover {
-    border-color: var(--border-active);
-    color: var(--text-primary);
-    transform: translateY(-2px);
-  }
-
-  .btn svg {
-    flex-shrink: 0;
-  }
-
-  @media (max-width: 900px) {
-    .hero-grid {
-      grid-template-columns: 1fr;
-      gap: var(--space-10);
-    }
-
-    .hero-text {
-      text-align: center;
-    }
-
-    .hero-subtitle {
-      margin: 0 auto var(--space-8);
-    }
-
-    .hero-actions {
-      justify-content: center;
-    }
-  }
-
+  /* Responsive */
   @media (max-width: 768px) {
     .hero {
-      padding: var(--space-16) 0;
-      min-height: auto;
+      padding: var(--space-12) 0 var(--space-10);
     }
 
-    .brand-lockup {
-      gap: var(--space-2);
-      margin-bottom: var(--space-4);
-      justify-content: center;
-    }
-
-    .brand-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-    }
-
-    .icon-text {
-      font-size: 14px;
+    .hero-content {
+      padding: 0 var(--space-4);
     }
 
     .hero-title {
-      font-size: clamp(1.75rem, 8vw, 2.5rem);
-    }
-
-    .hero-title .highlight {
-      white-space: normal;
+      font-size: clamp(1.75rem, 7vw, 2.5rem);
     }
 
     .hero-subtitle {
       font-size: var(--text-base);
     }
 
+    .hero-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .btn {
+      width: 100%;
+      max-width: 260px;
+      justify-content: center;
+    }
+
     .demo-body {
       padding: var(--space-4);
       font-size: var(--text-xs);
+    }
+
+    .tui-body {
+      min-height: 280px;
     }
 
     .tui-help-bar {
@@ -1047,16 +1034,15 @@ import InstallBlock from "./InstallBlock.astro";
       flex-wrap: wrap;
       gap: var(--space-2);
     }
+  }
 
-    .hero-actions {
-      flex-direction: column;
-      align-items: center;
+  @media (max-width: 480px) {
+    .demo-tabs {
+      gap: 0;
     }
 
-    .btn {
-      width: 100%;
-      max-width: 280px;
-      justify-content: center;
+    .demo-tab {
+      padding: var(--space-2) var(--space-3);
     }
   }
 </style>
