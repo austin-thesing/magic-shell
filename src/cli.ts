@@ -38,7 +38,7 @@ import { getTheme, setTheme, themes, themeNames, loadTheme } from "./lib/theme"
 
 // Global state
 let renderer: CliRenderer
-let currentModel: Model = OPENCODE_ZEN_MODELS[0] // Default to free GPT 5 Nano
+let currentModel: Model = OPENCODE_ZEN_MODELS[0] // Default to Big Pickle
 let config: Config
 let history: CommandHistory[] = []
 let currentCwd = getCwd()
@@ -227,7 +227,7 @@ Enter your API key below:`,
     const freeNote = new TextRenderable(renderer, {
       id: "free-note",
       content: t`
-${fg("#22c55e")("Tip:")} OpenCode Zen has free models like GPT 5 Nano and Grok Code!`,
+${fg("#22c55e")("Tip:")} OpenCode Zen has free models like Big Pickle and GLM 4.7!`,
       marginTop: 1,
     })
     container.add(freeNote)
@@ -247,7 +247,7 @@ ${fg("#64748b")("Press Enter to save | Ctrl+C to exit")}`,
 
       // Set default model based on provider
       if (provider === "opencode-zen") {
-        currentModel = OPENCODE_ZEN_MODELS.find((m) => m.id === "gpt-5-nano") || OPENCODE_ZEN_MODELS[0]
+        currentModel = OPENCODE_ZEN_MODELS.find((m) => m.id === "big-pickle") || OPENCODE_ZEN_MODELS[0]
       } else {
         currentModel = OPENROUTER_MODELS[0]
       }
@@ -291,13 +291,6 @@ function createMainUI() {
     flexGrow: 1,
   })
   headerRow.add(headerText)
-
-  // Model badge on the right
-  const modelBadge = new TextRenderable(renderer, {
-    id: "model-badge",
-    content: getModelDisplay(),
-  })
-  headerRow.add(modelBadge)
 
   // === Status Bar (provider, model info, safe indicator) ===
   statusBarText = new TextRenderable(renderer, {
@@ -412,7 +405,7 @@ function getHelpBarContent(): StyledText {
 function getWelcomeMessage(): string {
   const providerName = config.provider === "opencode-zen" ? "OpenCode Zen" : "OpenRouter"
   const freeNote = config.provider === "opencode-zen" 
-    ? "\nFree models: grok-code, glm-4.7-free" 
+    ? "\nFree models: big-pickle, glm-4.7-free" 
     : ""
   return `Ready. Using ${providerName}.${freeNote}\nType what you want to do, or press Ctrl+X P for command palette.`
 }
@@ -700,19 +693,6 @@ function toggleLastResultExpand(): void {
   toggleResultExpand(lastResult.id)
 }
 
-function getModelDisplay(): StyledText {
-  const theme = getTheme()
-  const categoryColor =
-    currentModel.category === "fast"
-      ? theme.colors.success
-      : currentModel.category === "smart"
-        ? theme.colors.primary
-        : theme.colors.secondary
-  const providerBadge = currentModel.provider === "opencode-zen" ? fg(theme.colors.accent)("[zen]") : fg(theme.colors.warning)("[or]")
-  const freeBadge = currentModel.free ? fg(theme.colors.success)(" FREE") : ""
-  return t`${providerBadge} ${fg(categoryColor)(currentModel.name)}${freeBadge}`
-}
-
 // Refresh all UI elements with current theme colors
 function refreshThemeColors() {
   const theme = getTheme()
@@ -729,6 +709,7 @@ function refreshThemeColors() {
   if (statusBarText) {
     statusBarText.content = getStatusBarContent()
   }
+
   
   // Update help bar
   if (helpBarText) {

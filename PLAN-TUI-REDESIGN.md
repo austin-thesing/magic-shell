@@ -38,9 +38,9 @@ Current layout:
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│ magic-shell                           [grok-code]   │
+│ magic-shell                         [big-pickle]   │
 ├─────────────────────────────────────────────────────┤
-│ Provider: opencode-zen  Model: grok-code  ● Safe    │
+│ Provider: opencode-zen  Model: big-pickle  ● Safe   │
 ├─────────────────────────────────────────────────────┤
 │                                                     │
 │ ┌─ Chat History (scrollable) ─────────────────────┐ │

@@ -16,7 +16,7 @@ const DEFAULT_CONFIG: Config = {
   provider: "opencode-zen",
   openrouterApiKey: "", // Only used as fallback if keychain unavailable
   opencodeZenApiKey: "", // Only used as fallback if keychain unavailable
-  defaultModel: "gemini-3-flash", // Fast, reliable Google model
+  defaultModel: "big-pickle", // Reliable free model
   safetyLevel: "moderate",
   dryRunByDefault: false,
   blockedCommands: [

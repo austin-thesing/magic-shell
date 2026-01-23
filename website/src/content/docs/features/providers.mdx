@@ -26,14 +26,13 @@ OpenCode Zen provides curated models optimized for coding tasks. It's the defaul
 |-------|-------------|
 | `claude-sonnet-4-5` | Anthropic's hybrid reasoning model |
 | `claude-opus-4-5` | Anthropic's most capable model |
-| `gemini-3-flash` | Google's fast model |
-| `gemini-3-pro` | Google's powerful model |
 | `kimi-k2` | Moonshot's Kimi K2 |
 | `kimi-k2-thinking` | Kimi K2 with extended reasoning |
 | `qwen3-coder` | Alibaba's massive coding model |
+| `glm-4.6` | Zhipu AI's capable model |
 
 <Aside type="tip">
-  For most shell commands, the free `grok-code` model works excellently. Save premium models for complex multi-step tasks.
+  For most shell commands, the free `glm-4.7-free` model works excellently. The default is `big-pickle` for quick experiments.
 </Aside>
 
 ### Get an API Key
@@ -53,7 +52,6 @@ OpenRouter provides access to models from many providers through a single API.
 |-------|-------------|
 | `mimo-v2-flash` | MiMo V2 Flash |
 | `deepseek-v3` | DeepSeek V3 |
-| `gemini-2.5-flash` | Gemini 2.5 Flash |
 
 ### Premium Models
 
@@ -61,9 +59,8 @@ OpenRouter provides access to models from many providers through a single API.
 |-------|-------------|
 | `claude-sonnet-4.5` | Anthropic Claude Sonnet 4.5 |
 | `claude-opus-4.5` | Anthropic Claude Opus 4.5 |
-| `gpt-5.2-codex` | OpenAI GPT 5.2 Codex |
-| `gemini-2.5-pro` | Google Gemini 2.5 Pro |
 | `deepseek-r1` | DeepSeek R1 reasoning model |
+| `glm-4.7` | Zhipu AI's capable model |
 
 ### Get an API Key
 
@@ -97,7 +94,7 @@ Press `Ctrl+X S` to open the provider switcher.
 msh --models
 
 # Set default model
-msh --model grok-code
+msh --model big-pickle
 ```
 
 ### Via TUI
@@ -108,9 +105,9 @@ Press `Ctrl+X M` to open the model picker.
 
 | Use Case | Recommended Model |
 |----------|------------------|
-| Quick commands | `grok-code` (free) |
+| Quick commands | `big-pickle` (free) |
 | Complex git operations | `claude-sonnet-4.5` |
-| System administration | `grok-code` or `gemini-3-flash` |
+| System administration | `grok-code` or `glm-4.7-free` |
 | Multi-step tasks | `claude-opus-4.5` or `kimi-k2-thinking` |
 | Learning/experimenting | Any free model |
 

@@ -174,16 +174,16 @@ You can also type commands directly in the TUI:
 OpenCode Zen provides curated models optimized for coding tasks, including **free models**.
 
 **Free Models:**
+- `big-pickle` - Stealth model (default)
 - `grok-code` - xAI's Grok Code Fast 1
 - `glm-4.7-free` - GLM 4.7
 - `minimax-m2.1-free` - MiniMax M2.1
-- `big-pickle` - Stealth model
 
 **Premium Models:**
 - Claude Sonnet 4.5, Claude Opus 4.5
-- Gemini 3 Flash, Gemini 3 Pro
 - Kimi K2, Kimi K2 Thinking
 - Qwen3 Coder 480B
+- GLM 4.6
 - And more...
 
 Get your API key at: https://opencode.ai/auth
@@ -195,13 +195,11 @@ Access to a wide variety of models from different providers.
 **Free Models:**
 - MiMo V2 Flash
 - DeepSeek V3
-- Gemini 2.5 Flash
 
 **Premium Models:**
 - Claude Sonnet 4.5, Claude Opus 4.5
-- GPT 5.2 Codex
-- Gemini 2.5 Pro
 - DeepSeek R1
+- GLM 4.7
 - And many more...
 
 Get your API key at: https://openrouter.ai/keys
@@ -244,7 +242,7 @@ Configuration is stored in `~/.magic-shell/config.json`.
 ```json
 {
   "provider": "opencode-zen",
-  "defaultModel": "gemini-3-flash",
+  "defaultModel": "big-pickle",
   "safetyLevel": "moderate",
   "dryRunByDefault": false,
   "repoContext": false,

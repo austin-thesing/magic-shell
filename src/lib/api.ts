@@ -31,7 +31,7 @@ function getZenEndpoint(modelId: string): string {
     case "anthropic":
       return "https://opencode.ai/zen/v1/messages"
     case "google":
-      return `https://opencode.ai/zen/v1/models/${modelId}:generateContent`
+      return `https://opencode.ai/zen/v1/models/${modelId}`
     case "openai-compatible":
       return "https://opencode.ai/zen/v1/chat/completions"
   }
@@ -197,6 +197,12 @@ async function callOpenRouter(
 // Debug flag - set to true to see API responses
 const DEBUG_API = process.env.DEBUG_API === "1"
 
+function appendDebugInfo(message: string, status: number, responseText: string): string {
+  if (!DEBUG_API) return message
+  const snippet = responseText.slice(0, 1000)
+  return `${message}\n[DEBUG] status=${status} response=${snippet}`
+}
+
 // OpenCode Zen - OpenAI Responses API
 async function callZenOpenAIResponses(
   apiKey: string,
@@ -222,6 +228,7 @@ async function callZenOpenAIResponses(
       input: userInput,
       max_output_tokens: 500,
       temperature: 0.1,
+      stream: false,
     }),
   })
 
@@ -242,7 +249,7 @@ async function callZenOpenAIResponses(
         errorMessage = errorData.message
       }
     } catch {}
-    throw new Error(errorMessage)
+    throw new Error(appendDebugInfo(errorMessage, response.status, responseText))
   }
 
   let data: any
@@ -253,7 +260,8 @@ async function callZenOpenAIResponses(
   }
   
   if (data.error) {
-    throw new Error(data.error.message || data.error)
+    const errorMessage = data.error.message || data.error
+    throw new Error(appendDebugInfo(errorMessage, response.status, responseText))
   }
 
   // OpenAI Responses API structure:
@@ -334,7 +342,7 @@ async function callZenAnthropic(
         errorMessage = errorData.error.message
       }
     } catch {}
-    throw new Error(errorMessage)
+    throw new Error(appendDebugInfo(errorMessage, response.status, errorText))
   }
 
   const data = await response.json()
@@ -385,7 +393,7 @@ async function callZenOpenAICompatible(
         errorMessage = errorData.error.message
       }
     } catch {}
-    throw new Error(errorMessage)
+    throw new Error(appendDebugInfo(errorMessage, response.status, errorText))
   }
 
   const data = await response.json()
@@ -393,7 +401,24 @@ async function callZenOpenAICompatible(
     throw new Error(data.error.message)
   }
 
-  return data.choices?.[0]?.message?.content?.trim() || ""
+  const choice = data.choices?.[0]
+  const messageContent = choice?.message?.content
+  if (typeof messageContent === "string") {
+    return messageContent.trim()
+  }
+  if (Array.isArray(messageContent)) {
+    const textBlocks = messageContent
+      .map((block) => (typeof block === "string" ? block : block?.text))
+      .filter(Boolean)
+    if (textBlocks.length > 0) {
+      return textBlocks.join("").trim()
+    }
+  }
+  if (typeof choice?.text === "string") {
+    return choice.text.trim()
+  }
+
+  return ""
 }
 
 // OpenCode Zen - Google (Gemini)
@@ -404,8 +429,8 @@ async function callZenGoogle(
   systemPrompt: string,
   userInput: string
 ): Promise<string> {
-  // Gemini endpoint format: /v1/models/{model}:generateContent
-  const endpoint = `https://opencode.ai/zen/v1/models/${modelId}:generateContent`
+  // Zen Gemini endpoint: /v1/models/{model}
+  const endpoint = `https://opencode.ai/zen/v1/models/${modelId}`
   
   if (DEBUG_API) {
     console.error(`[DEBUG] Calling Google Gemini API`)
@@ -413,6 +438,7 @@ async function callZenGoogle(
     console.error(`[DEBUG] Endpoint: ${endpoint}`)
   }
   
+  const prompt = `${systemPrompt}\n\nUser request: ${userInput}`
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -421,9 +447,8 @@ async function callZenGoogle(
     },
     body: JSON.stringify({
       contents: [
-        { role: "user", parts: [{ text: userInput }] },
+        { role: "user", parts: [{ text: prompt }] },
       ],
-      systemInstruction: { parts: [{ text: systemPrompt }] },
       generationConfig: {
         maxOutputTokens: 500,
         temperature: 0.1,
@@ -446,7 +471,7 @@ async function callZenGoogle(
         errorMessage = errorData.error.message
       }
     } catch {}
-    throw new Error(errorMessage)
+    throw new Error(appendDebugInfo(errorMessage, response.status, responseText))
   }
 
   let data: any
@@ -457,7 +482,7 @@ async function callZenGoogle(
   }
   
   if (data.error) {
-    throw new Error(data.error.message)
+    throw new Error(appendDebugInfo(data.error.message, response.status, responseText))
   }
 
   // Google returns candidates array
@@ -509,5 +534,9 @@ export async function translateToCommand(
     }
   }
 
-  return cleanCommand(rawCommand)
+  const cleaned = cleanCommand(rawCommand)
+  if (!cleaned) {
+    throw new Error("Model returned an empty command. Try another model or rephrase your request.")
+  }
+  return cleaned
 }

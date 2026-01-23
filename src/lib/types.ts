@@ -33,24 +33,7 @@ export const OPENROUTER_MODELS: Model[] = [
     contextLength: 128000,
     free: true,
   },
-  {
-    id: "google/gemini-2.5-flash-preview:free",
-    name: "Gemini 2.5 Flash",
-    description: "Free Google model with thinking capabilities",
-    category: "fast",
-    provider: "openrouter",
-    contextLength: 1048576,
-    free: true,
-  },
   // Fast models
-  {
-    id: "google/gemini-3-flash-preview",
-    name: "Gemini 3 Flash",
-    description: "Google's fastest model, 1M context",
-    category: "fast",
-    provider: "openrouter",
-    contextLength: 1048576,
-  },
   {
     id: "anthropic/claude-haiku-4-5",
     name: "Claude Haiku 4.5",
@@ -58,14 +41,6 @@ export const OPENROUTER_MODELS: Model[] = [
     category: "fast",
     provider: "openrouter",
     contextLength: 200000,
-  },
-  {
-    id: "openai/gpt-5.1-codex-mini",
-    name: "GPT 5.1 Codex Mini",
-    description: "OpenAI's efficient coding model",
-    category: "fast",
-    provider: "openrouter",
-    contextLength: 128000,
   },
   // Smart models
   {
@@ -83,22 +58,6 @@ export const OPENROUTER_MODELS: Model[] = [
     category: "smart",
     provider: "openrouter",
     contextLength: 200000,
-  },
-  {
-    id: "openai/gpt-5.2-codex",
-    name: "GPT 5.2 Codex",
-    description: "OpenAI's latest coding model",
-    category: "smart",
-    provider: "openrouter",
-    contextLength: 400000,
-  },
-  {
-    id: "google/gemini-2.5-pro",
-    name: "Gemini 2.5 Pro",
-    description: "Google's advanced reasoning model",
-    category: "smart",
-    provider: "openrouter",
-    contextLength: 1048576,
   },
   {
     id: "zhipu/glm-4.7",
@@ -131,6 +90,15 @@ export const OPENROUTER_MODELS: Model[] = [
 export const OPENCODE_ZEN_MODELS: Model[] = [
   // Free models (great for trying out)
   {
+    id: "big-pickle",
+    name: "Big Pickle",
+    description: "Free stealth model (limited time)",
+    category: "smart",
+    provider: "opencode-zen",
+    contextLength: 128000,
+    free: true,
+  },
+  {
     id: "grok-code",
     name: "Grok Code Fast 1",
     description: "Free xAI coding model (limited time)",
@@ -157,35 +125,7 @@ export const OPENCODE_ZEN_MODELS: Model[] = [
     contextLength: 128000,
     free: true,
   },
-  {
-    id: "big-pickle",
-    name: "Big Pickle",
-    description: "Free stealth model (limited time)",
-    category: "smart",
-    provider: "opencode-zen",
-    contextLength: 128000,
-    free: true,
-  },
-  {
-    id: "gpt-5-nano",
-    name: "GPT 5 Nano",
-    description: "Free OpenAI model (temporarily disabled)",
-    category: "fast",
-    provider: "opencode-zen",
-    contextLength: 128000,
-    free: true,
-    disabled: true,
-    disabledReason: "OpenCode Zen API issue",
-  },
   // Fast models
-  {
-    id: "gemini-3-flash",
-    name: "Gemini 3 Flash",
-    description: "Google's fastest Gemini model",
-    category: "fast",
-    provider: "opencode-zen",
-    contextLength: 1000000,
-  },
   {
     id: "claude-3-5-haiku",
     name: "Claude Haiku 3.5",
@@ -193,16 +133,6 @@ export const OPENCODE_ZEN_MODELS: Model[] = [
     category: "fast",
     provider: "opencode-zen",
     contextLength: 200000,
-  },
-  {
-    id: "gpt-5.1-codex-mini",
-    name: "GPT 5.1 Codex Mini",
-    description: "OpenAI's efficient coding model (temporarily disabled)",
-    category: "fast",
-    provider: "opencode-zen",
-    disabled: true,
-    disabledReason: "OpenCode Zen API issue",
-    contextLength: 128000,
   },
   // Smart models
   {
@@ -220,34 +150,6 @@ export const OPENCODE_ZEN_MODELS: Model[] = [
     category: "smart",
     provider: "opencode-zen",
     contextLength: 200000,
-  },
-  {
-    id: "gpt-5.1-codex",
-    name: "GPT 5.1 Codex",
-    description: "OpenAI's coding-optimized model (temporarily disabled)",
-    category: "smart",
-    provider: "opencode-zen",
-    contextLength: 128000,
-    disabled: true,
-    disabledReason: "OpenCode Zen API issue",
-  },
-  {
-    id: "gpt-5.2-codex",
-    name: "GPT 5.2 Codex",
-    description: "OpenAI's latest coding model (temporarily disabled)",
-    category: "smart",
-    provider: "opencode-zen",
-    contextLength: 128000,
-    disabled: true,
-    disabledReason: "OpenCode Zen API issue",
-  },
-  {
-    id: "gemini-3-pro",
-    name: "Gemini 3 Pro",
-    description: "Google's advanced Gemini model",
-    category: "smart",
-    provider: "opencode-zen",
-    contextLength: 1000000,
   },
   {
     id: "kimi-k2",

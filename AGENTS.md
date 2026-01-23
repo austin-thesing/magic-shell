@@ -162,7 +162,7 @@ export function getShellInfo(): ShellInfo {
 ```typescript
 const DEFAULT_CONFIG: Config = {
   provider: "opencode-zen",
-  defaultModel: "gpt-5-nano",
+  defaultModel: "big-pickle",
   safetyLevel: "moderate",
   // ...
 }
