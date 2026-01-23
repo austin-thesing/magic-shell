@@ -936,12 +936,18 @@ function showThemeSelector() {
 
   const currentTheme = getTheme()
 
+  // Center horizontally: (terminal width - container width) / 2
+  // Using a reasonable default for typical terminals
+  const themeContainerWidth = 45
+  const terminalWidth = process.stdout.columns || 80
+  const themeContainerLeft = Math.max(2, Math.floor((terminalWidth - themeContainerWidth) / 2))
+
   const container = new BoxRenderable(renderer, {
     id: "theme-selector-container",
     position: "absolute",
-    left: "center",
+    left: themeContainerLeft,
     top: 4,
-    width: 45,
+    width: themeContainerWidth,
     height: themeNames.length + 4,
     backgroundColor: currentTheme.colors.backgroundPanel,
     border: true,
@@ -1109,12 +1115,17 @@ function showCommandPalette() {
 
   const commands = getCommandPaletteOptions()
 
+  // Center horizontally: (terminal width - container width) / 2
+  const paletteWidth = 55
+  const termWidth = process.stdout.columns || 80
+  const paletteLeft = Math.max(2, Math.floor((termWidth - paletteWidth) / 2))
+
   const container = new BoxRenderable(renderer, {
     id: "command-palette-container",
     position: "absolute",
-    left: "center",
+    left: paletteLeft,
     top: 3,
-    width: 55,
+    width: paletteWidth,
     height: Math.min(commands.length + 4, 16),
     backgroundColor: "#1e293b",
     border: true,

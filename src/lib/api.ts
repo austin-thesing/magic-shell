@@ -100,12 +100,14 @@ function formatHistory(history: CommandHistory[]): string {
 function cleanCommand(command: string): string {
   let cleaned = command
 
-  // Remove markdown code block markers
+  // Remove markdown code block markers (```bash, ```sh, etc.)
   cleaned = cleaned.replace(/^```[\w]*\n?/gm, "")
   cleaned = cleaned.replace(/\n?```$/gm, "")
 
-  // Remove backticks
-  cleaned = cleaned.replace(/^`+|`+$/g, "")
+  // Remove wrapping backticks (inline code like `command`)
+  // Uses separate replacements for clarity
+  cleaned = cleaned.replace(/^`+/, "")
+  cleaned = cleaned.replace(/`+$/, "")
 
   // Remove common prefixes LLMs add
   cleaned = cleaned.replace(/^(command:|shell:|bash:|zsh:|sh:)\s*/i, "")

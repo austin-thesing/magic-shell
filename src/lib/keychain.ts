@@ -1,4 +1,4 @@
-import { execSync, spawnSync } from "child_process"
+import { spawnSync } from "child_process"
 
 const SERVICE_NAME = "magic-shell"
 
@@ -60,46 +60,74 @@ export async function deleteSecret(key: string): Promise<boolean> {
 function setSecretMacOS(key: string, value: string): boolean {
   try {
     // First try to delete any existing entry (ignore errors)
-    try {
-      execSync(
-        `security delete-generic-password -s "${SERVICE_NAME}" -a "${key}" 2>/dev/null`,
-        { encoding: "utf-8" }
-      )
-    } catch {
-      // Ignore - entry might not exist
-    }
+    spawnSync("security", [
+      "delete-generic-password",
+      "-s", SERVICE_NAME,
+      "-a", key,
+    ], {
+      encoding: "utf-8",
+      stdio: "pipe",
+    })
+    // Ignore errors - entry might not exist
 
-    // Add the new password
-    execSync(
-      `security add-generic-password -s "${SERVICE_NAME}" -a "${key}" -w "${value}"`,
-      { encoding: "utf-8" }
-    )
-    return true
-  } catch {
+    // Add the new password using stdin to avoid command injection
+    // and prevent secret exposure in process list
+    const result = spawnSync("security", [
+      "add-generic-password",
+      "-s", SERVICE_NAME,
+      "-a", key,
+      "-w", value,
+    ], {
+      encoding: "utf-8",
+      stdio: "pipe",
+    })
+    return result.status === 0
+  } catch (error) {
+    if (process.env.DEBUG_API === "1") {
+      console.error("[DEBUG] macOS keychain set error:", error instanceof Error ? error.message : String(error))
+    }
     return false
   }
 }
 
 function getSecretMacOS(key: string): string | null {
   try {
-    const result = execSync(
-      `security find-generic-password -s "${SERVICE_NAME}" -a "${key}" -w 2>/dev/null`,
-      { encoding: "utf-8" }
-    )
-    return result.trim()
-  } catch {
+    const result = spawnSync("security", [
+      "find-generic-password",
+      "-s", SERVICE_NAME,
+      "-a", key,
+      "-w",
+    ], {
+      encoding: "utf-8",
+      stdio: "pipe",
+    })
+    if (result.status !== 0) {
+      return null
+    }
+    return result.stdout?.trim() || null
+  } catch (error) {
+    if (process.env.DEBUG_API === "1") {
+      console.error("[DEBUG] macOS keychain get error:", error instanceof Error ? error.message : String(error))
+    }
     return null
   }
 }
 
 function deleteSecretMacOS(key: string): boolean {
   try {
-    execSync(
-      `security delete-generic-password -s "${SERVICE_NAME}" -a "${key}" 2>/dev/null`,
-      { encoding: "utf-8" }
-    )
-    return true
-  } catch {
+    const result = spawnSync("security", [
+      "delete-generic-password",
+      "-s", SERVICE_NAME,
+      "-a", key,
+    ], {
+      encoding: "utf-8",
+      stdio: "pipe",
+    })
+    return result.status === 0
+  } catch (error) {
+    if (process.env.DEBUG_API === "1") {
+      console.error("[DEBUG] macOS keychain delete error:", error instanceof Error ? error.message : String(error))
+    }
     return false
   }
 }
@@ -121,31 +149,51 @@ function setSecretLinux(key: string, value: string): boolean {
       encoding: "utf-8",
     })
     return result.status === 0
-  } catch {
+  } catch (error) {
+    if (process.env.DEBUG_API === "1") {
+      console.error("[DEBUG] Linux secret-tool set error:", error instanceof Error ? error.message : String(error))
+    }
     return false
   }
 }
 
 function getSecretLinux(key: string): string | null {
   try {
-    const result = execSync(
-      `secret-tool lookup service "${SERVICE_NAME}" account "${key}" 2>/dev/null`,
-      { encoding: "utf-8" }
-    )
-    return result.trim() || null
-  } catch {
+    const result = spawnSync("secret-tool", [
+      "lookup",
+      "service", SERVICE_NAME,
+      "account", key,
+    ], {
+      encoding: "utf-8",
+      stdio: "pipe",
+    })
+    if (result.status !== 0) {
+      return null
+    }
+    return result.stdout?.trim() || null
+  } catch (error) {
+    if (process.env.DEBUG_API === "1") {
+      console.error("[DEBUG] Linux secret-tool get error:", error instanceof Error ? error.message : String(error))
+    }
     return null
   }
 }
 
 function deleteSecretLinux(key: string): boolean {
   try {
-    execSync(
-      `secret-tool clear service "${SERVICE_NAME}" account "${key}" 2>/dev/null`,
-      { encoding: "utf-8" }
-    )
-    return true
-  } catch {
+    const result = spawnSync("secret-tool", [
+      "clear",
+      "service", SERVICE_NAME,
+      "account", key,
+    ], {
+      encoding: "utf-8",
+      stdio: "pipe",
+    })
+    return result.status === 0
+  } catch (error) {
+    if (process.env.DEBUG_API === "1") {
+      console.error("[DEBUG] Linux secret-tool delete error:", error instanceof Error ? error.message : String(error))
+    }
     return false
   }
 }
@@ -159,24 +207,77 @@ function setSecretWindows(key: string, value: string): boolean {
     const targetName = `${SERVICE_NAME}:${key}`
     
     // First remove existing credential (ignore errors)
-    try {
-      execSync(`cmdkey /delete:${targetName}`, {
-        encoding: "utf-8",
-        stdio: "pipe",
-      })
-    } catch {
-      // Ignore
-    }
-
-    // Add new credential using cmdkey
-    // Escape special characters in the value
-    const escapedValue = value.replace(/"/g, '""')
-    execSync(`cmdkey /generic:${targetName} /user:${targetName} /pass:"${escapedValue}"`, {
+    spawnSync("cmdkey", [`/delete:${targetName}`], {
       encoding: "utf-8",
       stdio: "pipe",
     })
-    return true
-  } catch {
+
+    // Use PowerShell with .NET CredentialManager to securely store credentials
+    // This avoids exposing the secret in command-line arguments
+    const psScript = `
+$targetName = $input | Select-Object -First 1
+$password = $input | Select-Object -Skip 1 -First 1
+
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+
+public class CredentialManager {
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    public static extern bool CredWrite(ref CREDENTIAL credential, int flags);
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct CREDENTIAL {
+        public int Flags;
+        public int Type;
+        public string TargetName;
+        public string Comment;
+        public long LastWritten;
+        public int CredentialBlobSize;
+        public IntPtr CredentialBlob;
+        public int Persist;
+        public int AttributeCount;
+        public IntPtr Attributes;
+        public string TargetAlias;
+        public string UserName;
+    }
+
+    public static bool SaveCredential(string target, string password) {
+        var passwordBytes = System.Text.Encoding.Unicode.GetBytes(password);
+        var credentialBlob = Marshal.AllocHGlobal(passwordBytes.Length);
+        Marshal.Copy(passwordBytes, 0, credentialBlob, passwordBytes.Length);
+
+        var credential = new CREDENTIAL {
+            Type = 1, // CRED_TYPE_GENERIC
+            TargetName = target,
+            CredentialBlobSize = passwordBytes.Length,
+            CredentialBlob = credentialBlob,
+            Persist = 2, // CRED_PERSIST_LOCAL_MACHINE
+            UserName = target
+        };
+
+        var result = CredWrite(ref credential, 0);
+        Marshal.FreeHGlobal(credentialBlob);
+        return result;
+    }
+}
+"@
+
+[CredentialManager]::SaveCredential($targetName, $password)
+`.trim()
+
+    const result = spawnSync("powershell", ["-NoProfile", "-Command", psScript], {
+      input: `${targetName}\n${value}`,
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    })
+    
+    // Check if the result is "True"
+    return result.stdout?.trim() === "True"
+  } catch (error) {
+    if (process.env.DEBUG_API === "1") {
+      console.error("[DEBUG] Windows credential set error:", error instanceof Error ? error.message : String(error))
+    }
     return false
   }
 }
@@ -247,7 +348,10 @@ public class CredentialManager {
     
     const password = result.stdout?.trim()
     return password || null
-  } catch {
+  } catch (error) {
+    if (process.env.DEBUG_API === "1") {
+      console.error("[DEBUG] Windows credential get error:", error instanceof Error ? error.message : String(error))
+    }
     return null
   }
 }
@@ -255,12 +359,15 @@ public class CredentialManager {
 function deleteSecretWindows(key: string): boolean {
   try {
     const targetName = `${SERVICE_NAME}:${key}`
-    execSync(`cmdkey /delete:${targetName}`, {
+    const result = spawnSync("cmdkey", [`/delete:${targetName}`], {
       encoding: "utf-8",
       stdio: "pipe",
     })
-    return true
-  } catch {
+    return result.status === 0
+  } catch (error) {
+    if (process.env.DEBUG_API === "1") {
+      console.error("[DEBUG] Windows credential delete error:", error instanceof Error ? error.message : String(error))
+    }
     return false
   }
 }
@@ -274,28 +381,18 @@ function deleteSecretWindows(key: string): boolean {
  */
 export function isSecureStorageAvailable(): boolean {
   switch (process.platform) {
-    case "darwin":
-      try {
-        execSync("which security", { encoding: "utf-8", stdio: "pipe" })
-        return true
-      } catch {
-        return false
-      }
-    case "linux":
-      try {
-        execSync("which secret-tool", { encoding: "utf-8", stdio: "pipe" })
-        return true
-      } catch {
-        return false
-      }
-    case "win32":
-      // cmdkey is always available on Windows
-      try {
-        execSync("where cmdkey", { encoding: "utf-8", stdio: "pipe" })
-        return true
-      } catch {
-        return false
-      }
+    case "darwin": {
+      const result = spawnSync("which", ["security"], { encoding: "utf-8", stdio: "pipe" })
+      return result.status === 0
+    }
+    case "linux": {
+      const result = spawnSync("which", ["secret-tool"], { encoding: "utf-8", stdio: "pipe" })
+      return result.status === 0
+    }
+    case "win32": {
+      const result = spawnSync("where", ["cmdkey"], { encoding: "utf-8", stdio: "pipe" })
+      return result.status === 0
+    }
     default:
       return false
   }

@@ -130,6 +130,39 @@ function printModels() {
   console.log()
 }
 
+/**
+ * Validate API key format based on provider
+ * Returns error message if invalid, null if valid
+ */
+function validateApiKey(key: string, provider: Provider): string | null {
+  const trimmed = key.trim()
+  
+  if (trimmed.length === 0) {
+    return "API key cannot be empty"
+  }
+  
+  if (trimmed.length < 20) {
+    return "API key seems too short (expected at least 20 characters)"
+  }
+  
+  // Both providers use sk- prefix (OpenRouter uses sk-or-, OpenCode Zen uses sk-)
+  if (!trimmed.startsWith("sk-")) {
+    const providerName = provider === "opencode-zen" ? "OpenCode Zen" : "OpenRouter"
+    return `${providerName} API keys typically start with 'sk-'`
+  }
+  
+  // Check for common copy-paste errors
+  if (trimmed.includes(" ")) {
+    return "API key contains spaces - check for copy-paste errors"
+  }
+  
+  if (trimmed.includes("\n") || trimmed.includes("\r")) {
+    return "API key contains newlines - check for copy-paste errors"
+  }
+  
+  return null
+}
+
 async function setup() {
   const readline = await import("readline")
   const rl = readline.createInterface({
@@ -164,10 +197,27 @@ async function setup() {
         ? "https://opencode.ai/auth" 
         : "https://openrouter.ai/keys"
       console.log(`\nGet your API key from: ${colors.cyan}${url}${colors.reset}`)
-      const newKey = await question("Enter API key: ")
-      if (newKey.trim()) {
+      
+      let validKey = false
+      while (!validKey) {
+        const newKey = await question("Enter API key: ")
+        if (!newKey.trim()) {
+          console.log(`${colors.yellow}Keeping existing API key${colors.reset}`)
+          break
+        }
+        
+        const validationError = validateApiKey(newKey, provider)
+        if (validationError) {
+          console.log(`${colors.yellow}Warning: ${validationError}${colors.reset}`)
+          const proceed = await question("Continue anyway? [y/N]: ")
+          if (proceed.toLowerCase() !== "y") {
+            continue
+          }
+        }
+        
         await setApiKey(provider, newKey.trim())
         console.log(`${colors.green}✓ API key saved${colors.reset}`)
+        validKey = true
       }
     }
   } else {
@@ -175,14 +225,28 @@ async function setup() {
       ? "https://opencode.ai/auth" 
       : "https://openrouter.ai/keys"
     console.log(`\nGet your API key from: ${colors.cyan}${url}${colors.reset}`)
-    const newKey = await question("Enter API key: ")
-    if (newKey.trim()) {
+    
+    let validKey = false
+    while (!validKey) {
+      const newKey = await question("Enter API key: ")
+      if (!newKey.trim()) {
+        console.log(`${colors.red}No API key provided. Exiting.${colors.reset}`)
+        rl.close()
+        process.exit(1)
+      }
+      
+      const validationError = validateApiKey(newKey, provider)
+      if (validationError) {
+        console.log(`${colors.yellow}Warning: ${validationError}${colors.reset}`)
+        const proceed = await question("Continue anyway? [y/N]: ")
+        if (proceed.toLowerCase() !== "y") {
+          continue
+        }
+      }
+      
       await setApiKey(provider, newKey.trim())
       console.log(`${colors.green}✓ API key saved${colors.reset}`)
-    } else {
-      console.log(`${colors.red}No API key provided. Exiting.${colors.reset}`)
-      rl.close()
-      process.exit(1)
+      validKey = true
     }
   }
 

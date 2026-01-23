@@ -319,6 +319,7 @@ export interface Config {
   dryRunByDefault: boolean
   blockedCommands: string[]
   confirmedDangerousPatterns: string[]
+  theme?: string
 }
 
 export interface CommandHistory {
