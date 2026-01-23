@@ -11,8 +11,8 @@ function getZenApiType(modelId: string): ZenApiType {
   if (modelId.startsWith("gpt-")) {
     return "openai-responses"
   }
-  // Anthropic models AND MiniMax (uses Anthropic endpoint per docs)
-  if (modelId.startsWith("claude-") || modelId.startsWith("minimax-")) {
+  // Anthropic models use the Messages API
+  if (modelId.startsWith("claude-")) {
     return "anthropic"
   }
   // Google models

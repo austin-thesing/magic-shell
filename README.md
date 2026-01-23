@@ -177,7 +177,6 @@ OpenCode Zen provides curated models optimized for coding tasks, including **fre
 - `big-pickle` - Stealth model (default)
 - `grok-code` - xAI's Grok Code Fast 1
 - `glm-4.7` - GLM 4.7
-- `minimax-m2.1-free` - MiniMax M2.1
 
 **Premium Models:**
 - Claude Sonnet 4.5, Claude Opus 4.5

@@ -86,6 +86,7 @@ async function main() {
 
   renderer = await createCliRenderer({
     exitOnCtrlC: false,
+    useMouse: false,
   })
 
   // Use theme background color
@@ -435,10 +436,7 @@ function getInputHintContent(): StyledText {
 
 function getWelcomeMessage(): string {
   const providerName = config.provider === "opencode-zen" ? "OpenCode Zen" : "OpenRouter"
-  const freeNote = config.provider === "opencode-zen" 
-    ? "\nFree models: big-pickle" 
-    : ""
-  return `Ready. Using ${providerName}.${freeNote}\nType what you want to do, or press Ctrl+X P for command palette.`
+  return `Ready. Using ${providerName}.\nType what you want to do, or press Ctrl+X P for command palette.`
 }
 
 function addSystemMessage(content: string): ChatMessage {

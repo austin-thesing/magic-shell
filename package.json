@@ -1,6 +1,6 @@
 {
   "name": "@austinthesing/magic-shell",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "Natural language to terminal commands with safety features. Supports OpenCode Zen (with free models) and OpenRouter.",
   "type": "module",
   "main": "dist/index.js",

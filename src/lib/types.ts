@@ -115,15 +115,6 @@ export const OPENCODE_ZEN_MODELS: Model[] = [
     provider: "opencode-zen",
     contextLength: 128000,
   },
-  {
-    id: "minimax-m2.1-free",
-    name: "MiniMax M2.1",
-    description: "Free MiniMax model (limited time)",
-    category: "smart",
-    provider: "opencode-zen",
-    contextLength: 128000,
-    free: true,
-  },
   // Fast models
   {
     id: "claude-3-5-haiku",
