@@ -1,0 +1,168 @@
+---
+const levels = [
+  {
+    severity: "low",
+    label: "Low",
+    description: "Worth reviewing before running",
+    example: "git checkout main",
+    color: "#7fd88f",
+  },
+  {
+    severity: "medium",
+    label: "Medium", 
+    description: "Requires elevated privileges",
+    example: "sudo apt install",
+    color: "#f5a742",
+  },
+  {
+    severity: "high",
+    label: "High",
+    description: "Significant changes or data loss risk",
+    example: "rm -rf node_modules",
+    color: "#e06c75",
+  },
+  {
+    severity: "critical",
+    label: "Critical",
+    description: "Blocked - could cause system damage",
+    example: "rm -rf /",
+    color: "#ff4444",
+  },
+];
+---
+
+<div class="safety-levels">
+  <div class="levels-stack">
+    {levels.map((level, index) => (
+      <div 
+        class={`level-card severity-${level.severity}`}
+        style={`--level-color: ${level.color}; --level-index: ${index};`}
+      >
+        <div class="level-header">
+          <div class="level-indicator">
+            <span class="indicator-dot"></span>
+            <span class="level-label">{level.label}</span>
+          </div>
+          <span class="level-badge">{level.severity}</span>
+        </div>
+        <p class="level-description">{level.description}</p>
+        <div class="level-example">
+          <code>$ {level.example}</code>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .safety-levels {
+    position: relative;
+  }
+
+  .levels-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .level-card {
+    background: var(--bg-terminal);
+    border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--level-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+    position: relative;
+    transition: all var(--transition-base);
+  }
+
+  .level-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--level-color) 8%, transparent),
+      transparent 50%
+    );
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .level-card:hover {
+    border-color: var(--level-color);
+    transform: translateX(4px);
+    box-shadow: -4px 0 20px color-mix(in srgb, var(--level-color) 15%, transparent);
+  }
+
+  .level-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-2);
+    position: relative;
+  }
+
+  .level-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--level-color);
+    box-shadow: 0 0 8px var(--level-color);
+  }
+
+  .level-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--level-color);
+  }
+
+  .level-badge {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--space-1) var(--space-2);
+    background: var(--bg-elevated);
+    border-radius: var(--radius-sm);
+  }
+
+  .level-description {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-3) 0;
+    position: relative;
+  }
+
+  .level-example {
+    position: relative;
+  }
+
+  .level-example code {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    background: var(--bg-elevated);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    display: inline-block;
+  }
+
+  .severity-critical .level-example code {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 640px) {
+    .level-card {
+      padding: var(--space-3) var(--space-4);
+    }
+  }
+</style>

@@ -1,0 +1,143 @@
+---
+title: TUI Mode
+description: Magic Shell's full interactive terminal interface with themes, history, and keyboard shortcuts.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Magic Shell's TUI (Terminal User Interface) mode provides a rich interactive experience for translating and executing commands.
+
+## Launching TUI Mode
+
+```bash
+# Launch TUI
+msh -i
+
+# Or simply (TUI is the default when no query is provided)
+msh
+```
+
+## Interface Overview
+
+The TUI displays:
+
+- **Header**: Current model, provider, and mode indicators
+- **Output area**: Command translations and results
+- **Input area**: Where you type your queries
+- **Status bar**: Helpful hints and keyboard shortcuts
+
+## Keyboard Shortcuts
+
+All shortcuts use the `Ctrl+X` chord (press Ctrl+X, release, then press the key):
+
+### Navigation & Control
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+X P` | Open command palette |
+| `Ctrl+X ?` | Show help |
+| `Ctrl+X Q` | Exit TUI |
+| `Ctrl+C` | Exit / Cancel current operation |
+| `Esc` | Close dialogs |
+
+### Configuration
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+X M` | Change model |
+| `Ctrl+X S` | Switch provider |
+| `Ctrl+X T` | Change theme |
+| `Ctrl+X D` | Toggle dry-run mode |
+| `Ctrl+X C` | Show current config |
+
+### History & Output
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+X H` | Show command history |
+| `Ctrl+X L` | Clear output |
+
+## Direct Commands
+
+You can also type commands directly in the input:
+
+| Command | Action |
+|---------|--------|
+| `!help` | Show help |
+| `!model` | Change model |
+| `!provider` | Switch provider |
+| `!dry` | Toggle dry-run mode |
+| `!config` | Show configuration |
+| `!history` | Show command history |
+| `!clear` | Clear output |
+
+## Dry-Run Mode
+
+When dry-run mode is enabled:
+- Commands are translated but **not executed**
+- Full safety analysis is shown
+- Great for learning and reviewing
+
+Toggle with `Ctrl+X D` or `!dry`.
+
+<Aside type="tip">
+  Enable dry-run mode when trying Magic Shell on a new system or with unfamiliar queries.
+</Aside>
+
+## Command History
+
+Magic Shell remembers your recent commands and translations:
+
+- Press `Ctrl+X H` to view history
+- History persists across sessions
+- Context from history improves future translations
+
+## Model Switching
+
+Different models have different strengths:
+
+<Steps>
+1. Press `Ctrl+X M` to open model picker
+2. Use arrow keys to navigate
+3. Press Enter to select
+4. Free models are indicated in the list
+</Steps>
+
+## Provider Switching
+
+Switch between OpenCode Zen and OpenRouter:
+
+<Steps>
+1. Press `Ctrl+X S` to open provider picker
+2. Select your provider
+3. You may need to enter an API key if switching to an unconfigured provider
+</Steps>
+
+## Tips for TUI Mode
+
+### Efficient Workflow
+
+1. **Use dry-run** for complex queries first
+2. **Check history** for similar past commands
+3. **Switch models** if translations aren't accurate
+4. **Use the palette** (`Ctrl+X P`) to discover features
+
+### Keyboard-First
+
+The TUI is designed for keyboard efficiency:
+- No mouse required
+- All actions have shortcuts
+- Dialog navigation with arrow keys
+
+### Context Awareness
+
+Magic Shell uses context to improve translations:
+- Recent command history
+- Current working directory  
+- Detected shell type
+
+## Exiting TUI
+
+- `Ctrl+X Q` - Graceful exit
+- `Ctrl+C` - Quick exit
+- `Ctrl+D` - Exit (on empty input)

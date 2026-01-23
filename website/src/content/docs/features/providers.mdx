@@ -1,0 +1,129 @@
+---
+title: AI Providers
+description: Choose between OpenCode Zen and OpenRouter for AI-powered command translation.
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Magic Shell supports two AI providers, each with their own strengths.
+
+## OpenCode Zen (Recommended)
+
+OpenCode Zen provides curated models optimized for coding tasks. It's the default provider and offers several **free models**.
+
+### Free Models
+
+| Model | Description |
+|-------|-------------|
+| `grok-code` | xAI's Grok Code Fast 1 - fast and capable |
+| `glm-4.7-free` | GLM 4.7 - good general purpose |
+| `minimax-m2.1-free` | MiniMax M2.1 - efficient |
+| `big-pickle` | Stealth model - experimental |
+
+### Premium Models
+
+| Model | Description |
+|-------|-------------|
+| `claude-sonnet-4-5` | Anthropic's hybrid reasoning model |
+| `claude-opus-4-5` | Anthropic's most capable model |
+| `gemini-3-flash` | Google's fast model |
+| `gemini-3-pro` | Google's powerful model |
+| `kimi-k2` | Moonshot's Kimi K2 |
+| `kimi-k2-thinking` | Kimi K2 with extended reasoning |
+| `qwen3-coder` | Alibaba's massive coding model |
+
+<Aside type="tip">
+  For most shell commands, the free `grok-code` model works excellently. Save premium models for complex multi-step tasks.
+</Aside>
+
+### Get an API Key
+
+1. Visit [opencode.ai/auth](https://opencode.ai/auth)
+2. Sign up or log in
+3. Copy your API key
+4. Run `msh --setup` and paste it
+
+## OpenRouter
+
+OpenRouter provides access to models from many providers through a single API.
+
+### Free Models
+
+| Model | Description |
+|-------|-------------|
+| `mimo-v2-flash` | MiMo V2 Flash |
+| `deepseek-v3` | DeepSeek V3 |
+| `gemini-2.5-flash` | Gemini 2.5 Flash |
+
+### Premium Models
+
+| Model | Description |
+|-------|-------------|
+| `claude-sonnet-4.5` | Anthropic Claude Sonnet 4.5 |
+| `claude-opus-4.5` | Anthropic Claude Opus 4.5 |
+| `gpt-5.2-codex` | OpenAI GPT 5.2 Codex |
+| `gemini-2.5-pro` | Google Gemini 2.5 Pro |
+| `deepseek-r1` | DeepSeek R1 reasoning model |
+
+### Get an API Key
+
+1. Visit [openrouter.ai/keys](https://openrouter.ai/keys)
+2. Create an account
+3. Generate a new API key
+4. Run `msh --setup` and select OpenRouter
+
+## Switching Providers
+
+### Via CLI
+
+```bash
+# Switch to OpenRouter
+msh --provider openrouter
+
+# Switch back to OpenCode Zen
+msh --provider opencode-zen
+```
+
+### Via TUI
+
+Press `Ctrl+X S` to open the provider switcher.
+
+## Switching Models
+
+### Via CLI
+
+```bash
+# List available models
+msh --models
+
+# Set default model
+msh --model grok-code
+```
+
+### Via TUI
+
+Press `Ctrl+X M` to open the model picker.
+
+## Model Recommendations
+
+| Use Case | Recommended Model |
+|----------|------------------|
+| Quick commands | `grok-code` (free) |
+| Complex git operations | `claude-sonnet-4.5` |
+| System administration | `grok-code` or `gemini-3-flash` |
+| Multi-step tasks | `claude-opus-4.5` or `kimi-k2-thinking` |
+| Learning/experimenting | Any free model |
+
+## Environment Variables
+
+Set your API keys via environment variables:
+
+```bash
+# OpenCode Zen
+export OPENCODE_ZEN_API_KEY="your-key"
+
+# OpenRouter  
+export OPENROUTER_API_KEY="your-key"
+```
+
+Keys stored in the system keychain (via `msh --setup`) take precedence over environment variables.

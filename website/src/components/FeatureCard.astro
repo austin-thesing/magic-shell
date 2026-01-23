@@ -1,0 +1,127 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  icon?: string;
+}
+
+const { title, description, icon } = Astro.props;
+---
+
+<div class="feature-card">
+  <div class="feature-header">
+    <div class="traffic-lights">
+      <span class="light"></span>
+      <span class="light"></span>
+      <span class="light"></span>
+    </div>
+    {icon && <span class="feature-icon">{icon}</span>}
+  </div>
+  <div class="feature-content">
+    <h3 class="feature-title">{title}</h3>
+    <p class="feature-description">{description}</p>
+  </div>
+</div>
+
+<style>
+  .feature-card {
+    background: var(--bg-terminal);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all var(--transition-base);
+    position: relative;
+  }
+
+  .feature-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      transparent 0%,
+      var(--border-subtle) 50%,
+      transparent 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  .feature-card:hover {
+    border-color: var(--border-active);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .feature-card:hover::before {
+    opacity: 1;
+    background: linear-gradient(
+      135deg,
+      var(--color-primary-glow) 0%,
+      transparent 50%,
+      var(--color-primary-glow) 100%
+    );
+  }
+
+  .feature-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .traffic-lights {
+    display: flex;
+    gap: 6px;
+  }
+
+  .light {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border-default);
+  }
+
+  .feature-card:hover .traffic-lights .light:nth-child(1) {
+    background: #ff5f56;
+  }
+
+  .feature-card:hover .traffic-lights .light:nth-child(2) {
+    background: #ffbd2e;
+  }
+
+  .feature-card:hover .traffic-lights .light:nth-child(3) {
+    background: #27ca3f;
+  }
+
+  .feature-icon {
+    font-size: var(--text-lg);
+  }
+
+  .feature-content {
+    padding: var(--space-5);
+  }
+
+  .feature-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.01em;
+  }
+
+  .feature-description {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>

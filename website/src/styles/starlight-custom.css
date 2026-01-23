@@ -1,0 +1,226 @@
+/**
+ * Starlight Theme Customization
+ * Matches the Magic Shell "Terminal Alchemy" design system
+ */
+
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/600.css";
+@import "@fontsource/geist-sans/400.css";
+@import "@fontsource/geist-sans/500.css";
+@import "@fontsource/geist-sans/600.css";
+
+:root {
+  /* Override Starlight colors with Magic Shell palette */
+  --sl-color-accent-low: #1a1510;
+  --sl-color-accent: #fab283;
+  --sl-color-accent-high: #fcd4b8;
+  
+  --sl-color-white: #eeeeee;
+  --sl-color-gray-1: #b0b0b0;
+  --sl-color-gray-2: #808080;
+  --sl-color-gray-3: #505050;
+  --sl-color-gray-4: #333333;
+  --sl-color-gray-5: #252525;
+  --sl-color-gray-6: #161616;
+  --sl-color-black: #050505;
+
+  /* Typography */
+  --sl-font: "Geist Sans", "Inter", system-ui, -apple-system, sans-serif;
+  --sl-font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
+
+  /* Text sizes */
+  --sl-text-xs: 0.8125rem;
+  --sl-text-sm: 0.875rem;
+  --sl-text-base: 1rem;
+  --sl-text-lg: 1.125rem;
+  --sl-text-xl: 1.25rem;
+  --sl-text-2xl: 1.5rem;
+  --sl-text-3xl: 2rem;
+  --sl-text-4xl: 2.5rem;
+
+  /* Border radius */
+  --sl-border-radius: 8px;
+}
+
+/* Dark mode specific adjustments */
+:root[data-theme="dark"] {
+  --sl-color-bg: #050505;
+  --sl-color-bg-nav: #0a0a0a;
+  --sl-color-bg-sidebar: #0a0a0a;
+  --sl-color-hairline-light: #252525;
+  --sl-color-hairline: #333333;
+}
+
+/* Sidebar styling */
+.sidebar-content {
+  background: var(--sl-color-bg-sidebar);
+}
+
+nav.sidebar a {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-sm);
+}
+
+nav.sidebar a[aria-current="page"] {
+  background: var(--sl-color-accent-low);
+  color: var(--sl-color-accent);
+}
+
+/* Code blocks */
+.expressive-code {
+  --ec-codeBg: #0a0a0a;
+  --ec-codeFont: var(--sl-font-mono);
+  --ec-codeFontSize: 0.875rem;
+  --ec-uiBorderRadius: 8px;
+}
+
+.expressive-code pre {
+  border: 1px solid #252525;
+}
+
+/* Inline code */
+:not(pre) > code {
+  font-family: var(--sl-font-mono);
+  font-size: 0.9em;
+  padding: 0.15em 0.4em;
+  background: #161616;
+  border-radius: 4px;
+  color: #fab283;
+}
+
+/* Headings */
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3,
+.sl-markdown-content h4 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.sl-markdown-content h1 {
+  font-size: var(--sl-text-3xl);
+}
+
+.sl-markdown-content h2 {
+  font-size: var(--sl-text-2xl);
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--sl-color-hairline-light);
+}
+
+.sl-markdown-content h3 {
+  font-size: var(--sl-text-xl);
+}
+
+/* Links */
+.sl-markdown-content a {
+  color: #5c9cf5;
+  text-decoration: none;
+}
+
+.sl-markdown-content a:hover {
+  color: #fab283;
+  text-decoration: underline;
+}
+
+/* Tables */
+.sl-markdown-content table {
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: var(--sl-border-radius);
+  overflow: hidden;
+}
+
+.sl-markdown-content th {
+  background: #111111;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-sm);
+}
+
+.sl-markdown-content td {
+  border-color: var(--sl-color-hairline-light);
+}
+
+/* Callouts/Asides */
+.starlight-aside {
+  border-radius: var(--sl-border-radius);
+  border-left-width: 3px;
+}
+
+.starlight-aside--tip {
+  --sl-color-asides-text-accent: #7fd88f;
+  border-color: #7fd88f;
+}
+
+.starlight-aside--caution {
+  --sl-color-asides-text-accent: #f5a742;
+  border-color: #f5a742;
+}
+
+.starlight-aside--danger {
+  --sl-color-asides-text-accent: #e06c75;
+  border-color: #e06c75;
+}
+
+/* Search */
+.search-input {
+  font-family: var(--sl-font-mono);
+  background: #0a0a0a;
+  border: 1px solid #333333;
+}
+
+.search-input:focus {
+  border-color: #fab283;
+  box-shadow: 0 0 0 2px rgba(250, 178, 131, 0.15);
+}
+
+/* Page navigation */
+.pagination-links a {
+  border-radius: var(--sl-border-radius);
+  border: 1px solid var(--sl-color-hairline-light);
+  transition: all 0.2s ease;
+}
+
+.pagination-links a:hover {
+  border-color: #fab283;
+  background: #111111;
+}
+
+/* Header */
+header.header {
+  background: rgba(5, 5, 5, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #252525;
+}
+
+/* Mobile menu */
+@media (max-width: 50rem) {
+  .mobile-menu-toggle {
+    color: var(--sl-color-white);
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #484848;
+}
+
+/* Selection */
+::selection {
+  background: #fab283;
+  color: #050505;
+}

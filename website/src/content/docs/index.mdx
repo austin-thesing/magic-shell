@@ -1,0 +1,51 @@
+---
+title: Magic Shell Documentation
+description: Transform natural language into terminal commands with AI-powered translation and built-in safety features.
+template: splash
+hero:
+  tagline: Transform natural language into terminal commands with AI-powered translation and built-in safety features.
+  actions:
+    - text: Get Started
+      link: /getting-started/installation/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/austin-thesing/magic-shell
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Quick Start
+
+```bash
+# Install Magic Shell
+curl -fsSL https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.sh | bash
+
+# Configure your API key
+msh --setup
+
+# Try your first command
+msh "find all files larger than 100MB"
+```
+
+## Explore
+
+<CardGrid stagger>
+  <Card title="Installation" icon="rocket">
+    Get Magic Shell running in seconds on macOS, Linux, or Windows.
+    [Install now →](/getting-started/installation/)
+  </Card>
+  <Card title="AI Providers" icon="star">
+    Choose between OpenCode Zen (with free models!) and OpenRouter.
+    [Learn more →](/features/providers/)
+  </Card>
+  <Card title="Safety System" icon="warning">
+    Every command is analyzed for risk before execution.
+    [See safety levels →](/features/safety-levels/)
+  </Card>
+  <Card title="TUI Mode" icon="laptop">
+    Full interactive terminal interface with themes and shortcuts.
+    [Explore TUI →](/features/tui-mode/)
+  </Card>
+</CardGrid>

@@ -1,0 +1,139 @@
+---
+title: Themes
+description: Customize Magic Shell's appearance with 8 beautiful built-in themes.
+---
+
+Magic Shell includes 8 carefully crafted themes to match your terminal aesthetic.
+
+## Available Themes
+
+### OpenCode (Default)
+
+Warm orange and blue tones on deep black.
+
+```
+Primary: #fab283 (warm orange)
+Background: #0a0a0a
+```
+
+### Tokyo Night
+
+Soft purple and blue inspired by Tokyo Night for VS Code.
+
+```
+Primary: #82aaff (soft blue)
+Background: #1a1b26
+```
+
+### Catppuccin
+
+Pastel colors from the Catppuccin Mocha palette.
+
+```
+Primary: #89b4fa (pastel blue)
+Background: #1e1e2e
+```
+
+### Gruvbox
+
+Retro warm tones inspired by the classic Gruvbox theme.
+
+```
+Primary: #83a598 (muted teal)
+Background: #282828
+```
+
+### Nord
+
+Cool arctic blues from the Nord color palette.
+
+```
+Primary: #88C0D0 (frost blue)
+Background: #2E3440
+```
+
+### Dracula
+
+Purple vampire vibes from the Dracula theme.
+
+```
+Primary: #bd93f9 (purple)
+Background: #282a36
+```
+
+### One Dark
+
+Atom-inspired dark theme.
+
+```
+Primary: #61afef (blue)
+Background: #282c34
+```
+
+### Matrix
+
+Classic green terminal aesthetic.
+
+```
+Primary: #00ff00 (bright green)
+Background: #000000
+```
+
+## Changing Themes
+
+### Via CLI
+
+```bash
+# List available themes
+msh --themes
+
+# Set theme
+msh --theme tokyonight
+```
+
+### Via TUI
+
+In interactive mode, press `Ctrl+X T` to open the theme picker.
+
+### Via Config File
+
+Edit `~/.magic-shell/config.json`:
+
+```json
+{
+  "theme": "catppuccin"
+}
+```
+
+## Theme Colors
+
+Each theme defines a consistent set of colors:
+
+| Color | Usage |
+|-------|-------|
+| `primary` | Main accent color, prompts, highlights |
+| `secondary` | Secondary accent, links |
+| `accent` | Tertiary accent |
+| `error` | Error messages |
+| `warning` | Warning messages |
+| `success` | Success messages |
+| `info` | Informational messages |
+| `text` | Primary text |
+| `textMuted` | Secondary/dimmed text |
+| `background` | Main background |
+| `backgroundPanel` | Panel backgrounds |
+| `backgroundElement` | Element backgrounds |
+| `border` | Default borders |
+| `borderActive` | Active/focused borders |
+| `borderSubtle` | Subtle borders |
+
+## Theme Compatibility
+
+Magic Shell themes are compatible with [OpenCode](https://github.com/anomalyco/opencode) themes. If you use OpenCode, you'll feel right at home!
+
+## Tips
+
+- **Match your terminal**: Choose a theme that complements your terminal emulator's colors
+- **Reduce eye strain**: Dark themes with lower contrast (like Nord) are easier on the eyes for long sessions
+- **High visibility**: Themes like Matrix provide maximum contrast for quick scanning
+- **Consistency**: Using the same theme across tools (IDE, terminal, Magic Shell) creates a cohesive experience

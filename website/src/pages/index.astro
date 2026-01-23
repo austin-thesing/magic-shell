@@ -1,0 +1,436 @@
+---
+import Landing from "../layouts/Landing.astro";
+import TransformHero from "../components/TransformHero.astro";
+import FeatureCard from "../components/FeatureCard.astro";
+import InstallBlock from "../components/InstallBlock.astro";
+import ThemeShowcase from "../components/ThemeShowcase.astro";
+import SafetyLevels from "../components/SafetyLevels.astro";
+import TerminalWindow from "../components/TerminalWindow.astro";
+---
+
+<Landing title="Magic Shell - Natural Language to Terminal Commands">
+  <TransformHero />
+
+  <!-- Features Section -->
+  <section class="section features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Everything you need</h2>
+        <p class="section-subtitle">
+          Powerful features that make command-line work feel like magic.
+        </p>
+      </div>
+
+      <div class="features-grid stagger-children">
+        <FeatureCard
+          title="Natural Language"
+          description="Describe what you want in plain English. Magic Shell translates it to the right command for your shell."
+          icon="~>"
+        />
+        <FeatureCard
+          title="Multiple AI Providers"
+          description="Choose between OpenCode Zen (with free models!) and OpenRouter for access to the best AI models."
+          icon="<>"
+        />
+        <FeatureCard
+          title="Safety Analysis"
+          description="Every command is analyzed for risk before execution. Dangerous patterns are blocked automatically."
+          icon="!!"
+        />
+        <FeatureCard
+          title="Beautiful TUI"
+          description="Full interactive terminal interface with 8 themes, command history, and keyboard shortcuts."
+          icon="[]"
+        />
+        <FeatureCard
+          title="Shell-Aware"
+          description="Automatically detects bash, zsh, fish, PowerShell, and more. Commands adapt to your shell's syntax."
+          icon="$_"
+        />
+        <FeatureCard
+          title="Secure Storage"
+          description="API keys stored in your system keychain - macOS Keychain, Linux secret-tool, or Windows Credential Manager."
+          icon="**"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <h2>How it works</h2>
+        <p class="section-subtitle">
+          Three simple steps from thought to execution.
+        </p>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Describe</h3>
+            <p>Type what you want to do in natural language.</p>
+            <TerminalWindow title="input">
+              <code class="step-code"><span class="prompt">$</span> msh "find files larger than 100MB"</code>
+            </TerminalWindow>
+          </div>
+        </div>
+
+        <div class="step-connector">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+          </svg>
+        </div>
+
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Review</h3>
+            <p>Magic Shell translates and shows you the command.</p>
+            <TerminalWindow title="output">
+              <code class="step-code"><span class="output-text">find . -type f -size +100M</span></code>
+            </TerminalWindow>
+          </div>
+        </div>
+
+        <div class="step-connector">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+          </svg>
+        </div>
+
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Execute</h3>
+            <p>Run immediately with <code>-x</code> or copy to clipboard.</p>
+            <TerminalWindow title="execute">
+              <code class="step-code"><span class="prompt">$</span> msh -x "show disk usage"</code>
+            </TerminalWindow>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Safety Section -->
+  <section class="section safety">
+    <div class="container">
+      <div class="section-header">
+        <h2>Built-in safety</h2>
+        <p class="section-subtitle">
+          Every command is analyzed before execution. Dangerous patterns are blocked.
+        </p>
+      </div>
+
+      <div class="safety-content">
+        <SafetyLevels />
+      </div>
+    </div>
+  </section>
+
+  <!-- Themes Section -->
+  <section class="section themes">
+    <div class="container">
+      <div class="section-header">
+        <h2>8 beautiful themes</h2>
+        <p class="section-subtitle">
+          Match your terminal aesthetic. Switch themes anytime with <code>Ctrl+X T</code>.
+        </p>
+      </div>
+
+      <ThemeShowcase />
+    </div>
+  </section>
+
+  <!-- Install Section -->
+  <section class="section install">
+    <div class="container">
+      <div class="section-header">
+        <h2>Get started in seconds</h2>
+        <p class="section-subtitle">
+          One command to install. Works on macOS, Linux, and Windows.
+        </p>
+      </div>
+
+      <div class="install-wrapper">
+        <InstallBlock platform="macos" />
+      </div>
+
+      <div class="install-note">
+        <p>Then run <code>msh --setup</code> to configure your API key.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <span class="footer-logo">msh</span>
+          <p class="footer-tagline">Type what you mean. Execute what you need.</p>
+        </div>
+
+        <div class="footer-links">
+          <a href="/getting-started/installation/" class="footer-link">Documentation</a>
+          <a href="https://github.com/austin-thesing/magic-shell" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/austin-thesing/magic-shell/issues" class="footer-link" target="_blank" rel="noopener">Issues</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>
+          MIT License. Created by <a href="https://github.com/austin-thesing" target="_blank" rel="noopener">Austin Thesing</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+</Landing>
+
+<style>
+  /* Section styling */
+  .section {
+    padding: var(--space-24) 0;
+    position: relative;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+  }
+
+  .section-header h2 {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .section-subtitle code {
+    background: var(--bg-elevated);
+    padding: 0.15em 0.4em;
+    border-radius: var(--radius-sm);
+    font-size: 0.9em;
+  }
+
+  /* Features */
+  .features {
+    background: linear-gradient(180deg, var(--bg-void) 0%, var(--bg-base) 100%);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-5);
+  }
+
+  @media (max-width: 900px) {
+    .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* How it works */
+  .how-it-works {
+    background: var(--bg-base);
+  }
+
+  .steps {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .step {
+    display: flex;
+    gap: var(--space-5);
+    align-items: flex-start;
+  }
+
+  .step-number {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: 50%;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    flex: 1;
+    padding-bottom: var(--space-4);
+  }
+
+  .step-content h3 {
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    color: var(--color-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .step-content p {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-4);
+  }
+
+  .step-code {
+    display: block;
+    font-size: var(--text-sm);
+    background: none;
+    padding: 0;
+  }
+
+  .step-code .prompt {
+    color: var(--color-primary);
+    margin-right: var(--space-2);
+  }
+
+  .step-code .output-text {
+    color: var(--text-secondary);
+  }
+
+  .step-connector {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-2) 0 var(--space-2) calc(20px + var(--space-5));
+    color: var(--border-active);
+  }
+
+  /* Safety */
+  .safety {
+    background: linear-gradient(180deg, var(--bg-base) 0%, var(--bg-void) 100%);
+  }
+
+  .safety-content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Themes */
+  .themes {
+    background: var(--bg-void);
+  }
+
+  /* Install */
+  .install {
+    background: var(--bg-base);
+    padding-bottom: var(--space-16);
+  }
+
+  .install-wrapper {
+    max-width: 700px;
+    margin: 0 auto var(--space-6);
+  }
+
+  .install-note {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .install-note code {
+    color: var(--color-primary);
+    background: var(--bg-elevated);
+  }
+
+  /* Footer */
+  .footer {
+    background: var(--bg-terminal);
+    border-top: 1px solid var(--border-subtle);
+    padding: var(--space-12) 0 var(--space-8);
+  }
+
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-8);
+    flex-wrap: wrap;
+    gap: var(--space-6);
+  }
+
+  .footer-brand {
+    max-width: 300px;
+  }
+
+  .footer-logo {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .footer-tagline {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin-top: var(--space-2);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: var(--space-6);
+  }
+
+  .footer-link {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    transition: color var(--transition-fast);
+  }
+
+  .footer-link:hover {
+    color: var(--color-primary);
+  }
+
+  .footer-bottom {
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border-subtle);
+    text-align: center;
+  }
+
+  .footer-bottom p {
+    color: var(--text-dim);
+    font-size: var(--text-xs);
+  }
+
+  .footer-bottom a {
+    color: var(--text-muted);
+    transition: color var(--transition-fast);
+  }
+
+  .footer-bottom a:hover {
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 600px) {
+    .footer-content {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-links {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+</style>

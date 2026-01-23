@@ -1,0 +1,20 @@
+{
+  "name": "website",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "serve dist --listen ${PORT:-3000}",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.37.3",
+    "@fontsource/geist-sans": "^5.2.5",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "astro": "^5.6.1",
+    "serve": "^14.2.5",
+    "sharp": "^0.34.2"
+  }
+}

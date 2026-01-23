@@ -1,0 +1,212 @@
+---
+title: Config File
+description: Reference for Magic Shell's configuration file format.
+---
+
+Magic Shell stores configuration in `~/.magic-shell/config.json`.
+
+## Location
+
+| Platform | Path |
+|----------|------|
+| macOS | `~/.magic-shell/config.json` |
+| Linux | `~/.magic-shell/config.json` |
+| Windows | `%USERPROFILE%\.magic-shell\config.json` |
+
+## Default Configuration
+
+```json
+{
+  "provider": "opencode-zen",
+  "defaultModel": "gpt-5-nano",
+  "safetyLevel": "moderate",
+  "dryRunByDefault": false,
+  "theme": "opencode",
+  "blockedCommands": [],
+  "confirmedDangerousPatterns": []
+}
+```
+
+## Options Reference
+
+### provider
+
+The AI provider to use for translations.
+
+| Value | Description |
+|-------|-------------|
+| `"opencode-zen"` | OpenCode Zen (default, has free models) |
+| `"openrouter"` | OpenRouter |
+
+```json
+{
+  "provider": "opencode-zen"
+}
+```
+
+### defaultModel
+
+The model ID to use for translations.
+
+```json
+{
+  "defaultModel": "grok-code"
+}
+```
+
+Run `msh --models` to see available models for your provider.
+
+### safetyLevel
+
+Controls when commands require confirmation.
+
+| Value | Description |
+|-------|-------------|
+| `"strict"` | Confirm all potentially risky commands |
+| `"moderate"` | Confirm high and critical severity (default) |
+| `"relaxed"` | Only block critical severity |
+
+```json
+{
+  "safetyLevel": "moderate"
+}
+```
+
+### dryRunByDefault
+
+When `true`, always show commands without executing them.
+
+```json
+{
+  "dryRunByDefault": false
+}
+```
+
+### theme
+
+Color theme for TUI mode and CLI output.
+
+Available themes:
+- `"opencode"` (default)
+- `"tokyonight"`
+- `"catppuccin"`
+- `"gruvbox"`
+- `"nord"`
+- `"dracula"`
+- `"one-dark"`
+- `"matrix"`
+
+```json
+{
+  "theme": "opencode"
+}
+```
+
+### blockedCommands
+
+Array of command patterns to always block.
+
+```json
+{
+  "blockedCommands": [
+    "DROP TABLE",
+    "TRUNCATE",
+    "format c:"
+  ]
+}
+```
+
+### confirmedDangerousPatterns
+
+Patterns you've previously confirmed as safe for your use case.
+
+```json
+{
+  "confirmedDangerousPatterns": [
+    "rm -rf node_modules",
+    "docker system prune"
+  ]
+}
+```
+
+## Example Configurations
+
+### Strict Mode for Production
+
+```json
+{
+  "provider": "opencode-zen",
+  "defaultModel": "grok-code",
+  "safetyLevel": "strict",
+  "dryRunByDefault": true,
+  "theme": "nord"
+}
+```
+
+### Relaxed Mode for Development
+
+```json
+{
+  "provider": "opencode-zen",
+  "defaultModel": "grok-code",
+  "safetyLevel": "relaxed",
+  "dryRunByDefault": false,
+  "theme": "dracula"
+}
+```
+
+### OpenRouter with Premium Model
+
+```json
+{
+  "provider": "openrouter",
+  "defaultModel": "claude-sonnet-4.5",
+  "safetyLevel": "moderate",
+  "dryRunByDefault": false,
+  "theme": "catppuccin"
+}
+```
+
+## Editing the Config
+
+### Via CLI
+
+Most settings can be changed via CLI options:
+
+```bash
+msh --provider openrouter
+msh --model claude-sonnet-4.5
+msh --theme tokyonight
+```
+
+### Manually
+
+Edit the file directly:
+
+```bash
+# Open in your editor
+$EDITOR ~/.magic-shell/config.json
+```
+
+### Via TUI
+
+In TUI mode, use `Ctrl+X C` to view config and various shortcuts to change settings.
+
+## Config Directory
+
+The `~/.magic-shell/` directory also contains:
+
+| File | Description |
+|------|-------------|
+| `config.json` | Main configuration |
+| `history.json` | Command history (if enabled) |
+
+## Resetting Configuration
+
+To reset to defaults, delete the config file:
+
+```bash
+rm ~/.magic-shell/config.json
+```
+
+A new default config will be created on next run.

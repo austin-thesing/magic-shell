@@ -1,0 +1,130 @@
+---
+title: Your First Command
+description: Learn the basics of using Magic Shell to translate natural language to terminal commands.
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Now that you have Magic Shell installed and configured, let's try your first command!
+
+## Basic Usage
+
+Simply describe what you want to do in plain English:
+
+```bash
+msh "find all JavaScript files"
+```
+
+Magic Shell will translate this and show you the command:
+
+```
+find . -name "*.js"
+```
+
+## Execution Modes
+
+### Print Only (Default)
+
+By default, Magic Shell prints the command without executing it:
+
+```bash
+msh "show disk usage"
+# Output: df -h
+```
+
+### Execute Immediately
+
+Use the `-x` flag to execute the command directly:
+
+```bash
+msh -x "show current directory"
+# Executes: pwd
+```
+
+<Aside type="caution">
+  The `-x` flag executes commands immediately. Always review the command in the output before using `-x` on unfamiliar queries.
+</Aside>
+
+### Dry Run with Safety Analysis
+
+Use `-n` to see the command with a full safety analysis:
+
+```bash
+msh -n "delete all node_modules folders"
+```
+
+This shows:
+- The translated command
+- Safety severity level
+- Why it was flagged (if applicable)
+- Whether confirmation is required
+
+## Interactive Mode
+
+For a richer experience, launch the TUI:
+
+```bash
+msh -i
+# or just
+msh
+```
+
+In TUI mode you can:
+- Type queries naturally
+- See command history
+- Change models on the fly
+- Toggle dry-run mode
+- Switch themes
+
+## Example Queries
+
+Here are some things you can ask Magic Shell:
+
+### File Operations
+```bash
+msh "find files larger than 100MB"
+msh "count lines of code in this project"
+msh "show the 10 most recently modified files"
+msh "compress this folder to a zip file"
+```
+
+### Git Operations
+```bash
+msh "undo my last commit but keep changes"
+msh "show commits from the last week"
+msh "create a branch called feature-login"
+msh "what files changed in the last commit"
+```
+
+### System Operations
+```bash
+msh "what process is using port 3000"
+msh "show memory usage"
+msh "list all running docker containers"
+msh "check if nginx is running"
+```
+
+### Network
+```bash
+msh "download this file" # followed by URL
+msh "what's my IP address"
+msh "test if google.com is reachable"
+```
+
+## Tips
+
+<Steps>
+1. **Be specific**: "find large files" is good, "find files larger than 100MB in the downloads folder" is better.
+
+2. **Mention your context**: "in this git repo" or "in the current directory" helps Magic Shell generate more accurate commands.
+
+3. **Use dry run first**: When trying something new, use `-n` to review the command and its safety analysis.
+
+4. **Check the model**: Different models have different strengths. Use `Ctrl+X M` in TUI to switch models.
+</Steps>
+
+## Next Steps
+
+- Learn about [AI providers](/features/providers/) and which models to use
+- Understand the [safety system](/features/safety-levels/) that protects you
+- Explore [TUI mode](/features/tui-mode/) features and shortcuts

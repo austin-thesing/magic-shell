@@ -1,0 +1,85 @@
+---
+title: Installation
+description: Get Magic Shell running in seconds on macOS, Linux, or Windows.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Quick Install
+
+The fastest way to get started is with our one-line installer:
+
+<Tabs>
+  <TabItem label="macOS / Linux">
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.sh | bash
+    ```
+  </TabItem>
+  <TabItem label="Windows">
+    ```powershell
+    irm https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.ps1 | iex
+    ```
+  </TabItem>
+</Tabs>
+
+## Package Managers
+
+### npm / pnpm / yarn / bun
+
+```bash
+# npm
+npm install -g @austinthesing/magic-shell
+
+# pnpm
+pnpm add -g @austinthesing/magic-shell
+
+# yarn
+yarn global add @austinthesing/magic-shell
+
+# bun (recommended)
+bun add -g @austinthesing/magic-shell
+```
+
+### Homebrew (macOS / Linux)
+
+```bash
+brew install austin-thesing/tap/magic-shell
+```
+
+## From Source
+
+**Prerequisites:** [Bun](https://bun.sh) runtime (v1.0 or higher)
+
+```bash
+# Clone the repository
+git clone https://github.com/austin-thesing/magic-shell.git
+cd magic-shell
+
+# Install dependencies
+bun install
+
+# Build
+bun run build
+
+# Link globally (optional)
+bun link
+```
+
+## Verify Installation
+
+After installation, verify Magic Shell is working:
+
+```bash
+msh --version
+```
+
+You can also use the shorter aliases `msh` or `ms`:
+
+```bash
+msh --help
+ms --help
+```
+
+## Next Steps
+
+Once installed, [configure your API key](/getting-started/configuration/) to start using Magic Shell.

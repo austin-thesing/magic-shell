@@ -1,0 +1,133 @@
+---
+title: Configuration
+description: Set up your API key and customize Magic Shell settings.
+---
+
+import { Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## API Key Setup
+
+Magic Shell requires an API key from one of the supported providers. Run the setup wizard:
+
+```bash
+msh --setup
+```
+
+This will guide you through:
+1. Selecting a provider (OpenCode Zen or OpenRouter)
+2. Entering your API key
+3. Choosing a default model
+
+### Get an API Key
+
+<Tabs>
+  <TabItem label="OpenCode Zen (Recommended)">
+    OpenCode Zen offers curated models optimized for coding, including **free models**.
+
+    1. Visit [opencode.ai/auth](https://opencode.ai/auth)
+    2. Create an account or sign in
+    3. Copy your API key
+
+    <Aside type="tip">
+      OpenCode Zen has free models like `grok-code` that work great for most tasks!
+    </Aside>
+  </TabItem>
+  <TabItem label="OpenRouter">
+    OpenRouter provides access to a wide variety of models from different providers.
+
+    1. Visit [openrouter.ai/keys](https://openrouter.ai/keys)
+    2. Create an account or sign in
+    3. Generate a new API key
+  </TabItem>
+</Tabs>
+
+### Environment Variables
+
+You can also set your API key via environment variables:
+
+```bash
+# OpenCode Zen
+export OPENCODE_ZEN_API_KEY="your-key-here"
+
+# OpenRouter
+export OPENROUTER_API_KEY="your-key-here"
+```
+
+Add these to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) for persistence.
+
+## Configuration File
+
+Magic Shell stores configuration in `~/.magic-shell/config.json`:
+
+```json
+{
+  "provider": "opencode-zen",
+  "defaultModel": "gpt-5-nano",
+  "safetyLevel": "moderate",
+  "dryRunByDefault": false,
+  "theme": "opencode"
+}
+```
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `provider` | AI provider (`opencode-zen` or `openrouter`) | `opencode-zen` |
+| `defaultModel` | Default model ID | `gpt-5-nano` |
+| `safetyLevel` | Safety strictness (`strict`, `moderate`, `relaxed`) | `moderate` |
+| `dryRunByDefault` | Always show commands without executing | `false` |
+| `theme` | Color theme name | `opencode` |
+
+## Secure Key Storage
+
+API keys are stored securely in your system's keychain:
+
+| Platform | Storage Location |
+|----------|-----------------|
+| macOS | macOS Keychain |
+| Linux | libsecret (secret-tool) |
+| Windows | Windows Credential Manager |
+
+<Aside>
+  Keys stored in the keychain take precedence over environment variables.
+</Aside>
+
+## Changing Settings
+
+### Via CLI
+
+```bash
+# Change provider
+msh --provider openrouter
+
+# Change default model
+msh --model claude-3-5-sonnet
+
+# Change theme
+msh --theme tokyonight
+
+# List available models
+msh --models
+
+# List available themes
+msh --themes
+```
+
+### Via TUI
+
+In interactive mode (`msh -i`), use keyboard shortcuts:
+- `Ctrl+X M` - Change model
+- `Ctrl+X S` - Switch provider
+- `Ctrl+X T` - Change theme
+- `Ctrl+X C` - View config
+
+## Debug Mode
+
+Enable API response debugging:
+
+```bash
+DEBUG_API=1 msh "your query"
+```
+
+This shows the full API request and response, useful for troubleshooting.

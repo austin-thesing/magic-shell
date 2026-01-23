@@ -1,0 +1,148 @@
+---
+title: CLI Options
+description: Complete reference for Magic Shell command-line options.
+---
+
+## Synopsis
+
+```bash
+magic-shell [options] [query]
+msh [options] [query]
+ms [options] [query]
+```
+
+## Options
+
+### Query & Execution
+
+| Option | Description |
+|--------|-------------|
+| `<query>` | Natural language query to translate |
+| `-x, --execute` | Translate and execute the command immediately |
+| `-n, --dry-run` | Show command with safety analysis, don't execute |
+| `-i, --interactive` | Launch interactive TUI mode |
+
+### Configuration
+
+| Option | Description |
+|--------|-------------|
+| `--setup` | Run the setup wizard for API key configuration |
+| `--provider <name>` | Set AI provider (`opencode-zen` or `openrouter`) |
+| `--model <id>` | Set default model |
+| `--models` | List available models for current provider |
+| `--theme <name>` | Set color theme |
+| `--themes` | List available themes |
+| `--safety <level>` | Set safety level (`strict`, `moderate`, `relaxed`) |
+
+### Information
+
+| Option | Description |
+|--------|-------------|
+| `-h, --help` | Show help message |
+| `-v, --version` | Show version number |
+
+## Examples
+
+### Basic Translation
+
+```bash
+# Translate a query (prints the command)
+msh "list all javascript files"
+
+# Output: find . -name "*.js"
+```
+
+### Execute Immediately
+
+```bash
+# Translate and run
+msh -x "show current git branch"
+
+# Executes: git branch --show-current
+```
+
+### Dry Run
+
+```bash
+# See command with safety analysis
+msh -n "delete all node_modules folders"
+
+# Shows:
+# Command: find . -name "node_modules" -type d -prune -exec rm -rf {} +
+# Severity: medium
+# Reason: Recursive deletion operation
+```
+
+### Interactive Mode
+
+```bash
+# Launch TUI
+msh -i
+
+# Or simply (TUI is default with no query)
+msh
+```
+
+### Change Provider
+
+```bash
+# Switch to OpenRouter
+msh --provider openrouter
+
+# Switch back to OpenCode Zen
+msh --provider opencode-zen
+```
+
+### Change Model
+
+```bash
+# List available models
+msh --models
+
+# Set default model
+msh --model claude-sonnet-4.5
+```
+
+### Change Theme
+
+```bash
+# List themes
+msh --themes
+
+# Set theme
+msh --theme dracula
+```
+
+### Setup Wizard
+
+```bash
+# Configure API key and preferences
+msh --setup
+```
+
+## Exit Codes
+
+| Code | Description |
+|------|-------------|
+| `0` | Success |
+| `1` | General error |
+| `2` | Invalid arguments |
+| `3` | API error |
+| `4` | Command blocked by safety system |
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `OPENCODE_ZEN_API_KEY` | API key for OpenCode Zen provider |
+| `OPENROUTER_API_KEY` | API key for OpenRouter provider |
+| `DEBUG_API=1` | Enable API debugging output |
+
+## Shell Aliases
+
+Magic Shell installs three commands:
+- `magic-shell` - Full name
+- `msh` - Short alias
+- `ms` - Shortest alias
+
+All three are identical in functionality.

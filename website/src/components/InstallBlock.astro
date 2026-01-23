@@ -1,0 +1,243 @@
+---
+interface Props {
+  platform?: "macos" | "windows" | "npm";
+}
+
+const { platform = "macos" } = Astro.props;
+
+const commands = {
+  macos: "curl -fsSL https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.sh | bash",
+  windows: "irm https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.ps1 | iex",
+  npm: "npm install -g @austinthesing/magic-shell",
+};
+---
+
+<div class="install-block">
+  <div class="install-tabs" role="tablist">
+    <button 
+      class:list={["tab", { active: platform === "macos" }]} 
+      data-platform="macos"
+      role="tab"
+      aria-selected={platform === "macos"}
+    >
+      macOS / Linux
+    </button>
+    <button 
+      class:list={["tab", { active: platform === "windows" }]} 
+      data-platform="windows"
+      role="tab"
+      aria-selected={platform === "windows"}
+    >
+      Windows
+    </button>
+    <button 
+      class:list={["tab", { active: platform === "npm" }]} 
+      data-platform="npm"
+      role="tab"
+      aria-selected={platform === "npm"}
+    >
+      npm
+    </button>
+  </div>
+
+  <div class="install-commands">
+    <div class:list={["command-panel", { active: platform === "macos" }]} data-panel="macos">
+      <div class="command-wrapper">
+        <span class="prompt">$</span>
+        <code class="command">{commands.macos}</code>
+        <button class="copy-btn" data-command={commands.macos} aria-label="Copy command">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class:list={["command-panel", { active: platform === "windows" }]} data-panel="windows">
+      <div class="command-wrapper">
+        <span class="prompt">PS&gt;</span>
+        <code class="command">{commands.windows}</code>
+        <button class="copy-btn" data-command={commands.windows} aria-label="Copy command">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class:list={["command-panel", { active: platform === "npm" }]} data-panel="npm">
+      <div class="command-wrapper">
+        <span class="prompt">$</span>
+        <code class="command">{commands.npm}</code>
+        <button class="copy-btn" data-command={commands.npm} aria-label="Copy command">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.install-block').forEach(block => {
+    const tabs = block.querySelectorAll('.tab');
+    const panels = block.querySelectorAll('.command-panel');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const platform = tab.getAttribute('data-platform');
+        
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        panels.forEach(p => p.classList.remove('active'));
+        
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        block.querySelector(`[data-panel="${platform}"]`)?.classList.add('active');
+      });
+    });
+  });
+
+  // Copy functionality
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const command = btn.getAttribute('data-command');
+      if (!command) return;
+      
+      try {
+        await navigator.clipboard.writeText(command);
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    });
+  });
+</script>
+
+<style>
+  .install-block {
+    background: var(--bg-terminal);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .install-tabs {
+    display: flex;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .tab {
+    flex: 1;
+    padding: var(--space-3) var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    position: relative;
+  }
+
+  .tab:hover {
+    color: var(--text-secondary);
+    background: var(--bg-surface);
+  }
+
+  .tab.active {
+    color: var(--color-primary);
+  }
+
+  .tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-primary);
+  }
+
+  .command-panel {
+    display: none;
+  }
+
+  .command-panel.active {
+    display: block;
+  }
+
+  .command-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    overflow-x: auto;
+  }
+
+  .prompt {
+    color: var(--color-primary);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .command {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    background: none;
+    padding: 0;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  .copy-btn {
+    flex-shrink: 0;
+    padding: var(--space-2);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .copy-btn:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .copy-btn.copied {
+    color: var(--color-success);
+    border-color: var(--color-success);
+  }
+
+  .copy-btn svg {
+    display: block;
+  }
+
+  @media (max-width: 640px) {
+    .tab {
+      font-size: 0.7rem;
+      padding: var(--space-2) var(--space-3);
+    }
+
+    .command-wrapper {
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .command {
+      font-size: var(--text-xs);
+    }
+  }
+</style>

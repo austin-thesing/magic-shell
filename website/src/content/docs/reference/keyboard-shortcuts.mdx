@@ -1,0 +1,145 @@
+---
+title: Keyboard Shortcuts
+description: Complete reference for Magic Shell TUI keyboard shortcuts.
+---
+
+All TUI shortcuts use the `Ctrl+X` chord pattern: press `Ctrl+X`, release, then press the action key.
+
+## Quick Reference
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+X P` | Command palette |
+| `Ctrl+X M` | Change model |
+| `Ctrl+X S` | Switch provider |
+| `Ctrl+X D` | Toggle dry-run |
+| `Ctrl+X T` | Change theme |
+| `Ctrl+X H` | Show history |
+| `Ctrl+X C` | Show config |
+| `Ctrl+X L` | Clear output |
+| `Ctrl+X ?` | Show help |
+| `Ctrl+X Q` | Exit |
+| `Ctrl+C` | Exit / Cancel |
+| `Esc` | Close dialogs |
+
+## Detailed Reference
+
+### Navigation
+
+#### `Ctrl+X P` - Command Palette
+
+Opens the command palette with all available actions. Use arrow keys to navigate and Enter to select.
+
+#### `Ctrl+X ?` - Help
+
+Shows the help dialog with all available shortcuts and commands.
+
+#### `Ctrl+X Q` - Exit
+
+Gracefully exits Magic Shell TUI.
+
+#### `Ctrl+C` - Exit / Cancel
+
+- If an operation is running: cancels it
+- If idle: exits the TUI
+
+#### `Esc` - Close Dialog
+
+Closes any open dialog without making a selection.
+
+### Configuration
+
+#### `Ctrl+X M` - Change Model
+
+Opens the model picker. Shows:
+- Model name and ID
+- Category (fast/smart/reasoning)
+- Free indicator for no-cost models
+- Disabled indicator if unavailable
+
+#### `Ctrl+X S` - Switch Provider
+
+Switches between AI providers:
+- OpenCode Zen
+- OpenRouter
+
+If the target provider isn't configured, prompts for API key.
+
+#### `Ctrl+X T` - Change Theme
+
+Opens the theme picker with live preview. Available themes:
+- opencode (default)
+- tokyonight
+- catppuccin
+- gruvbox
+- nord
+- dracula
+- one-dark
+- matrix
+
+#### `Ctrl+X D` - Toggle Dry-Run
+
+Toggles dry-run mode on/off:
+- **On**: Commands are shown but not executed
+- **Off**: Commands can be executed (with safety checks)
+
+#### `Ctrl+X C` - Show Config
+
+Displays current configuration:
+- Provider
+- Model
+- Safety level
+- Theme
+- Dry-run status
+
+### Output
+
+#### `Ctrl+X H` - Show History
+
+Opens command history showing:
+- Previous queries
+- Translated commands
+- Timestamps
+
+#### `Ctrl+X L` - Clear Output
+
+Clears the output area while keeping input and config.
+
+## Input Line Shortcuts
+
+Standard line editing shortcuts work in the input field:
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+A` | Move to start of line |
+| `Ctrl+E` | Move to end of line |
+| `Ctrl+U` | Clear line |
+| `Ctrl+W` | Delete word before cursor |
+| `Ctrl+K` | Delete to end of line |
+| `Left/Right` | Move cursor |
+| `Up/Down` | Navigate history |
+| `Enter` | Submit query |
+
+## Direct Commands
+
+Type these in the input field as alternatives to shortcuts:
+
+| Command | Equivalent |
+|---------|------------|
+| `!help` | `Ctrl+X ?` |
+| `!model` | `Ctrl+X M` |
+| `!provider` | `Ctrl+X S` |
+| `!theme` | `Ctrl+X T` |
+| `!dry` | `Ctrl+X D` |
+| `!config` | `Ctrl+X C` |
+| `!history` | `Ctrl+X H` |
+| `!clear` | `Ctrl+X L` |
+
+## Why Ctrl+X Chord?
+
+The `Ctrl+X` prefix is used to:
+1. Avoid conflicts with common terminal shortcuts
+2. Group all Magic Shell actions under one prefix
+3. Follow familiar patterns (like Emacs `C-x` prefix)
+
+The slight extra keystroke provides a much larger shortcut namespace without conflicts.

@@ -1,0 +1,121 @@
+/**
+ * Magic Shell Design System
+ * "Terminal Alchemy" - Dark, atmospheric, warm orange meets deep black
+ */
+
+:root {
+  /* Primary palette - from opencode theme */
+  --color-primary: #fab283;
+  --color-primary-dim: #c48a66;
+  --color-primary-glow: rgba(250, 178, 131, 0.15);
+  --color-secondary: #5c9cf5;
+  --color-secondary-dim: #4a7bc4;
+  --color-accent: #9d7cd8;
+  --color-accent-dim: #7d62ad;
+
+  /* Semantic colors */
+  --color-success: #7fd88f;
+  --color-warning: #f5a742;
+  --color-error: #e06c75;
+  --color-info: #56b6c2;
+
+  /* Background layers - deep to elevated */
+  --bg-void: #030303;
+  --bg-base: #050505;
+  --bg-terminal: #0a0a0a;
+  --bg-elevated: #111111;
+  --bg-surface: #161616;
+  --bg-subtle: #1c1c1c;
+
+  /* Text */
+  --text-primary: #eeeeee;
+  --text-secondary: #b0b0b0;
+  --text-muted: #707070;
+  --text-dim: #505050;
+
+  /* Borders */
+  --border-subtle: #252525;
+  --border-default: #333333;
+  --border-active: #484848;
+  --border-glow: rgba(250, 178, 131, 0.3);
+
+  /* Typography */
+  --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
+  --font-sans: "Geist Sans", "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Font sizes - using clamp for fluid typography */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.8125rem);
+  --text-sm: clamp(0.8125rem, 0.775rem + 0.2vw, 0.875rem);
+  --text-base: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
+  --text-lg: clamp(1.0625rem, 1rem + 0.3vw, 1.125rem);
+  --text-xl: clamp(1.1875rem, 1.1rem + 0.4vw, 1.3125rem);
+  --text-2xl: clamp(1.4375rem, 1.3rem + 0.7vw, 1.75rem);
+  --text-3xl: clamp(1.75rem, 1.5rem + 1.25vw, 2.5rem);
+  --text-4xl: clamp(2.25rem, 1.8rem + 2.25vw, 3.75rem);
+  --text-5xl: clamp(2.75rem, 2rem + 3.75vw, 5rem);
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Shadows */
+  --shadow-glow: 0 0 20px var(--color-primary-glow);
+  --shadow-glow-strong: 0 0 40px var(--color-primary-glow);
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --shadow-deep: 0 8px 40px rgba(0, 0, 0, 0.7);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Z-index layers */
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-overlay: 100;
+  --z-modal: 1000;
+}
+
+/* Safety severity colors */
+:root {
+  --severity-low: #7fd88f;
+  --severity-medium: #f5a742;
+  --severity-high: #e06c75;
+  --severity-critical: #ff4444;
+}
+
+/* Theme colors for showcase */
+:root {
+  --theme-opencode-primary: #fab283;
+  --theme-opencode-bg: #0a0a0a;
+  --theme-tokyonight-primary: #82aaff;
+  --theme-tokyonight-bg: #1a1b26;
+  --theme-catppuccin-primary: #89b4fa;
+  --theme-catppuccin-bg: #1e1e2e;
+  --theme-gruvbox-primary: #83a598;
+  --theme-gruvbox-bg: #282828;
+  --theme-nord-primary: #88C0D0;
+  --theme-nord-bg: #2E3440;
+  --theme-dracula-primary: #bd93f9;
+  --theme-dracula-bg: #282a36;
+  --theme-onedark-primary: #61afef;
+  --theme-onedark-bg: #282c34;
+  --theme-matrix-primary: #00ff00;
+  --theme-matrix-bg: #000000;
+}

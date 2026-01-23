@@ -1,0 +1,179 @@
+---
+title: Safety Levels
+description: Magic Shell's comprehensive safety system protects you from dangerous commands.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Magic Shell includes a comprehensive safety analysis system that categorizes commands by risk level and can block dangerous operations.
+
+## Severity Levels
+
+Every command is analyzed and assigned a severity level:
+
+### Low
+
+Commands worth reviewing but generally safe.
+
+```bash
+git checkout main
+npm install
+ls -la
+```
+
+**Behavior:** Executed without confirmation in all safety modes.
+
+### Medium
+
+Commands requiring elevated privileges or making notable changes.
+
+```bash
+sudo apt install nginx
+chmod 755 script.sh
+rm -rf node_modules/
+```
+
+**Behavior:** May require confirmation depending on safety level.
+
+### High
+
+Commands with significant risk of data loss or system changes.
+
+```bash
+sudo rm -rf /var/log/*
+kill -9 -1
+shutdown -h now
+```
+
+**Behavior:** Requires confirmation in moderate and strict modes.
+
+### Critical
+
+Commands that could cause irreversible system damage. These are **always blocked**.
+
+```bash
+rm -rf /           # Delete entire filesystem
+:(){ :|:& };:      # Fork bomb
+dd if=/dev/zero of=/dev/sda  # Overwrite disk
+chmod -R 777 /     # Recursive permission change on root
+```
+
+<Aside type="danger">
+  Critical severity commands are blocked regardless of your safety level setting. This protects against both mistakes and potential prompt injection attacks.
+</Aside>
+
+## Safety Modes
+
+Configure your preferred safety level:
+
+### Strict
+
+Confirm **all** potentially risky commands (low and above).
+
+```bash
+msh --safety strict
+```
+
+Best for:
+- Learning environments
+- Production servers
+- Shared systems
+
+### Moderate (Default)
+
+Confirm **high** severity commands; **critical** commands are always blocked.
+
+```bash
+msh --safety moderate
+```
+
+Best for:
+- Daily development work
+- Personal machines
+- Balanced protection
+
+### Relaxed
+
+Skip confirmations for most commands; **critical** commands are still blocked.
+
+```bash
+msh --safety relaxed
+```
+
+Best for:
+- Experienced users
+- Quick scripting
+- Trusted environments
+
+## Blocked Patterns
+
+Certain dangerous patterns are **always blocked**, regardless of safety level:
+
+| Pattern | Risk |
+|---------|------|
+| `rm -rf /` | Delete entire filesystem |
+| `rm -rf ~` | Delete home directory |
+| `:(){ :\|:& };:` | Fork bomb |
+| `> /dev/sda` | Overwrite disk |
+| `mkfs.*` | Format filesystem |
+| `wget \| sh` | Pipe download to shell |
+| `curl \| bash` | Pipe download to shell |
+| `chmod -R 777 /` | Recursive root permission change |
+
+## How Analysis Works
+
+Magic Shell analyzes commands using:
+
+1. **Pattern Matching**: Regex patterns detect known dangerous commands
+2. **Privilege Detection**: Commands using `sudo`, `doas`, etc. are flagged
+3. **Path Analysis**: Operations on sensitive paths (`/`, `/etc`, `/usr`) are scrutinized
+4. **Combination Detection**: Dangerous flag combinations are identified
+
+## Dry-Run Mode
+
+Use dry run to see safety analysis without executing:
+
+```bash
+msh -n "delete all log files older than 30 days"
+```
+
+Output includes:
+- The translated command
+- Severity level
+- Matched patterns (if any)
+- Whether confirmation would be required
+
+## Customization
+
+### Blocked Commands
+
+Add custom patterns to block in your config:
+
+```json
+{
+  "blockedCommands": [
+    "DROP TABLE",
+    "TRUNCATE TABLE"
+  ]
+}
+```
+
+### Confirmed Patterns
+
+Track patterns you've previously confirmed:
+
+```json
+{
+  "confirmedDangerousPatterns": [
+    "rm -rf node_modules"
+  ]
+}
+```
+
+## Best Practices
+
+1. **Start with strict mode** when learning or on new systems
+2. **Use dry run** (`-n`) for unfamiliar queries
+3. **Review commands** before using `-x` flag
+4. **Keep moderate mode** for daily work
+5. **Never bypass safety** for commands you don't understand
