@@ -5,9 +5,7 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "magic-shell": "./dist/index.js",
     "msh": "./dist/index.js",
-    "ms": "./dist/index.js",
     "mshell": "./dist/tui.js"
   },
   "files": [
@@ -17,7 +15,7 @@
   ],
   "scripts": {
     "dev": "bun run src/index.ts",
-    "dev:tui": "bun run src/index.ts -i",
+    "dev:tui": "bun run src/cli.ts",
     "build": "bun build src/index.ts src/cli.ts src/tui.ts --outdir dist --target node",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "bun run build"

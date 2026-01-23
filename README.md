@@ -67,7 +67,7 @@ export OPENCODE_ZEN_API_KEY="your-key-here"
 
 ## Usage
 
-Magic Shell can be invoked using `magic-shell`, `msh`, or `ms`. For TUI mode directly, use `mshell`.
+Use `msh` for CLI mode and `mshell` for TUI mode.
 
 ### Basic Commands
 
