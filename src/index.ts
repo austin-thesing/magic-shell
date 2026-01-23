@@ -25,6 +25,7 @@ import { loadConfig, saveConfig, getApiKey, setApiKey, loadHistory } from "./lib
 import { analyzeCommand } from "./lib/safety"
 import { translateToCommand, getShellInfo } from "./lib/api"
 import { getAnsiColors, getTheme, setTheme, themes, themeNames, loadTheme } from "./lib/theme"
+import { checkForUpdates, dismissUpdate, getCurrentVersion, forceCheckForUpdates } from "./lib/update-checker"
 
 // Load theme from config
 loadTheme()
@@ -62,6 +63,10 @@ ${colors.bold}USAGE${colors.reset}
   msh --provider <name>    Set provider (opencode-zen or openrouter)
   msh --themes             List available themes
   msh --theme <name>       Set color theme
+  msh --repo-context       Enable project context detection
+  msh --no-repo-context    Disable project context detection
+  msh --version            Show version
+  msh --check-update       Check for updates
   msh --help               Show this help
 
 ${colors.bold}EXAMPLES${colors.reset}
@@ -73,6 +78,9 @@ ${colors.bold}EXAMPLES${colors.reset}
   
   ${colors.dim}# Check what would run${colors.reset}
   msh -n "delete all log files"
+  
+  ${colors.dim}# Use project context (knows your npm scripts, etc)${colors.reset}
+  msh --repo-context "run the dev server"
   
   ${colors.dim}# Pipe to clipboard (macOS)${colors.reset}
   msh "find large files" | pbcopy
@@ -312,7 +320,33 @@ function executeCommand(command: string): Promise<{ code: number; output: string
   })
 }
 
-async function translate(query: string, options: { execute?: boolean; dryRun?: boolean }) {
+// Simple spinner for loading states
+function createSpinner(message: string) {
+  const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+  let i = 0
+  const isTTY = process.stderr.isTTY
+  
+  const interval = isTTY ? setInterval(() => {
+    process.stderr.write(`\r${colors.primary}${frames[i]}${colors.reset} ${colors.dim}${message}${colors.reset}`)
+    i = (i + 1) % frames.length
+  }, 80) : null
+  
+  // For non-TTY, just print once
+  if (!isTTY) {
+    process.stderr.write(`${colors.dim}${message}...${colors.reset}\n`)
+  }
+  
+  return {
+    stop: () => {
+      if (interval) {
+        clearInterval(interval)
+        process.stderr.write("\r\x1b[K") // Clear line
+      }
+    }
+  }
+}
+
+async function translate(query: string, options: { execute?: boolean; dryRun?: boolean; repoContext?: boolean }) {
   const config = loadConfig()
   const apiKey = await getApiKey(config.provider)
   
@@ -328,9 +362,16 @@ async function translate(query: string, options: { execute?: boolean; dryRun?: b
 
   const history = loadHistory()
   const cwd = getCwd()
+  
+  // Use repo context from options (flag) or config
+  const useRepoContext = options.repoContext ?? config.repoContext ?? false
+
+  // Show loading spinner
+  const spinner = createSpinner(`Translating with ${model.name}`)
 
   try {
-    const command = await translateToCommand(apiKey, model, query, cwd, history)
+    const command = await translateToCommand(apiKey, model, query, cwd, history, useRepoContext)
+    spinner.stop()
     
     if (options.dryRun) {
       // Dry run - show command and safety analysis
@@ -338,6 +379,9 @@ async function translate(query: string, options: { execute?: boolean; dryRun?: b
       
       console.log(`${colors.dim}Query:${colors.reset} ${query}`)
       console.log(`${colors.dim}Model:${colors.reset} ${model.name}`)
+      if (useRepoContext) {
+        console.log(`${colors.dim}Project context:${colors.reset} enabled`)
+      }
       console.log()
       console.log(`${colors.bold}Command:${colors.reset} ${command}`)
       
@@ -372,14 +416,36 @@ async function translate(query: string, options: { execute?: boolean; dryRun?: b
       console.log(command)
     }
   } catch (error) {
+    spinner.stop()
     const message = error instanceof Error ? error.message : String(error)
     console.error(`${colors.red}Error: ${message}${colors.reset}`)
     process.exit(1)
   }
 }
 
+// Show update notification if available (non-blocking)
+async function showUpdateNotification() {
+  try {
+    const update = await checkForUpdates()
+    if (update?.hasUpdate) {
+      console.error(`${colors.cyan}┌─────────────────────────────────────────────────┐${colors.reset}`)
+      console.error(`${colors.cyan}│${colors.reset}  ${colors.bold}Update available!${colors.reset} ${colors.dim}${update.currentVersion}${colors.reset} → ${colors.green}${update.latestVersion}${colors.reset}          ${colors.cyan}│${colors.reset}`)
+      console.error(`${colors.cyan}│${colors.reset}  Run: ${colors.yellow}${update.updateCommand}${colors.reset}   ${colors.cyan}│${colors.reset}`)
+      console.error(`${colors.cyan}└─────────────────────────────────────────────────┘${colors.reset}`)
+      console.error()
+    }
+  } catch {
+    // Silently ignore update check errors
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2)
+  
+  // Check for updates in background (don't block)
+  const updatePromise = (args.length > 0 && !args[0].startsWith("-i")) 
+    ? showUpdateNotification() 
+    : Promise.resolve()
   
   if (args.length === 0 || args[0] === "-i" || args[0] === "--interactive") {
     // Launch interactive TUI
@@ -389,16 +455,35 @@ async function main() {
   }
   
   if (args[0] === "--help" || args[0] === "-h") {
+    await updatePromise
     printHelp()
     return
   }
   
+  if (args[0] === "--version" || args[0] === "-v") {
+    console.log(`magic-shell v${getCurrentVersion()}`)
+    return
+  }
+  
+  if (args[0] === "--check-update") {
+    const update = await forceCheckForUpdates()
+    if (update?.hasUpdate) {
+      console.log(`${colors.green}Update available!${colors.reset} ${update.currentVersion} → ${update.latestVersion}`)
+      console.log(`Run: ${colors.cyan}${update.updateCommand}${colors.reset}`)
+    } else {
+      console.log(`${colors.green}✓ You're running the latest version (${getCurrentVersion()})${colors.reset}`)
+    }
+    return
+  }
+  
   if (args[0] === "--setup") {
+    await updatePromise
     await setup()
     return
   }
   
   if (args[0] === "--models") {
+    await updatePromise
     printModels()
     return
   }
@@ -468,9 +553,28 @@ async function main() {
     return
   }
   
+  // Handle --repo-context toggle
+  if (args[0] === "--repo-context") {
+    const config = loadConfig()
+    config.repoContext = true
+    saveConfig(config)
+    console.log(`${colors.success}✓ Project context enabled${colors.reset}`)
+    console.log(`${colors.dim}Magic Shell will now detect package.json scripts, Makefile targets, etc.${colors.reset}`)
+    return
+  }
+  
+  if (args[0] === "--no-repo-context") {
+    const config = loadConfig()
+    config.repoContext = false
+    saveConfig(config)
+    console.log(`${colors.success}✓ Project context disabled${colors.reset}`)
+    return
+  }
+  
   // Parse flags and query
   let execute = false
   let dryRun = false
+  let repoContext: boolean | undefined = undefined
   let queryParts: string[] = []
   
   for (let i = 0; i < args.length; i++) {
@@ -479,6 +583,10 @@ async function main() {
       execute = true
     } else if (arg === "-n" || arg === "--dry-run") {
       dryRun = true
+    } else if (arg === "-r" || arg === "--repo-context") {
+      repoContext = true
+    } else if (arg === "--no-repo-context") {
+      repoContext = false
     } else if (!arg.startsWith("-")) {
       queryParts.push(arg)
     }
@@ -492,7 +600,7 @@ async function main() {
     process.exit(1)
   }
   
-  await translate(query, { execute, dryRun })
+  await translate(query, { execute, dryRun, repoContext })
 }
 
 main().catch((error) => {

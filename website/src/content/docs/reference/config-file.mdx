@@ -18,9 +18,10 @@ Magic Shell stores configuration in `~/.magic-shell/config.json`.
 ```json
 {
   "provider": "opencode-zen",
-  "defaultModel": "gpt-5-nano",
+  "defaultModel": "gemini-3-flash",
   "safetyLevel": "moderate",
   "dryRunByDefault": false,
+  "repoContext": false,
   "theme": "opencode",
   "blockedCommands": [],
   "confirmedDangerousPatterns": []
@@ -80,6 +81,29 @@ When `true`, always show commands without executing them.
 {
   "dryRunByDefault": false
 }
+```
+
+### repoContext
+
+When `true`, Magic Shell detects your project type and available commands. This sends minimal, non-sensitive information (script names, not contents) to the AI for better context.
+
+Detected project types:
+- **Node.js**: Reads `package.json` scripts and detects package manager (npm, bun, yarn, pnpm)
+- **Makefile**: Extracts make targets
+- **Rust**: Knows standard cargo commands
+- **Python**: Detects pyproject.toml, setup.py, requirements.txt
+- **Go**: Detects go.mod
+
+```json
+{
+  "repoContext": true
+}
+```
+
+Enable via CLI:
+```bash
+msh --repo-context   # Enable permanently
+msh -r "run tests"   # Use for single command
 ```
 
 ### theme

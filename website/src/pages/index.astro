@@ -43,14 +43,19 @@ import TerminalWindow from "../components/TerminalWindow.astro";
           icon="[]"
         />
         <FeatureCard
+          title="Project Aware"
+          description="Opt-in context detection reads your package.json scripts, Makefile targets, and more. Say 'run dev' and it knows what to do."
+          icon="{}"
+        />
+        <FeatureCard
           title="Shell-Aware"
           description="Automatically detects bash, zsh, fish, PowerShell, and more. Commands adapt to your shell's syntax."
           icon="$_"
         />
         <FeatureCard
-          title="Secure Storage"
-          description="API keys stored in your system keychain - macOS Keychain, Linux secret-tool, or Windows Credential Manager."
-          icon="**"
+          title="Auto Updates"
+          description="Checks for updates automatically and notifies you when a new version is available. Always stay current."
+          icon="^v"
         />
       </div>
     </div>
@@ -156,7 +161,7 @@ import TerminalWindow from "../components/TerminalWindow.astro";
       </div>
 
       <div class="install-wrapper">
-        <InstallBlock platform="macos" />
+        <InstallBlock platform="bun" />
       </div>
 
       <div class="install-note">

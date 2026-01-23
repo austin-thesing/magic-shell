@@ -393,8 +393,11 @@ function getStatusBarContent(): StyledText {
   const safeModeIndicator = dryRunMode 
     ? fg(theme.colors.warning)("[DRY RUN]")
     : fg(theme.colors.success)("Safe")
+  const repoContextIndicator = config.repoContext
+    ? fg(theme.colors.info)("[Repo]")
+    : ""
   
-  return t`${fg(theme.colors.textMuted)("Provider:")} ${fg(theme.colors.text)(providerName)}  ${fg(theme.colors.textMuted)("Model:")} ${fg(theme.colors.text)(currentModel.name)}  ${safeModeIndicator}`
+  return t`${fg(theme.colors.textMuted)("Provider:")} ${fg(theme.colors.text)(providerName)}  ${fg(theme.colors.textMuted)("Model:")} ${fg(theme.colors.text)(currentModel.name)}  ${safeModeIndicator}${repoContextIndicator ? " " : ""}${repoContextIndicator}`
 }
 
 function getHelpBarContent(): StyledText {
@@ -815,7 +818,7 @@ async function translateAndProcess(input: string) {
   const loadingMsg = addSystemMessage("Translating...")
 
   try {
-    const command = await translateToCommand(apiKey, currentModel, input, currentCwd, history)
+    const command = await translateToCommand(apiKey, currentModel, input, currentCwd, history, config.repoContext)
 
     // Remove the loading message
     chatScrollBox.remove(`msg-${loadingMsg.id}`)
@@ -1015,9 +1018,10 @@ function showHelp() {
   const helpText = `Keyboard Shortcuts (Ctrl+X then...):
 P  Command palette    M  Change model
 S  Switch provider    D  Toggle dry-run
-T  Change theme       H  Show history
-C  Show config        L  Clear chat
-?  This help          Q  Exit
+T  Change theme       R  Toggle repo context
+H  Show history       L  Clear chat
+C  Show config        ?  This help
+Q  Exit
 
 Other:
 Ctrl+C  Exit / Cancel     Esc  Close palette
@@ -1025,7 +1029,7 @@ Ctrl+C  Exit / Cancel     Esc  Close palette
 Tips:
 - Type naturally: "list all files" -> ls -la
 - Reference history: "do that again", "undo"
-- Free models: gpt-5-nano, grok-code, glm-4.7-free`
+- Enable repo context to use project scripts (Ctrl+X R)`
   
   addSystemMessage(helpText)
 }
@@ -1049,6 +1053,7 @@ Shell:        ${shellInfo.shell} (${shellInfo.shellPath})
 Platform:     ${shellInfo.platform}${shellInfo.isWSL ? " (WSL)" : ""}
 Safety:       ${config.safetyLevel}
 Dry-run:      ${dryRunMode ? "ON" : "OFF"}
+Repo context: ${config.repoContext ? "ON" : "OFF"}
 API Key:      ${apiKeyStatus}
 History:      ${history.length} commands`
 
@@ -1370,6 +1375,18 @@ function getCommandPaletteOptions(): PaletteCommand[] {
         dryRunMode = !dryRunMode
         statusBarText.content = getStatusBarContent()
         addSystemMessage(`Dry-run mode: ${dryRunMode ? "ON" : "OFF"}`)
+      },
+    },
+    {
+      name: "Toggle Project Context",
+      description: config.repoContext ? "Currently ON (sends script names to AI)" : "Currently OFF",
+      key: "r",
+      chord: "r",
+      action: () => {
+        config.repoContext = !config.repoContext
+        saveConfig(config)
+        statusBarText.content = getStatusBarContent()
+        addSystemMessage(`Project context: ${config.repoContext ? "ON - AI can see your package.json scripts, Makefile targets, etc." : "OFF"}`)
       },
     },
     {

@@ -16,7 +16,7 @@ const DEFAULT_CONFIG: Config = {
   provider: "opencode-zen",
   openrouterApiKey: "", // Only used as fallback if keychain unavailable
   opencodeZenApiKey: "", // Only used as fallback if keychain unavailable
-  defaultModel: "gpt-5-nano", // Free OpenCode Zen model as default
+  defaultModel: "gemini-3-flash", // Fast, reliable Google model
   safetyLevel: "moderate",
   dryRunByDefault: false,
   blockedCommands: [
@@ -28,6 +28,7 @@ const DEFAULT_CONFIG: Config = {
     "chown -R",
   ],
   confirmedDangerousPatterns: [],
+  repoContext: false, // Opt-in for privacy
 }
 
 function ensureConfigDir(): void {

@@ -320,6 +320,18 @@ export interface Config {
   blockedCommands: string[]
   confirmedDangerousPatterns: string[]
   theme?: string
+  /** Enable project context detection (opt-in for privacy). Sends script names from package.json, Makefile, etc to AI. */
+  repoContext?: boolean
+}
+
+export interface RepoContext {
+  type: string // e.g., "node", "python", "rust", "go", "make"
+  packageManager?: string // e.g., "npm", "bun", "yarn", "pnpm"
+  scripts?: string[] // Available npm/bun scripts
+  makeTargets?: string[] // Makefile targets
+  cargoCommands?: string[] // Cargo subcommands
+  hasDocker?: boolean
+  hasGit?: boolean
 }
 
 export interface CommandHistory {

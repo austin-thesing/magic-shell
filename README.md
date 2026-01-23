@@ -8,8 +8,10 @@ Magic Shell is an open-source CLI tool that translates plain English (or any nat
 
 - **Natural Language Translation**: Describe what you want to do in plain English
 - **Multiple AI Providers**: OpenCode Zen (with free models!) and OpenRouter
+- **Project Context Aware**: Opt-in detection of package.json scripts, Makefile targets, etc.
 - **Interactive TUI Mode**: Full-featured terminal interface with themes
 - **Command Safety Analysis**: Multi-level safety checks before executing commands
+- **Auto Updates**: Automatic update checking with one-command upgrades
 - **Cross-Platform**: macOS, Linux, and Windows support
 - **Shell-Aware**: Automatically detects and adapts to your shell (bash, zsh, fish, PowerShell, etc.)
 - **Secure Credential Storage**: Uses system keychain (macOS Keychain, Linux secret-tool, Windows Credential Manager)
@@ -18,38 +20,20 @@ Magic Shell is an open-source CLI tool that translates plain English (or any nat
 
 ## Installation
 
-### Quick Install (Recommended)
-
-**macOS / Linux:**
-```bash
-curl -fsSL https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.sh | bash
-```
-
-**Windows (PowerShell):**
-```powershell
-irm https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.ps1 | iex
-```
-
-### Via Package Manager
+### Via Package Manager (Recommended)
 
 ```bash
-# Install globally with bun (recommended)
+# bun (recommended)
 bun add -g @austinthesing/magic-shell
 
-# Or with npm
+# npm
 npm install -g @austinthesing/magic-shell
 
-# Or with yarn
-yarn global add @austinthesing/magic-shell
-
-# Or with pnpm
+# pnpm
 pnpm add -g @austinthesing/magic-shell
-```
 
-### Via Homebrew (macOS/Linux)
-
-```bash
-brew install austin-thesing/tap/magic-shell
+# yarn
+yarn global add @austinthesing/magic-shell
 ```
 
 ### From Source
@@ -118,6 +102,10 @@ msh
 | `msh --provider <name>` | Set provider (opencode-zen or openrouter) |
 | `msh --themes` | List available themes |
 | `msh --theme <name>` | Set color theme |
+| `msh --repo-context` | Enable project context detection |
+| `msh -r <query>` | Use project context for single query |
+| `msh --version` | Show version |
+| `msh --check-update` | Check for updates |
 | `msh --help` | Show help |
 
 ### Examples
@@ -160,6 +148,7 @@ All shortcuts use the `Ctrl+X` chord (press Ctrl+X, then the key):
 | `Ctrl+X S` | Switch provider |
 | `Ctrl+X D` | Toggle dry-run mode |
 | `Ctrl+X T` | Change theme |
+| `Ctrl+X R` | Toggle project context |
 | `Ctrl+X H` | Show history |
 | `Ctrl+X C` | Show config |
 | `Ctrl+X L` | Clear output |
@@ -257,9 +246,10 @@ Configuration is stored in `~/.magic-shell/config.json`.
 ```json
 {
   "provider": "opencode-zen",
-  "defaultModel": "grok-code",
+  "defaultModel": "gemini-3-flash",
   "safetyLevel": "moderate",
   "dryRunByDefault": false,
+  "repoContext": false,
   "theme": "opencode",
   "blockedCommands": [...],
   "confirmedDangerousPatterns": [...]

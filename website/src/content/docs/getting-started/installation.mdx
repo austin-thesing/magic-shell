@@ -5,28 +5,12 @@ description: Get Magic Shell running in seconds on macOS, Linux, or Windows.
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-## Quick Install
-
-The fastest way to get started is with our one-line installer:
-
-<Tabs>
-  <TabItem label="macOS / Linux">
-    ```bash
-    curl -fsSL https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.sh | bash
-    ```
-  </TabItem>
-  <TabItem label="Windows">
-    ```powershell
-    irm https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.ps1 | iex
-    ```
-  </TabItem>
-</Tabs>
-
-## Package Managers
-
-### npm / pnpm / yarn / bun
+## Package Managers (Recommended)
 
 ```bash
+# bun (recommended)
+bun add -g @austinthesing/magic-shell
+
 # npm
 npm install -g @austinthesing/magic-shell
 
@@ -35,15 +19,6 @@ pnpm add -g @austinthesing/magic-shell
 
 # yarn
 yarn global add @austinthesing/magic-shell
-
-# bun (recommended)
-bun add -g @austinthesing/magic-shell
-```
-
-### Homebrew (macOS / Linux)
-
-```bash
-brew install austin-thesing/tap/magic-shell
 ```
 
 ## From Source

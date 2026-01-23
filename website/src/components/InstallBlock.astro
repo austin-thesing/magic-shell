@@ -1,34 +1,26 @@
 ---
 interface Props {
-  platform?: "macos" | "windows" | "npm";
+  platform?: "bun" | "npm" | "pnpm";
 }
 
-const { platform = "macos" } = Astro.props;
+const { platform = "bun" } = Astro.props;
 
 const commands = {
-  macos: "curl -fsSL https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.sh | bash",
-  windows: "irm https://raw.githubusercontent.com/austin-thesing/magic-shell/main/install.ps1 | iex",
+  bun: "bun add -g @austinthesing/magic-shell",
   npm: "npm install -g @austinthesing/magic-shell",
+  pnpm: "pnpm add -g @austinthesing/magic-shell",
 };
 ---
 
 <div class="install-block">
   <div class="install-tabs" role="tablist">
     <button 
-      class:list={["tab", { active: platform === "macos" }]} 
-      data-platform="macos"
+      class:list={["tab", { active: platform === "bun" }]} 
+      data-platform="bun"
       role="tab"
-      aria-selected={platform === "macos"}
+      aria-selected={platform === "bun"}
     >
-      macOS / Linux
-    </button>
-    <button 
-      class:list={["tab", { active: platform === "windows" }]} 
-      data-platform="windows"
-      role="tab"
-      aria-selected={platform === "windows"}
-    >
-      Windows
+      bun
     </button>
     <button 
       class:list={["tab", { active: platform === "npm" }]} 
@@ -38,27 +30,22 @@ const commands = {
     >
       npm
     </button>
+    <button 
+      class:list={["tab", { active: platform === "pnpm" }]} 
+      data-platform="pnpm"
+      role="tab"
+      aria-selected={platform === "pnpm"}
+    >
+      pnpm
+    </button>
   </div>
 
   <div class="install-commands">
-    <div class:list={["command-panel", { active: platform === "macos" }]} data-panel="macos">
+    <div class:list={["command-panel", { active: platform === "bun" }]} data-panel="bun">
       <div class="command-wrapper">
         <span class="prompt">$</span>
-        <code class="command">{commands.macos}</code>
-        <button class="copy-btn" data-command={commands.macos} aria-label="Copy command">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <div class:list={["command-panel", { active: platform === "windows" }]} data-panel="windows">
-      <div class="command-wrapper">
-        <span class="prompt">PS&gt;</span>
-        <code class="command">{commands.windows}</code>
-        <button class="copy-btn" data-command={commands.windows} aria-label="Copy command">
+        <code class="command">{commands.bun}</code>
+        <button class="copy-btn" data-command={commands.bun} aria-label="Copy command">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -72,6 +59,19 @@ const commands = {
         <span class="prompt">$</span>
         <code class="command">{commands.npm}</code>
         <button class="copy-btn" data-command={commands.npm} aria-label="Copy command">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class:list={["command-panel", { active: platform === "pnpm" }]} data-panel="pnpm">
+      <div class="command-wrapper">
+        <span class="prompt">$</span>
+        <code class="command">{commands.pnpm}</code>
+        <button class="copy-btn" data-command={commands.pnpm} aria-label="Copy command">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>

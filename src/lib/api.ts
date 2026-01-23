@@ -1,5 +1,6 @@
-import type { CommandHistory, Model } from "./types"
+import type { CommandHistory, Model, Config } from "./types"
 import { detectShell, getShellSyntaxHints, getPlatformPaths, type ShellInfo } from "./shell"
+import { detectRepoContext, formatRepoContext } from "./repo-context"
 
 // Determine API type based on model ID for Zen
 // Reference: https://opencode.ai/docs/zen/
@@ -36,7 +37,7 @@ function getZenEndpoint(modelId: string): string {
   }
 }
 
-function buildSystemPrompt(cwd: string, history: CommandHistory[], shellInfo: ShellInfo): string {
+function buildSystemPrompt(cwd: string, history: CommandHistory[], shellInfo: ShellInfo, repoContextEnabled?: boolean): string {
   const historyContext = formatHistory(history)
   const platformPaths = getPlatformPaths(shellInfo.platform)
   const shellHints = getShellSyntaxHints(shellInfo.shell)
@@ -49,6 +50,18 @@ function buildSystemPrompt(cwd: string, history: CommandHistory[], shellInfo: Sh
         ? shellInfo.isWSL ? "Linux (WSL)" : "Linux"
         : "Unknown"
 
+  // Build project context section if enabled
+  let projectContextSection = ""
+  if (repoContextEnabled) {
+    const repoContext = detectRepoContext(cwd)
+    if (repoContext) {
+      projectContextSection = `
+Project context:
+${formatRepoContext(repoContext)}
+`
+    }
+  }
+
   return `You are a shell command translator. Convert the user's natural language request into a shell command.
 
 Current environment:
@@ -57,7 +70,7 @@ Current environment:
 - Working directory: ${cwd}
 - Home directory: ${shellInfo.homeDir}
 ${shellInfo.terminalEmulator ? `- Terminal: ${shellInfo.terminalEmulator}` : ""}
-
+${projectContextSection}
 ${shellHints}
 
 Recent command history:
@@ -68,7 +81,8 @@ Rules:
 - No explanations, no markdown, no backticks, no code blocks
 - Use the correct syntax for the detected shell (${shellInfo.shell})
 - If the request is unclear, make a reasonable assumption
-- Prefer simple, common commands over complex one-liners
+- Prefer simple, common commands over complex one-liners${repoContextEnabled ? `
+- Use project-specific commands when relevant (e.g., use the detected package manager and available scripts)` : ""}
 - Use the command history for context (e.g., "do that again", "undo", "delete the file I just created")
 - If the user asks something that can't be done with a shell command, output a command that prints a helpful message
 - For file operations, prefer safer alternatives when possible
@@ -446,10 +460,11 @@ export async function translateToCommand(
   model: Model,
   userInput: string,
   cwd: string,
-  history: CommandHistory[] = []
+  history: CommandHistory[] = [],
+  repoContextEnabled?: boolean
 ): Promise<string> {
   const shellInfo = getShellInfo()
-  const systemPrompt = buildSystemPrompt(cwd, history, shellInfo)
+  const systemPrompt = buildSystemPrompt(cwd, history, shellInfo, repoContextEnabled)
   let rawCommand: string
 
   if (model.provider === "openrouter") {
