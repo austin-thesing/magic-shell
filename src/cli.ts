@@ -397,7 +397,7 @@ function getStatusBarContent(): StyledText {
 function getHelpBarContent(): StyledText {
   const theme = getTheme()
   if (awaitingConfirmation) {
-    return t`${fg(theme.colors.warning)("[Enter] Run")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.error)("[Esc] Cancel")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.primary)("[e] Edit")}`
+    return t`${fg(theme.colors.warning)(">>> Press Enter to execute command <<<")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.error)("Esc")}${fg(theme.colors.textMuted)(" Cancel")} ${fg(theme.colors.primary)("e")}${fg(theme.colors.textMuted)(" Edit")} ${fg(theme.colors.primary)("c")}${fg(theme.colors.textMuted)(" Copy")}`
   }
   return t`${fg(theme.colors.textMuted)("Ctrl+X")} ${fg(theme.colors.primary)("P")}${fg(theme.colors.textMuted)(" Palette")}  ${fg(theme.colors.primary)("M")}${fg(theme.colors.textMuted)(" Model")}  ${fg(theme.colors.primary)("T")}${fg(theme.colors.textMuted)(" Theme")}  ${fg(theme.colors.primary)("D")}${fg(theme.colors.textMuted)(" Dry-run")}  ${fg(theme.colors.primary)("?")}${fg(theme.colors.textMuted)(" Help")}`
 }
@@ -541,16 +541,18 @@ function createAssistantMessageRenderable(msg: ChatMessage, theme: ReturnType<ty
   if (isSelected && !msg.executed) {
     const actionsText = new TextRenderable(renderer, {
       id: `msg-${msg.id}-actions`,
-      content: t`${fg(theme.colors.warning)("[Enter]")} ${fg(theme.colors.textMuted)("Run")}  ${fg(theme.colors.primary)("[c]")} ${fg(theme.colors.textMuted)("Copy")}  ${fg(theme.colors.primary)("[e]")} ${fg(theme.colors.textMuted)("Edit")}`,
+      content: t`${fg(theme.colors.warning)("Press Enter to run")} ${fg(theme.colors.textMuted)("|")} ${fg(theme.colors.primary)("[c]")} ${fg(theme.colors.textMuted)("Copy")} ${fg(theme.colors.primary)("[e]")} ${fg(theme.colors.textMuted)("Edit")} ${fg(theme.colors.error)("[Esc]")} ${fg(theme.colors.textMuted)("Cancel")}`,
     })
     card.add(actionsText)
   }
   
   // Executed badge
   if (msg.executed) {
+    const wasAutoRun = !msg.safety?.isDangerous
+    const execLabel = wasAutoRun ? "Auto-executed (safe)" : "Executed"
     const execText = new TextRenderable(renderer, {
       id: `msg-${msg.id}-exec`,
-      content: t`${fg(theme.colors.success)("Executed")}`,
+      content: t`${fg(theme.colors.success)("✓")} ${fg(theme.colors.success)(execLabel)}`,
     })
     card.add(execText)
   }

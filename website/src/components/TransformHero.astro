@@ -481,8 +481,11 @@ import InstallBlock from "./InstallBlock.astro";
 
   /* Centered header */
   .hero-header {
-    text-align: center;
+    text-align: left;
     margin-bottom: var(--space-10);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .hero-badge {
@@ -497,6 +500,7 @@ import InstallBlock from "./InstallBlock.astro";
     font-size: var(--text-xs);
     color: var(--text-secondary);
     margin-bottom: var(--space-5);
+    align-self: flex-start;
   }
 
   .badge-dot {
@@ -538,14 +542,14 @@ import InstallBlock from "./InstallBlock.astro";
     font-size: var(--text-lg);
     color: var(--text-secondary);
     max-width: 540px;
-    margin: 0 auto var(--space-7);
+    margin: 0 0 var(--space-7) 0;
     line-height: 1.6;
   }
 
   .hero-actions {
     display: flex;
     gap: var(--space-3);
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
   }
 
