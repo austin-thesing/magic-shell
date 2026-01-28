@@ -53,6 +53,14 @@ export const OPENROUTER_MODELS: Model[] = [
     provider: "openrouter",
     contextLength: 200000,
   },
+  {
+    id: "google/gemini-2.5-flash",
+    name: "Gemini 2.5 Flash",
+    description: "Google's fast Gemini 2.5 (stable until June 2026)",
+    category: "fast",
+    provider: "openrouter",
+    contextLength: 1000000,
+  },
   // Smart models
   {
     id: "anthropic/claude-sonnet-4.5",
@@ -77,6 +85,14 @@ export const OPENROUTER_MODELS: Model[] = [
     category: "smart",
     provider: "openrouter",
     contextLength: 128000,
+  },
+  {
+    id: "google/gemini-2.5-pro",
+    name: "Gemini 2.5 Pro",
+    description: "Google's Gemini 2.5 Pro (stable until June 2026)",
+    category: "smart",
+    provider: "openrouter",
+    contextLength: 1000000,
   },
   // Reasoning models
   {
@@ -110,21 +126,28 @@ export const OPENCODE_ZEN_MODELS: Model[] = [
     free: true,
   },
   {
-    id: "grok-code",
-    name: "Grok Code Fast 1",
-    description: "Free xAI coding model (limited time)",
-    category: "fast",
-    provider: "opencode-zen",
-    contextLength: 131072,
-    free: true,
-  },
-  {
     id: "glm-4.7",
     name: "GLM 4.7",
     description: "GLM model",
     category: "fast",
     provider: "opencode-zen",
     contextLength: 128000,
+  },
+  {
+    id: "minimax-m2.1",
+    name: "MiniMax M2.1",
+    description: "MiniMax's capable model",
+    category: "smart",
+    provider: "opencode-zen",
+    contextLength: 128000,
+  },
+  {
+    id: "kimi-k2.5",
+    name: "Kimi K2.5",
+    description: "Moonshot's latest model",
+    category: "smart",
+    provider: "opencode-zen",
+    contextLength: 131072,
   },
   // Fast models
   {
@@ -192,22 +215,6 @@ export const OPENCODE_ZEN_MODELS: Model[] = [
     category: "fast",
     provider: "opencode-zen",
     contextLength: 200000,
-  },
-  {
-    id: "gemini-2.5-pro",
-    name: "Gemini 2.5 Pro",
-    description: "Google's Gemini 2.5 Pro (stable until June 2026)",
-    category: "smart",
-    provider: "opencode-zen",
-    contextLength: 1000000,
-  },
-  {
-    id: "gemini-2.5-flash",
-    name: "Gemini 2.5 Flash",
-    description: "Google's fast Gemini 2.5 (stable until June 2026)",
-    category: "fast",
-    provider: "opencode-zen",
-    contextLength: 1000000,
   },
   // OpenAI models
   {

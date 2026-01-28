@@ -333,7 +333,7 @@ async function callZenGoogle(
   }
   const google = createGoogleGenerativeAI({
     apiKey,
-    baseURL: ZEN_BASE_URL,
+    baseURL: `https://opencode.ai/zen/v1/models/${modelId}`,
   })
 
   try {
