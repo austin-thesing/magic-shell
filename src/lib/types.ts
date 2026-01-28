@@ -1,26 +1,27 @@
-export type Provider = "openrouter" | "opencode-zen" | "custom"
+export type Provider = "openrouter" | "opencode-zen" | "custom";
 
 export interface Model {
-  id: string
-  name: string
-  description: string
-  category: "fast" | "smart" | "reasoning"
-  provider: Provider
-  contextLength: number
-  free?: boolean
-  disabled?: boolean
-  disabledReason?: string
+  id: string;
+  name: string;
+  description: string;
+  category: "fast" | "smart" | "reasoning";
+  provider: Provider;
+  contextLength: number;
+  free?: boolean;
+  disabled?: boolean;
+  disabledReason?: string;
 }
 
 // Custom models for LM Studio, Ollama, or any OpenAI-compatible endpoint
 export interface CustomModel {
-  id: string
-  name: string
-  modelId: string
-  baseUrl: string
-  apiKey?: string
-  contextLength: number
-  category: "fast" | "smart" | "reasoning"
+  id: string;
+  name: string;
+  description?: string;
+  modelId: string;
+  baseUrl: string;
+  apiKey?: string;
+  contextLength: number;
+  category: "fast" | "smart" | "reasoning";
 }
 
 // OpenRouter models - updated January 2026
@@ -111,7 +112,7 @@ export const OPENROUTER_MODELS: Model[] = [
     provider: "openrouter",
     contextLength: 128000,
   },
-]
+];
 
 // OpenCode Zen models - model IDs match the API exactly (no prefix needed for API calls)
 export const OPENCODE_ZEN_MODELS: Model[] = [
@@ -322,71 +323,66 @@ export const OPENCODE_ZEN_MODELS: Model[] = [
     provider: "opencode-zen",
     contextLength: 131072,
   },
-]
+];
 
-export const ALL_MODELS = [...OPENCODE_ZEN_MODELS, ...OPENROUTER_MODELS]
-
-// Get all models including custom ones
-export function getAllModels(customModels: CustomModel[] = []): (Model | CustomModel)[] {
-  return [...OPENCODE_ZEN_MODELS, ...OPENROUTER_MODELS, ...customModels]
-}
+export const ALL_MODELS = [...OPENCODE_ZEN_MODELS, ...OPENROUTER_MODELS];
 
 export interface Config {
-  provider: Provider
-  openrouterApiKey: string
-  opencodeZenApiKey: string
-  defaultModel: string
-  safetyLevel: "strict" | "moderate" | "relaxed"
-  dryRunByDefault: boolean
-  blockedCommands: string[]
-  confirmedDangerousPatterns: string[]
-  theme?: string
+  provider: Provider;
+  openrouterApiKey: string;
+  opencodeZenApiKey: string;
+  defaultModel: string;
+  safetyLevel: "strict" | "moderate" | "relaxed";
+  dryRunByDefault: boolean;
+  blockedCommands: string[];
+  confirmedDangerousPatterns: string[];
+  theme?: string;
   /** Enable project context detection (opt-in for privacy). Sends script names from package.json, Makefile, etc to AI. */
-  repoContext?: boolean
-  customModels?: CustomModel[]
+  repoContext?: boolean;
+  customModels?: CustomModel[];
 }
 
 export interface RepoContext {
-  type: string // e.g., "node", "python", "rust", "go", "make"
-  packageManager?: string // e.g., "npm", "bun", "yarn", "pnpm"
-  scripts?: string[] // Available npm/bun scripts
-  makeTargets?: string[] // Makefile targets
-  cargoCommands?: string[] // Cargo subcommands
-  hasDocker?: boolean
-  hasGit?: boolean
+  type: string; // e.g., "node", "python", "rust", "go", "make"
+  packageManager?: string; // e.g., "npm", "bun", "yarn", "pnpm"
+  scripts?: string[]; // Available npm/bun scripts
+  makeTargets?: string[]; // Makefile targets
+  cargoCommands?: string[]; // Cargo subcommands
+  hasDocker?: boolean;
+  hasGit?: boolean;
 }
 
 export interface CommandHistory {
-  input: string
-  command: string
-  output: string
-  timestamp: number
+  input: string;
+  command: string;
+  output: string;
+  timestamp: number;
 }
 
 export interface SafetyAnalysis {
-  isDangerous: boolean
-  severity: "low" | "medium" | "high" | "critical"
-  reason?: string
-  patterns: string[]
+  isDangerous: boolean;
+  severity: "low" | "medium" | "high" | "critical";
+  reason?: string;
+  patterns: string[];
 }
 
 // Chat-style TUI message types
-export type ChatMessageType = "user" | "assistant" | "system" | "result"
+export type ChatMessageType = "user" | "assistant" | "system" | "result";
 
 export interface ChatMessage {
-  id: string
-  type: ChatMessageType
-  content: string
-  timestamp: number
+  id: string;
+  type: ChatMessageType;
+  content: string;
+  timestamp: number;
   // For assistant messages (translated commands)
-  command?: string
-  safety?: SafetyAnalysis
+  command?: string;
+  safety?: SafetyAnalysis;
   // For result messages (after execution)
-  executed?: boolean
-  output?: string
-  exitCode?: number
-  executionKind?: "auto" | "manual" | "dry-run"
-  parentMessageId?: string
+  executed?: boolean;
+  output?: string;
+  exitCode?: number;
+  executionKind?: "auto" | "manual" | "dry-run";
+  parentMessageId?: string;
   // For expandable output view
-  expanded?: boolean
+  expanded?: boolean;
 }
