@@ -27,20 +27,21 @@ import {
   OPENCODE_ZEN_MODELS,
   OPENROUTER_MODELS,
   type Model,
+  type CustomModel,
   type CommandHistory,
   type Config,
   type Provider,
   type ChatMessage,
   type SafetyAnalysis,
 } from "./lib/types"
-import { loadConfig, saveConfig, getApiKey, setApiKey, loadHistory, addToHistory } from "./lib/config"
+import { loadConfig, saveConfig, getApiKey, setApiKey, loadHistory, addToHistory, getCustomModels, getCustomModel } from "./lib/config"
 import { analyzeCommand, getSeverityColor } from "./lib/safety"
 import { translateToCommand, getShellInfo } from "./lib/api"
 import { getTheme, setTheme, themes, themeNames, loadTheme } from "./lib/theme"
 
 // Global state
 let renderer: CliRenderer
-let currentModel: Model = OPENCODE_ZEN_MODELS[0] // Default to Big Pickle
+let currentModel: Model | CustomModel = OPENCODE_ZEN_MODELS[0] // Default to Big Pickle
 let config: Config
 let history: CommandHistory[] = []
 let currentCwd = getCwd()
@@ -78,10 +79,15 @@ async function main() {
   dryRunMode = config.dryRunByDefault
   loadTheme() // Load theme from config
 
-  // Set current model from config
-  const savedModel = ALL_MODELS.find((m) => m.id === config.defaultModel)
-  if (savedModel) {
-    currentModel = savedModel
+  // Set current model from config - check custom models first
+  const customModel = getCustomModel(config.defaultModel)
+  if (customModel) {
+    currentModel = customModel
+  } else {
+    const savedModel = ALL_MODELS.find((m) => m.id === config.defaultModel)
+    if (savedModel) {
+      currentModel = savedModel
+    }
   }
 
   renderer = await createCliRenderer({
@@ -1096,16 +1102,18 @@ Tips:
 
 async function showConfig() {
   const theme = getTheme()
-  const providerName = config.provider === "opencode-zen" ? "OpenCode Zen" : "OpenRouter"
+  const providerName = config.provider === "opencode-zen" ? "OpenCode Zen" : config.provider === "openrouter" ? "OpenRouter" : "Custom"
   const apiKey = await getApiKey(config.provider)
   const apiKeyStatus = apiKey ? "configured" : "not set"
-  const freeBadge = currentModel.free ? " (FREE)" : ""
+  const isCustom = "baseUrl" in currentModel
+  const freeBadge = !isCustom && "free" in currentModel && currentModel.free ? " (FREE)" : ""
+  const customBadge = isCustom ? " (custom)" : ""
   const shellInfo = getShellInfo()
 
   const configText = `Current Configuration
 
 Provider:     ${providerName}
-Model:        ${currentModel.name}${freeBadge}
+Model:        ${currentModel.name}${freeBadge}${customBadge}
 Model ID:     ${currentModel.id}
 Category:     ${currentModel.category}
 Theme:        ${theme.name}
@@ -1260,12 +1268,24 @@ function showModelSelector() {
   // Filter models by current provider, exclude disabled models
   const allModels = config.provider === "opencode-zen" ? OPENCODE_ZEN_MODELS : OPENROUTER_MODELS
   const availableModels = allModels.filter(m => !m.disabled)
+  
+  // Get custom models
+  const customModels = getCustomModels()
 
-  const options: SelectOption[] = availableModels.map((model) => ({
-    name: `${model.name} [${model.category}]${model.free ? " FREE" : ""}`,
-    description: model.description,
-    value: model,
-  }))
+  const options: SelectOption[] = [
+    // Provider models first
+    ...availableModels.map((model) => ({
+      name: `${model.name} [${model.category}]${model.free ? " FREE" : ""}`,
+      description: model.description,
+      value: model as Model | CustomModel,
+    })),
+    // Custom models with "(custom)" label
+    ...customModels.map((model) => ({
+      name: `${model.name} [${model.category}] (custom)`,
+      description: `${model.baseUrl} - ${model.modelId}`,
+      value: model as Model | CustomModel,
+    })),
+  ]
 
   modelSelector = new SelectRenderable(renderer, {
     id: "model-select",
@@ -1286,7 +1306,7 @@ function showModelSelector() {
   container.add(modelSelector)
 
   modelSelector.on(SelectRenderableEvents.ITEM_SELECTED, (_: number, option: SelectOption) => {
-    currentModel = option.value as Model
+    currentModel = option.value as Model | CustomModel
     config.defaultModel = currentModel.id
     saveConfig(config)
     
@@ -1297,8 +1317,10 @@ function showModelSelector() {
     modelSelector = null
     inputField.focus()
 
-    const freeBadge = currentModel.free ? " (FREE)" : ""
-    addSystemMessage(`Model changed to ${currentModel.name}${freeBadge}`)
+    const isCustom = "baseUrl" in currentModel
+    const freeBadge = "free" in currentModel && currentModel.free ? " (FREE)" : ""
+    const customBadge = isCustom ? " (custom)" : ""
+    addSystemMessage(`Model changed to ${currentModel.name}${freeBadge}${customBadge}`)
   })
 
   modelSelector.focus()

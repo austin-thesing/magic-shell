@@ -1,7 +1,7 @@
 import { homedir } from "os"
 import { join } from "path"
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs"
-import type { Config, CommandHistory, Provider } from "./types"
+import type { Config, CommandHistory, Provider, CustomModel } from "./types"
 import { getSecret, setSecret, isSecureStorageAvailable } from "./keychain"
 
 const CONFIG_DIR = join(homedir(), ".magic-shell")
@@ -29,6 +29,7 @@ const DEFAULT_CONFIG: Config = {
   ],
   confirmedDangerousPatterns: [],
   repoContext: false, // Opt-in for privacy
+  customModels: [],
 }
 
 function ensureConfigDir(): void {
@@ -132,6 +133,47 @@ export function addToHistory(entry: CommandHistory): void {
   const history = loadHistory()
   history.push(entry)
   saveHistory(history)
+}
+
+// Custom model management
+export function getCustomModels(): CustomModel[] {
+  const config = loadConfig()
+  return config.customModels || []
+}
+
+export function getCustomModel(id: string): CustomModel | undefined {
+  const customModels = getCustomModels()
+  return customModels.find((m) => m.id === id)
+}
+
+export function addCustomModel(model: CustomModel): void {
+  const config = loadConfig()
+  if (!config.customModels) {
+    config.customModels = []
+  }
+  // Check if model with same ID exists
+  const existingIndex = config.customModels.findIndex((m) => m.id === model.id)
+  if (existingIndex >= 0) {
+    // Replace existing
+    config.customModels[existingIndex] = model
+  } else {
+    config.customModels.push(model)
+  }
+  saveConfig(config)
+}
+
+export function removeCustomModel(id: string): boolean {
+  const config = loadConfig()
+  if (!config.customModels) {
+    return false
+  }
+  const initialLength = config.customModels.length
+  config.customModels = config.customModels.filter((m) => m.id !== id)
+  if (config.customModels.length !== initialLength) {
+    saveConfig(config)
+    return true
+  }
+  return false
 }
 
 export { isSecureStorageAvailable }

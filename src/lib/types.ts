@@ -1,4 +1,4 @@
-export type Provider = "openrouter" | "opencode-zen"
+export type Provider = "openrouter" | "opencode-zen" | "custom"
 
 export interface Model {
   id: string
@@ -10,6 +10,17 @@ export interface Model {
   free?: boolean
   disabled?: boolean
   disabledReason?: string
+}
+
+// Custom models for LM Studio, Ollama, or any OpenAI-compatible endpoint
+export interface CustomModel {
+  id: string
+  name: string
+  modelId: string
+  baseUrl: string
+  apiKey?: string
+  contextLength: number
+  category: "fast" | "smart" | "reasoning"
 }
 
 // OpenRouter models - updated January 2026
@@ -182,6 +193,22 @@ export const OPENCODE_ZEN_MODELS: Model[] = [
     provider: "opencode-zen",
     contextLength: 200000,
   },
+  {
+    id: "gemini-2.5-pro",
+    name: "Gemini 2.5 Pro",
+    description: "Google's Gemini 2.5 Pro (stable until June 2026)",
+    category: "smart",
+    provider: "opencode-zen",
+    contextLength: 1000000,
+  },
+  {
+    id: "gemini-2.5-flash",
+    name: "Gemini 2.5 Flash",
+    description: "Google's fast Gemini 2.5 (stable until June 2026)",
+    category: "fast",
+    provider: "opencode-zen",
+    contextLength: 1000000,
+  },
   // OpenAI models
   {
     id: "gpt-5.2",
@@ -292,6 +319,11 @@ export const OPENCODE_ZEN_MODELS: Model[] = [
 
 export const ALL_MODELS = [...OPENCODE_ZEN_MODELS, ...OPENROUTER_MODELS]
 
+// Get all models including custom ones
+export function getAllModels(customModels: CustomModel[] = []): (Model | CustomModel)[] {
+  return [...OPENCODE_ZEN_MODELS, ...OPENROUTER_MODELS, ...customModels]
+}
+
 export interface Config {
   provider: Provider
   openrouterApiKey: string
@@ -304,6 +336,7 @@ export interface Config {
   theme?: string
   /** Enable project context detection (opt-in for privacy). Sends script names from package.json, Makefile, etc to AI. */
   repoContext?: boolean
+  customModels?: CustomModel[]
 }
 
 export interface RepoContext {

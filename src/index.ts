@@ -8,6 +8,9 @@
  *   msh -x "delete node_modules"   # Translate and execute
  *   msh -n "find large files"      # Dry run (show what would execute)
  *   msh --setup                    # Configure API keys
+ *   msh --add-model                # Add custom model (LM Studio, Ollama, etc.)
+ *   msh --list-custom              # List custom models
+ *   msh --remove-model <id>        # Remove custom model
  *   msh --help                     # Show help
  *   
  *   mshell                         # Interactive TUI mode (separate command)
@@ -19,10 +22,12 @@ import {
   OPENCODE_ZEN_MODELS,
   OPENROUTER_MODELS,
   ALL_MODELS,
+  getAllModels,
   type Model,
   type Provider,
+  type CustomModel,
 } from "./lib/types"
-import { loadConfig, saveConfig, getApiKey, setApiKey, loadHistory } from "./lib/config"
+import { loadConfig, saveConfig, getApiKey, setApiKey, loadHistory, addCustomModel, removeCustomModel, getCustomModels } from "./lib/config"
 import { analyzeCommand } from "./lib/safety"
 import { translateToCommand, getShellInfo } from "./lib/api"
 import { getAnsiColors, getTheme, setTheme, themes, themeNames, loadTheme } from "./lib/theme"
@@ -59,7 +64,10 @@ ${colors.bold}USAGE${colors.reset}
   msh -n <query>           Dry run - show command with safety analysis
   msh --setup              Configure API keys and provider
   msh --models             List available models
-  msh --model <id>         Set default model
+  msh --model <id>         Set default model (including custom)
+  msh --add-model          Add custom model (LM Studio, Ollama, etc.)
+  msh --list-custom        List custom models
+  msh --remove-model <id>  Remove custom model
   msh --provider <name>    Set provider (opencode-zen or openrouter)
   msh --themes             List available themes
   msh --theme <name>       Set color theme
@@ -103,6 +111,7 @@ ${colors.bold}CONFIG${colors.reset}
 
 function printModels() {
   const config = loadConfig()
+  const customModels = getCustomModels()
   
   console.log(`\n${colors.bold}OpenCode Zen Models${colors.reset}`)
   console.log(`${colors.dim}(* = free, X = temporarily disabled)${colors.reset}\n`)
@@ -136,6 +145,18 @@ function printModels() {
       console.log(`    ${colors.error}${model.disabledReason}${colors.reset}`)
     } else {
       console.log(`    ${colors.dim}${model.description}${colors.reset}`)
+    }
+  }
+  
+  // Custom models section
+  if (customModels.length > 0) {
+    console.log(`\n${colors.bold}Custom Models${colors.reset} ${colors.info}(custom)${colors.reset}\n`)
+    for (const model of customModels) {
+      const isCurrent = config.defaultModel === model.id
+      const marker = isCurrent ? colors.success + "→ " : "  "
+      const category = colors.dim + `[${model.category}]` + colors.reset
+      console.log(`${marker}${model.id} ${colors.info}(custom)${colors.reset} ${category}`)
+      console.log(`    ${colors.dim}${model.name} - ${model.baseUrl}${colors.reset}`)
     }
   }
   
@@ -324,6 +345,97 @@ function executeCommand(command: string): Promise<{ code: number; output: string
   })
 }
 
+// Add custom model (interactive)
+async function setupCustomModel() {
+  const readline = await import("readline")
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
+
+  const question = (prompt: string): Promise<string> => {
+    return new Promise((resolve) => {
+      rl.question(prompt, resolve)
+    })
+  }
+
+  console.log(`\n${colors.bold}${colors.cyan}Add Custom Model${colors.reset}`)
+  console.log(`For LM Studio, Ollama, or any OpenAI-compatible endpoint\n`)
+
+  // Model ID (for referencing)
+  const id = await question("Model ID (for referencing, e.g., my-local-llama): ")
+  if (!id.trim()) {
+    console.log(`${colors.red}Model ID is required${colors.reset}`)
+    rl.close()
+    return
+  }
+
+  // Check if already exists
+  const existing = getCustomModels().find(m => m.id === id.trim())
+  if (existing) {
+    const replace = await question(`Model "${id}" already exists. Replace? [y/N]: `)
+    if (replace.toLowerCase() !== "y") {
+      console.log(`${colors.gray}Cancelled${colors.reset}`)
+      rl.close()
+      return
+    }
+  }
+
+  // Display name
+  const name = await question("Display name (e.g., 'Local Llama 3.2'): ")
+  if (!name.trim()) {
+    console.log(`${colors.red}Display name is required${colors.reset}`)
+    rl.close()
+    return
+  }
+
+  // API model ID
+  const modelId = await question("API model ID (sent to server, e.g., llama-3.2-3b): ")
+  if (!modelId.trim()) {
+    console.log(`${colors.red}API model ID is required${colors.reset}`)
+    rl.close()
+    return
+  }
+
+  // Base URL
+  const defaultUrl = "http://127.0.0.1:1234/v1"
+  const baseUrlInput = await question(`Base URL [${defaultUrl}]: `)
+  const baseUrl = baseUrlInput.trim() || defaultUrl
+
+  // API key
+  const apiKey = await question("API key (optional, press Enter to skip): ")
+
+  // Context length
+  const contextLengthInput = await question("Context length [8192]: ")
+  const contextLength = parseInt(contextLengthInput) || 8192
+
+  // Category
+  console.log("\nCategory:")
+  console.log("  1. fast")
+  console.log("  2. smart")
+  console.log("  3. reasoning")
+  const categoryChoice = await question("Choice [2]: ")
+  const categories = ["fast", "smart", "reasoning"] as const
+  const category = categories[parseInt(categoryChoice || "2") - 1] || "smart"
+
+  // Create and save
+  const customModel: CustomModel = {
+    id: id.trim(),
+    name: name.trim(),
+    modelId: modelId.trim(),
+    baseUrl: baseUrl.trim(),
+    apiKey: apiKey.trim() || undefined,
+    contextLength,
+    category,
+  }
+
+  addCustomModel(customModel)
+  console.log(`\n${colors.green}✓ Added custom model "${id}"${colors.reset}`)
+  console.log(`${colors.dim}Test with: msh --model ${id} "hello world"${colors.reset}\n`)
+
+  rl.close()
+}
+
 // Simple spinner for loading states
 function createSpinner(message: string) {
   const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
@@ -353,16 +465,20 @@ function createSpinner(message: string) {
 async function translate(query: string, options: { execute?: boolean; dryRun?: boolean; repoContext?: boolean }) {
   const config = loadConfig()
   const apiKey = await getApiKey(config.provider)
+  const customModels = getCustomModels()
   
-  if (!apiKey) {
+  // Find current model - check custom models first
+  const customModel = customModels.find(m => m.id === config.defaultModel)
+  const builtInModel = ALL_MODELS.find(m => m.id === config.defaultModel)
+  const model = customModel || builtInModel
+    || (config.provider === "opencode-zen" ? OPENCODE_ZEN_MODELS[0] : OPENROUTER_MODELS[0])
+
+  // Check if we need an API key
+  if (!customModel && !apiKey) {
     console.error(`${colors.red}Error: No API key configured.${colors.reset}`)
     console.error(`Run: ${colors.cyan}msh --setup${colors.reset}`)
     process.exit(1)
   }
-
-  // Find current model
-  const model = ALL_MODELS.find(m => m.id === config.defaultModel) 
-    || (config.provider === "opencode-zen" ? OPENCODE_ZEN_MODELS[0] : OPENROUTER_MODELS[0])
 
   const history = loadHistory()
   const cwd = getCwd()
@@ -371,7 +487,7 @@ async function translate(query: string, options: { execute?: boolean; dryRun?: b
   const useRepoContext = options.repoContext ?? config.repoContext ?? false
 
   // Show loading spinner
-  const spinner = createSpinner(`Translating with ${model.name}`)
+  const spinner = createSpinner(`Translating with ${customModel ? customModel.name : (model as Model).name}`)
 
   try {
     const command = await translateToCommand(apiKey, model, query, cwd, history, useRepoContext)
@@ -499,8 +615,55 @@ async function main() {
     return
   }
   
+  if (args[0] === "--add-model") {
+    await setupCustomModel()
+    return
+  }
+  
+  if (args[0] === "--list-custom") {
+    const customModels = getCustomModels()
+    if (customModels.length === 0) {
+      console.log(`${colors.dim}No custom models configured.${colors.reset}`)
+      console.log(`Add one with: ${colors.primary}msh --add-model${colors.reset}`)
+    } else {
+      console.log(`\n${colors.bold}Custom Models${colors.reset}\n`)
+      for (const model of customModels) {
+        console.log(`${colors.info}${model.id}${colors.reset} - ${model.name}`)
+        console.log(`  ${colors.dim}Model: ${model.modelId}${colors.reset}`)
+        console.log(`  ${colors.dim}URL: ${model.baseUrl}${colors.reset}`)
+        console.log(`  ${colors.dim}Category: ${model.category}${colors.reset}`)
+        console.log()
+      }
+    }
+    return
+  }
+  
+  if (args[0] === "--remove-model" && args[1]) {
+    const modelId = args[1]
+    const removed = removeCustomModel(modelId)
+    if (removed) {
+      console.log(`${colors.success}✓ Removed custom model "${modelId}"${colors.reset}`)
+    } else {
+      console.error(`${colors.error}Custom model "${modelId}" not found${colors.reset}`)
+      process.exit(1)
+    }
+    return
+  }
+  
   if (args[0] === "--model" && args[1]) {
     const modelId = args[1]
+    // Check custom models first
+    const customModel = getCustomModels().find(m => m.id === modelId)
+    if (customModel) {
+      const config = loadConfig()
+      config.defaultModel = modelId
+      config.provider = "custom"
+      saveConfig(config)
+      console.log(`${colors.success}✓ Default model set to ${customModel.name}${colors.reset}`)
+      console.log(`${colors.dim}(Custom model: ${customModel.baseUrl})${colors.reset}`)
+      return
+    }
+    
     const model = ALL_MODELS.find(m => m.id === modelId)
     if (!model) {
       console.error(`${colors.error}Unknown model: ${modelId}${colors.reset}`)

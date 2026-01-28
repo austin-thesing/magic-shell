@@ -4,7 +4,7 @@ import { createOpenAI } from "@ai-sdk/openai"
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible"
 import { generateText, type LanguageModel } from "ai"
 
-import type { CommandHistory, Model, Config } from "./types"
+import type { CommandHistory, Model, Config, CustomModel } from "./types"
 import { detectShell, getShellSyntaxHints, getPlatformPaths, type ShellInfo } from "./shell"
 import { detectRepoContext, formatRepoContext } from "./repo-context"
 
@@ -200,7 +200,7 @@ async function generateZenText(
     model,
     system: systemPrompt,
     prompt: userInput,
-    maxTokens: 500,
+    maxOutputTokens: 500,
     temperature: 0.1,
   })
 
@@ -291,6 +291,34 @@ async function callZenOpenAICompatible(
   }
 }
 
+// Custom model (LM Studio, Ollama, etc.)
+async function callCustomModel(
+  model: CustomModel,
+  systemPrompt: string,
+  userInput: string
+): Promise<string> {
+  if (DEBUG_API) {
+    console.error(`[DEBUG] Calling Custom Model`)
+    console.error(`[DEBUG] Model: ${model.modelId}`)
+    console.error(`[DEBUG] Base URL: ${model.baseUrl}`)
+  }
+  const openaiCompatible = createOpenAICompatible({
+    name: "custom",
+    apiKey: model.apiKey || "not-needed",
+    baseURL: model.baseUrl,
+  })
+
+  try {
+    return await generateZenText(openaiCompatible(model.modelId), systemPrompt, userInput)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    if (DEBUG_API) {
+      console.error(`[DEBUG] Custom Model Error: ${message}`)
+    }
+    throw new Error(message)
+  }
+}
+
 // OpenCode Zen - Google (Gemini)
 // Gemini uses the generateContent endpoint format
 async function callZenGoogle(
@@ -329,9 +357,14 @@ export function getShellInfo(): ShellInfo {
   return cachedShellInfo
 }
 
+// Type guard to check if a model is a custom model
+function isCustomModel(model: Model | CustomModel): model is CustomModel {
+  return "baseUrl" in model
+}
+
 export async function translateToCommand(
   apiKey: string,
-  model: Model,
+  model: Model | CustomModel,
   userInput: string,
   cwd: string,
   history: CommandHistory[] = [],
@@ -341,7 +374,10 @@ export async function translateToCommand(
   const systemPrompt = buildSystemPrompt(cwd, history, shellInfo, repoContextEnabled)
   let rawCommand: string
 
-  if (model.provider === "openrouter") {
+  // Handle custom models (LM Studio, Ollama, etc.)
+  if (isCustomModel(model)) {
+    rawCommand = await callCustomModel(model, systemPrompt, userInput)
+  } else if (model.provider === "openrouter") {
     rawCommand = await callOpenRouter(apiKey, model.id, systemPrompt, userInput)
   } else {
     // OpenCode Zen - determine API type
