@@ -386,3 +386,8 @@ export interface ChatMessage {
   // For expandable output view
   expanded?: boolean;
 }
+
+// Type guard to check if a model is a custom model
+export function isCustomModel(model: Model | CustomModel): model is CustomModel {
+  return "baseUrl" in model;
+}

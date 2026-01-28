@@ -108,7 +108,8 @@ function printModels() {
   console.log(`\n${colors.bold}OpenCode Zen Models${colors.reset}`);
   console.log(`${colors.dim}(* = free, X = temporarily disabled)${colors.reset}\n`);
 
-  for (const model of OPENCODE_ZEN_MODELS) {
+  const sortedZenModels = [...OPENCODE_ZEN_MODELS].sort((a, b) => a.name.localeCompare(b.name));
+  for (const model of sortedZenModels) {
     const isCurrent = config.provider === "opencode-zen" && config.defaultModel === model.id;
     const marker = isCurrent ? colors.success + "→ " : "  ";
     const free = model.free ? colors.success + " *" + colors.reset : "";
@@ -125,7 +126,8 @@ function printModels() {
 
   console.log(`\n${colors.bold}OpenRouter Models${colors.reset}\n`);
 
-  for (const model of OPENROUTER_MODELS) {
+  const sortedRouterModels = [...OPENROUTER_MODELS].sort((a, b) => a.name.localeCompare(b.name));
+  for (const model of sortedRouterModels) {
     const isCurrent = config.provider === "openrouter" && config.defaultModel === model.id;
     const marker = isCurrent ? colors.success + "→ " : "  ";
     const free = model.free ? colors.success + " *" + colors.reset : "";
@@ -143,7 +145,8 @@ function printModels() {
   // Custom models section
   if (customModels.length > 0) {
     console.log(`\n${colors.bold}Custom Models${colors.reset} ${colors.info}(custom)${colors.reset}\n`);
-    for (const model of customModels) {
+    const sortedCustomModels = [...customModels].sort((a, b) => a.name.localeCompare(b.name));
+    for (const model of sortedCustomModels) {
       const isCurrent = config.defaultModel === model.id;
       const marker = isCurrent ? colors.success + "→ " : "  ";
       const category = colors.dim + `[${model.category}]` + colors.reset;

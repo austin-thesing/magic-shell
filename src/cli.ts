@@ -22,7 +22,7 @@ import {
 import { spawn } from "child_process";
 import { cwd as getCwd } from "process";
 
-import { ALL_MODELS, OPENCODE_ZEN_MODELS, OPENROUTER_MODELS, type Model, type CustomModel, type CommandHistory, type Config, type Provider, type ChatMessage, type SafetyAnalysis } from "./lib/types";
+import { ALL_MODELS, OPENCODE_ZEN_MODELS, OPENROUTER_MODELS, type Model, type CustomModel, type CommandHistory, type Config, type Provider, type ChatMessage, type SafetyAnalysis, isCustomModel } from "./lib/types";
 import { loadConfig, saveConfig, getApiKey, setApiKey, loadHistory, addToHistory, getCustomModels, getCustomModel } from "./lib/config";
 import { analyzeCommand, getSeverityColor } from "./lib/safety";
 import { translateToCommand, getShellInfo } from "./lib/api";
@@ -60,10 +60,6 @@ let awaitingConfirmation = false;
 // Helper to generate message IDs
 function generateMessageId(): string {
   return `msg-${++messageIdCounter}`;
-}
-
-function isCustomModel(model: Model | CustomModel): model is CustomModel {
-  return "baseUrl" in model;
 }
 
 function isFreeModel(model: Model | CustomModel): model is Model & { free: true } {
@@ -813,7 +809,8 @@ function isDirectCommand(input: string): boolean {
 
 async function translateAndProcess(input: string) {
   const apiKey = await getApiKey(config.provider);
-  if (!apiKey) {
+  const customModel = isCustomModel(currentModel);
+  if (!customModel && !apiKey) {
     addSystemMessage("Error: No API key configured. Run !provider to set up.");
     return;
   }
@@ -1192,8 +1189,8 @@ async function switchProvider() {
 
 function showModelSelector() {
   if (modelSelector) {
-    renderer.root.remove("model-selector-container");
-    modelSelector = null;
+    // Already open - don't create another instance
+    return;
   }
 
   const container = new BoxRenderable(renderer, {
@@ -1216,10 +1213,10 @@ function showModelSelector() {
 
   // Filter models by current provider, exclude disabled models
   const allModels = config.provider === "opencode-zen" ? OPENCODE_ZEN_MODELS : OPENROUTER_MODELS;
-  const availableModels = allModels.filter((m) => !m.disabled);
+  const availableModels = allModels.filter((m) => !m.disabled).sort((a, b) => a.name.localeCompare(b.name));
 
   // Get custom models
-  const customModels = getCustomModels();
+  const customModels = getCustomModels().sort((a, b) => a.name.localeCompare(b.name));
 
   const options: SelectOption[] = [
     // Provider models first
@@ -1280,8 +1277,8 @@ let themeSelector: SelectRenderable | null = null;
 
 function showThemeSelector() {
   if (themeSelector) {
-    renderer.root.remove("theme-selector-container");
-    themeSelector = null;
+    // Already open - don't create another instance
+    return;
   }
 
   const currentTheme = getTheme();
@@ -1491,7 +1488,7 @@ function getCommandPaletteOptions(): PaletteCommand[] {
 
 function showCommandPalette() {
   if (commandPalette) {
-    closeCommandPalette();
+    // Already open - don't create another instance
     return;
   }
 
