@@ -14,8 +14,8 @@ msh --setup
 ```
 
 This will guide you through:
-1. Selecting a provider (OpenCode Zen or OpenRouter)
-2. Entering your API key
+1. Selecting a provider (OpenCode Zen, OpenRouter, or custom models)
+2. Entering your API key (if needed)
 3. Choosing a default model
 
 ### Get an API Key
@@ -55,6 +55,40 @@ export OPENROUTER_API_KEY="your-key-here"
 
 Add these to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) for persistence.
 
+## Custom Models
+
+Magic Shell supports custom models for local or remote OpenAI-compatible endpoints. This is perfect for running models locally with LM Studio or Ollama.
+
+### Adding a Custom Model
+
+```bash
+# Interactive setup wizard
+msh --add-model
+```
+
+The wizard will prompt you for:
+- Model ID (unique identifier)
+- Display name
+- API model ID (sent to the server)
+- Base URL (e.g., `http://localhost:1234/v1`)
+- API key (optional, stored securely)
+- Category (fast/smart/reasoning)
+
+### Managing Custom Models
+
+```bash
+# List all custom models
+msh --list-custom
+
+# Set a custom model as default
+msh --model my-local-llama
+
+# Remove a custom model
+msh --remove-model my-local-llama
+```
+
+Custom model API keys are stored securely in your system keychain, just like provider API keys.
+
 ## Configuration File
 
 Magic Shell stores configuration in `~/.magic-shell/config.json`:
@@ -73,7 +107,7 @@ Magic Shell stores configuration in `~/.magic-shell/config.json`:
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `provider` | AI provider (`opencode-zen` or `openrouter`) | `opencode-zen` |
+| `provider` | AI provider (`opencode-zen`, `openrouter`, or `custom`) | `opencode-zen` |
 | `defaultModel` | Default model ID | `big-pickle` |
 | `safetyLevel` | Safety strictness (`strict`, `moderate`, `relaxed`) | `moderate` |
 | `dryRunByDefault` | Always show commands without executing | `false` |
@@ -103,6 +137,12 @@ msh --provider openrouter
 
 # Change default model
 msh --model claude-3-5-sonnet
+
+# Add a custom model
+msh --add-model
+
+# List custom models
+msh --list-custom
 
 # Change theme
 msh --theme tokyonight

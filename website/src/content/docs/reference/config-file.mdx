@@ -24,7 +24,8 @@ Magic Shell stores configuration in `~/.magic-shell/config.json`.
   "repoContext": false,
   "theme": "opencode",
   "blockedCommands": [],
-  "confirmedDangerousPatterns": []
+  "confirmedDangerousPatterns": [],
+  "customModels": []
 }
 ```
 
@@ -151,6 +152,35 @@ Patterns you've previously confirmed as safe for your use case.
     "docker system prune"
   ]
 }
+```
+
+### customModels
+
+Array of custom model configurations for local or remote OpenAI-compatible endpoints.
+
+```json
+{
+  "customModels": [
+    {
+      "id": "my-local-llama",
+      "name": "Local Llama 3.2",
+      "description": "Local model running in LM Studio",
+      "modelId": "llama-3.2-3b",
+      "baseUrl": "http://localhost:1234/v1",
+      "contextLength": 128000,
+      "category": "smart"
+    }
+  ]
+}
+```
+
+Custom model API keys are stored securely in your system keychain, not in the config file.
+
+Add custom models via CLI:
+```bash
+msh --add-model      # Interactive wizard
+msh --list-custom    # List all custom models
+msh --remove-model <id>  # Remove a custom model
 ```
 
 ## Example Configurations

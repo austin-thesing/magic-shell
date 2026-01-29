@@ -26,8 +26,11 @@ msh [options] [query]
 |--------|-------------|
 | `--setup` | Run the setup wizard for API key configuration |
 | `--provider <name>` | Set AI provider (`opencode-zen` or `openrouter`) |
-| `--model <id>` | Set default model |
+| `--model <id>` | Set default model (including custom models) |
 | `--models` | List available models for current provider |
+| `--add-model` | Add custom model (LM Studio, Ollama, etc.) |
+| `--list-custom` | List custom models |
+| `--remove-model <id>` | Remove custom model |
 | `--theme <name>` | Set color theme |
 | `--themes` | List available themes |
 | `--safety <level>` | Set safety level (`strict`, `moderate`, `relaxed`) |
@@ -96,6 +99,22 @@ msh --models
 
 # Set default model
 msh --model claude-sonnet-4.5
+
+# Set a custom model
+msh --model my-local-llama
+```
+
+### Custom Models
+
+```bash
+# Add a custom model (interactive wizard)
+msh --add-model
+
+# List custom models
+msh --list-custom
+
+# Remove a custom model
+msh --remove-model my-local-llama
 ```
 
 ### Change Theme
