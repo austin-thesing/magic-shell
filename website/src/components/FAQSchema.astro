@@ -1,0 +1,93 @@
+---
+// FAQ Schema for Magic Shell
+const baseUrl = 'https://mshell.dev';
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Magic Shell?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Magic Shell is an open-source CLI tool that translates natural language into shell commands using AI. It supports multiple AI providers (OpenCode Zen with free models, and OpenRouter), includes a beautiful interactive TUI mode, and features comprehensive safety analysis to protect against dangerous commands."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I install Magic Shell?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Install Magic Shell globally using your preferred package manager: 'bun add -g @austinthesing/magic-shell' (recommended), 'npm install -g @austinthesing/magic-shell', 'pnpm add -g @austinthesing/magic-shell', or 'yarn global add @austinthesing/magic-shell'. After installation, run 'msh --setup' to configure your API key."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Magic Shell free to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, Magic Shell is completely free and open-source under the MIT license. It supports free AI models through OpenCode Zen (including big-pickle, glm-4.7, minimax-m2.1, and kimi-k2.5) as well as premium models from various providers. You can also use custom local models with LM Studio or Ollama at no cost."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What AI providers does Magic Shell support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Magic Shell supports OpenCode Zen (recommended, with free models), OpenRouter, and custom OpenAI-compatible endpoints. You can also add custom models from LM Studio, Ollama, or any OpenAI-compatible API. Each provider offers different models with varying capabilities and pricing."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the safety system work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Magic Shell analyzes every command for potential risks before execution. Commands are categorized into severity levels (low, medium, high, critical). Critical commands like 'rm -rf /' or fork bombs are always blocked. You can configure safety levels: strict (confirm all risky commands), moderate (confirm high severity), or relaxed (minimal confirmations). The system uses pattern matching, privilege detection, and path analysis to identify dangerous operations."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What's the difference between msh and mshell commands?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "msh is the quick CLI mode for one-shot command translations. Use it like 'msh \"find large files\"' to get a command, or 'msh -x \"show disk usage\"' to execute directly. mshell launches the full interactive TUI mode with themes, command history, model switching, and keyboard shortcuts. TUI mode is recommended for extended sessions and exploration."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use Magic Shell with local AI models?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! Magic Shell supports custom models from LM Studio, Ollama, or any OpenAI-compatible endpoint. Run 'msh --add-model' to configure a custom model with your local server URL. This allows you to use Magic Shell completely offline with locally-hosted models."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What platforms does Magic Shell support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Magic Shell works on macOS, Linux, and Windows. It automatically detects your shell (bash, zsh, fish, PowerShell, CMD, Nushell, or POSIX sh) and adapts command syntax accordingly. Credentials are securely stored using your system's native keychain (macOS Keychain, Linux libsecret, or Windows Credential Manager)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I switch between different AI models?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In CLI mode, use 'msh --model <model-id>' to set the default model. In TUI mode, press Ctrl+X M to open the model selector and switch between available models on the fly. You can also switch providers with 'msh --provider <name>' or Ctrl+X S in TUI mode. Run 'msh --models' to see all available models."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the keyboard shortcuts in TUI mode?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "All shortcuts use Ctrl+X chord: Ctrl+X P (command palette), Ctrl+X M (change model), Ctrl+X S (switch provider), Ctrl+X D (toggle dry-run), Ctrl+X T (change theme), Ctrl+X R (toggle project context), Ctrl+X H (show history), Ctrl+X C (show config), Ctrl+X L (clear output), Ctrl+X ? (help), Ctrl+X Q (exit). Press Ctrl+C to exit or cancel, and Esc to close dialogs."
+      }
+    }
+  ]
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />

@@ -1,0 +1,34 @@
+# Magic Shell - robots.txt
+# https://mshell.dev/robots.txt
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://mshell.dev/sitemap-index.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Block access to any admin or private areas (if added in future)
+Disallow: /admin/
+Disallow: /private/
+
+# Allow all search engine bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /

@@ -1,5 +1,7 @@
 ---
 import "../styles/global.css";
+import Schema from "../components/Schema.astro";
+import FAQSchema from "../components/FAQSchema.astro";
 
 interface Props {
   title: string;
@@ -18,19 +20,42 @@ const { title, description = "Transform natural language into terminal commands 
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     
+    <!-- Schema.org Structured Data -->
+    <Schema type="homepage" title={title} description={description} />
+    <FAQSchema />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://mshell.dev/" />
+    
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mshell.dev/" />
+    <meta property="og:site_name" content="Magic Shell" />
     <meta property="og:image" content="https://mshell.dev/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Magic Shell - Transform natural language into terminal commands" />
+    <meta property="og:locale" content="en_US" />
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content="https://mshell.dev/og-image.png" />
+    <meta name="twitter:image:alt" content="Magic Shell - Transform natural language into terminal commands" />
+    <meta name="twitter:site" content="@magicshellcli" />
+    <meta name="twitter:creator" content="@austinthesing" />
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="author" content="Austin Thesing" />
+    <meta name="keywords" content="cli, terminal, natural language, shell, ai, command line, developer tools, opencode, openrouter, bash, zsh, fish, powershell, command translation, terminal assistant" />
+    <meta name="theme-color" content="#ff6b35" />
+    
+    <!-- Language -->
+    <meta http-equiv="content-language" content="en" />
     
     <!-- PostHog Analytics -->
     <script is:inline>

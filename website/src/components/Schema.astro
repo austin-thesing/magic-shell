@@ -1,0 +1,241 @@
+---
+interface Props {
+  type: 'homepage' | 'docs' | 'article';
+  title?: string;
+  description?: string;
+  url?: string;
+}
+
+const { type, title, description, url } = Astro.props;
+
+const baseUrl = 'https://mshell.dev';
+const currentUrl = url || Astro.url.href;
+
+// Organization Schema - represents Magic Shell as a project/brand
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${baseUrl}/#organization`,
+  "name": "Magic Shell",
+  "url": baseUrl,
+  "logo": `${baseUrl}/favicon.svg`,
+  "description": "Transform natural language into terminal commands with AI-powered translation and built-in safety features",
+  "sameAs": [
+    "https://github.com/austin-thesing/magic-shell"
+  ],
+  "foundingDate": "2026",
+  "founder": {
+    "@type": "Person",
+    "name": "Austin Thesing",
+    "url": "https://github.com/austin-thesing"
+  }
+};
+
+// WebSite Schema - for the homepage
+const websiteSchema = type === 'homepage' ? {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${baseUrl}/#website`,
+  "url": baseUrl,
+  "name": "Magic Shell",
+  "description": "Transform natural language into terminal commands with AI-powered translation and built-in safety features",
+  "publisher": {
+    "@id": `${baseUrl}/#organization`
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": `${baseUrl}/getting-started/installation/?q={search_term_string}`
+    },
+    "query-input": "required name=search_term_string"
+  }
+} : null;
+
+// SoftwareApplication Schema - for the CLI tool
+const softwareSchema = type === 'homepage' ? {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Magic Shell",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "macOS, Linux, Windows",
+  "description": "Open-source CLI tool that translates natural language into shell commands using AI. Supports multiple AI providers, includes a beautiful interactive TUI mode, and features comprehensive safety analysis.",
+  "url": baseUrl,
+  "downloadUrl": "https://www.npmjs.com/package/@austinthesing/magic-shell",
+  "softwareVersion": "0.2.14",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Austin Thesing",
+    "url": "https://github.com/austin-thesing"
+  },
+  "publisher": {
+    "@id": `${baseUrl}/#organization`
+  },
+  "screenshot": `${baseUrl}/og-image.png`,
+  "featureList": [
+    "Natural language to terminal command translation",
+    "Multiple AI providers (OpenCode Zen, OpenRouter)",
+    "Interactive TUI mode with 8 themes",
+    "Command safety analysis with multi-level checks",
+    "Project context awareness",
+    "Cross-platform support (macOS, Linux, Windows)",
+    "Shell-aware command generation",
+    "Secure credential storage",
+    "Command history tracking",
+    "Auto-update checking"
+  ],
+  "requirements": "Node.js 18.0.0 or higher",
+  "installUrl": `${baseUrl}/getting-started/installation/`,
+  "softwareHelp": {
+    "@type": "WebPage",
+    "url": `${baseUrl}/getting-started/installation/`
+  },
+  "codeRepository": "https://github.com/austin-thesing/magic-shell",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "TypeScript"
+  },
+  "license": "https://opensource.org/licenses/MIT"
+} : null;
+
+// HowTo Schema - for installation guide
+const howToSchema = type === 'homepage' ? {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to Install and Use Magic Shell",
+  "description": "Step-by-step guide to installing Magic Shell and transforming natural language into terminal commands",
+  "image": `${baseUrl}/og-image.png`,
+  "totalTime": "PT5M",
+  "estimatedCost": {
+    "@type": "MonetaryAmount",
+    "currency": "USD",
+    "value": "0"
+  },
+  "tool": [
+    {
+      "@type": "HowToTool",
+      "name": "Node.js or Bun runtime"
+    },
+    {
+      "@type": "HowToTool",
+      "name": "Terminal or command prompt"
+    }
+  ],
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "name": "Install Magic Shell",
+      "text": "Install Magic Shell globally using your preferred package manager (bun, npm, pnpm, or yarn)",
+      "itemListElement": [
+        {
+          "@type": "HowToDirection",
+          "text": "Run: bun add -g @austinthesing/magic-shell"
+        }
+      ],
+      "url": `${baseUrl}/getting-started/installation/#step1`
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "name": "Configure API Key",
+      "text": "Set up your API key for OpenCode Zen or OpenRouter to enable AI-powered command translation",
+      "itemListElement": [
+        {
+          "@type": "HowToDirection",
+          "text": "Run: msh --setup"
+        },
+        {
+          "@type": "HowToDirection",
+          "text": "Or set environment variable: export OPENCODE_ZEN_API_KEY='your-key-here'"
+        }
+      ],
+      "url": `${baseUrl}/getting-started/configuration/#step2`
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "name": "Start Using Magic Shell",
+      "text": "Launch the interactive TUI mode or use quick CLI commands to translate natural language to terminal commands",
+      "itemListElement": [
+        {
+          "@type": "HowToDirection",
+          "text": "For TUI mode: mshell"
+        },
+        {
+          "@type": "HowToDirection",
+          "text": "For quick commands: msh 'your natural language query'"
+        }
+      ],
+      "url": `${baseUrl}/getting-started/first-command/#step3`
+    }
+  ]
+} : null;
+
+// BreadcrumbList Schema - for documentation pages
+const breadcrumbSchema = type === 'docs' && url ? {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": baseUrl
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Documentation",
+      "item": `${baseUrl}/getting-started/installation/`
+    }
+  ]
+} : null;
+
+// Article Schema - for documentation pages
+const articleSchema = type === 'article' && title ? {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": title,
+  "description": description || "Magic Shell documentation and guides",
+  "url": currentUrl,
+  "datePublished": "2024-01-01T00:00:00+00:00",
+  "dateModified": new Date().toISOString(),
+  "author": {
+    "@type": "Person",
+    "name": "Austin Thesing",
+    "url": "https://github.com/austin-thesing"
+  },
+  "publisher": {
+    "@id": `${baseUrl}/#organization`
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": currentUrl
+  },
+  "image": `${baseUrl}/og-image.png`,
+  "inLanguage": "en-US"
+} : null;
+
+// Combine all schemas using @graph
+const schemas = [
+  organizationSchema,
+  websiteSchema,
+  softwareSchema,
+  howToSchema,
+  breadcrumbSchema,
+  articleSchema
+].filter(Boolean);
+
+const schemaData = {
+  "@context": "https://schema.org",
+  "@graph": schemas
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
