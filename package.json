@@ -5,8 +5,8 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "msh": "./dist/index.js",
-    "mshell": "./dist/tui.js"
+    "msh": "dist/index.js",
+    "mshell": "dist/tui.js"
   },
   "files": [
     "dist",
