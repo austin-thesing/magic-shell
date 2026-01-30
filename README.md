@@ -163,13 +163,15 @@ All shortcuts use the `Ctrl+X` chord (press Ctrl+X, then the key):
 
 You can also type commands directly in the TUI:
 
-- `!help` - Show help
-- `!model` - Change model
-- `!provider` - Switch provider
-- `!dry` - Toggle dry-run mode
-- `!config` - Show current configuration
-- `!history` - Show command history
-- `!clear` - Clear output
+- `!help` or `/help` - Show help
+- `!model` or `/model` - Change model
+- `!provider` or `/provider` - Switch provider
+- `!dry` or `/dry` - Toggle dry-run mode
+- `!config` or `/config` - Show current configuration
+- `!history` or `/history` - Show command history
+- `!clear` or `/clear` - Clear output
+
+> **Note:** Both `!` and `/` prefixes work for all commands. Use whichever feels more natural!
 
 ## AI Providers
 
@@ -570,6 +572,26 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
+
+## Release Notes
+
+### v0.2.15 - Slash Command Support
+- Added `/` command support in TUI mode (e.g., `/help`, `/clear`)
+- Both `!` and `/` prefixes now work for all TUI commands
+- Updated help text to show command options
+
+### v0.2.14
+- Improved CI/CD workflows
+- Enhanced landing page SEO and structure
+- Fixed bin paths in package.json
+
+### v0.2.13
+- Added custom model support (LM Studio, Ollama, OpenAI-compatible)
+- Secure credential storage via system keychain
+- Project context detection for package.json scripts and Makefile
+- Multiple AI providers (OpenCode Zen, OpenRouter)
+- Beautiful TUI with 8 built-in themes
+- Comprehensive safety system with severity levels
 
 ## Acknowledgments
 

@@ -782,8 +782,8 @@ async function handleInput(value: string) {
 
   inputField.setText("");
 
-  // Handle special commands
-  if (input.startsWith("!")) {
+  // Handle special commands (both ! and / prefixes)
+  if (input.startsWith("!") || input.startsWith("/")) {
     await handleSpecialCommand(input);
     return;
   }
@@ -1033,6 +1033,12 @@ T  Change theme       R  Toggle repo context
 H  Show history       L  Clear chat
 C  Show config        ?  This help
 
+Commands (type ! or / followed by):
+help      Show this help      model     Change model
+provider  Switch provider     dry       Toggle dry-run
+config    Show configuration  history   Show history
+clear     Clear chat
+
 Safety Levels:
 - strict:   Confirm ALL potentially dangerous commands
 - moderate: Confirm high/critical severity commands (default)
@@ -1040,6 +1046,7 @@ Safety Levels:
 
 Tips:
 - Type naturally: "list all files" -> ls -la
+- Use ! or / commands: !help or /help
 - Reference history: "do that again", "undo"
 - Enable repo context to use project scripts (Ctrl+X R)`;
 
