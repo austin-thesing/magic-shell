@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "magic-shell-website",
+  "account_id": "443d20e37c03fd9af4ee799444a4569e",
+  "compatibility_date": "2026-02-09",
+  "assets": {
+    "directory": "./dist"
+  },
+  "routes": [
+    {
+      "pattern": "mshell.dev/*",
+      "zone_name": "mshell.dev"
+    },
+    {
+      "pattern": "www.mshell.dev/*",
+      "zone_name": "mshell.dev"
+    }
+  ]
+}
