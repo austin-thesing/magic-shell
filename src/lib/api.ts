@@ -14,6 +14,12 @@ import { detectRepoContext, formatRepoContext } from "./repo-context";
 type ZenApiType = "openai-responses" | "anthropic" | "openai-compatible" | "google";
 
 function getZenApiType(modelId: string): ZenApiType {
+  // Zen has a small handful of models that don't follow the ID prefix convention.
+  // Keep these overrides in sync with https://opencode.ai/docs/zen/
+  if (modelId === "minimax-m2.1-free") {
+    return "anthropic";
+  }
+
   // OpenAI Responses API models (GPT models)
   if (modelId.startsWith("gpt-")) {
     return "openai-responses";
