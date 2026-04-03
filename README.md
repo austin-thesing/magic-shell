@@ -575,6 +575,10 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Release Notes
 
+### v0.2.17 - Dependency Maintenance
+- Updated published CLI dependencies to current releases
+- Fixed TUI input typing compatibility after the `@opentui/core` upgrade
+
 ### v0.2.15 - Slash Command Support
 - Added `/` command support in TUI mode (e.g., `/help`, `/clear`)
 - Both `!` and `/` prefixes now work for all TUI commands

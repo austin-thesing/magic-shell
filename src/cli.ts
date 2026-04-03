@@ -214,15 +214,10 @@ Enter your API key below:`,
   const input = new InputRenderable(renderer, {
     id: "api-key-input",
     width: 70,
-    height: 1,
     placeholder: provider === "opencode-zen" ? "zen_..." : "sk-or-v1-...",
     backgroundColor: "#1e293b",
     focusedBackgroundColor: "#334155",
     textColor: "#f8fafc",
-    // Enable paste support
-    onPaste: (event) => {
-      input.insertText(event.text);
-    },
     cursorColor: "#60a5fa",
   });
   container.add(input);
